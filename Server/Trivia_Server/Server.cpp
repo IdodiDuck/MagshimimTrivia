@@ -23,10 +23,8 @@ Server::~Server()
 	{
 		for (const auto& currentServedClient : this->_servedClients)
 		{
-			// Freeing IRequestHandler pointer allocated memory (second value in client's map pairs)
-			IRequestHandler* currentHandle = currentServedClient.second;
-			delete currentHandle;
-			currentHandle = nullptr;
+			// Removing each client by it's socket identifier
+			removeClient(currentServedClient.first);
 		}
 
 		// the only use of the destructor should be for freeing 
@@ -186,6 +184,11 @@ void Server::removeClient(SOCKET removedSocket)
 
 	if (removedClientIt != this->_servedClients.end())
 	{
+		// Freeing IRequestHandler pointer allocated memory (second value in client's map pairs)
+		IRequestHandler* currentHandle = removedClientIt->second;
+		delete currentHandle;
+		currentHandle = nullptr;
+
 		this->_servedClients.erase(removedClientIt);
 		return;
 	}
