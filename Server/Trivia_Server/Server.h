@@ -27,7 +27,7 @@ private:
 	void connectClients();
 	void acceptClient();
 	void clientHandler(const SOCKET clientSocket);
-	
+
 	void introduceClient(SOCKET clientSocket);
 
 	// Support Methods - 

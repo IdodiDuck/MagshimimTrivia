@@ -79,7 +79,7 @@ void Server::run(const int port)
 		std::cout << "Listening on port " << port << std::endl << std::endl;
 		std::cout << "CONNECT_CLIENTS: Waiting for connections...\n" << std::endl;
 	}
-	
+
 }
 
 void Server::connectClients()
@@ -142,17 +142,30 @@ void Server::introduceClient(SOCKET clientSocket)
 	}
 
 	char introductionBuffer[BUFFER_SIZE] = { 0 };
-	
-	int clientResponse = recv(clientSocket, introductionBuffer, INTRODUCTION_MESSAGE_LENGTH, DEFAULT_RECV_FLAGS);
 
-	if (clientResponse == INVALID_SOCKET)
+	int clientResponse = 0;
+
+	while (true)
 	{
-		std::string errorDescription = "Error while recieving from socket: ";
-		errorDescription += std::to_string(clientSocket);
-		throw std::exception(errorDescription.c_str());
+		clientResponse = recv(clientSocket, introductionBuffer, INTRODUCTION_MESSAGE_LENGTH, DEFAULT_RECV_FLAGS);
+		if (clientResponse == SOCKET_ERROR)
+		{
+			std::string errorDescription = "Error while receiving from socket: ";
+			errorDescription += std::to_string(clientSocket);
+			throw std::exception(errorDescription.c_str());
+		}
+
+		introductionBuffer[clientResponse] = 0;
+
+		std::string receivedMessage(introductionBuffer);
+
+
+		if (receivedMessage == data)
+		{
+			std::cout << "Received from the client: " << receivedMessage << std::endl;
+			break;
+		}
+
 	}
-
-	introductionBuffer[INTRODUCTION_MESSAGE_LENGTH] = 0;
-
 	std::cout << "Received from client: " << introductionBuffer << std::endl;
 }
