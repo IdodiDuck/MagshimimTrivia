@@ -31,6 +31,7 @@ private:
 	void introduceClient(SOCKET clientSocket);
 
 	// Support Methods - 
+	void removeClient(SOCKET removedSocket);
 
 	// Attributes - 
 	SOCKET _serverSocket;

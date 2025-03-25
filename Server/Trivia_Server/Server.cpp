@@ -2,6 +2,7 @@
 #include "LoginRequestHandler.h"
 
 #include <iostream>
+#include <algorithm>
 
 Server::Server()
 {
@@ -145,9 +146,11 @@ void Server::introduceClient(SOCKET clientSocket)
 
 	int clientResponse = 0;
 
+	// Server keeps waiting for hello from the client socket
 	while (true)
 	{
 		clientResponse = recv(clientSocket, introductionBuffer, INTRODUCTION_MESSAGE_LENGTH, DEFAULT_RECV_FLAGS);
+		
 		if (clientResponse == SOCKET_ERROR)
 		{
 			std::string errorDescription = "Error while receiving from socket: ";
@@ -167,5 +170,25 @@ void Server::introduceClient(SOCKET clientSocket)
 		}
 
 	}
+
 	std::cout << "Received from client: " << introductionBuffer << std::endl;
+	std::cout << "Disconnecting client: " << clientSocket << std::endl;
+}
+
+void Server::removeClient(SOCKET removedSocket)
+{
+	// Finding the iterator of the client we remove from map
+	auto removedClientIt = std::find_if(_servedClients.begin(), _servedClients.end(),
+	[removedSocket](const std::pair<SOCKET, IRequestHandler*>& client) 
+	{
+		return client.first == removedSocket;
+	});
+
+	if (removedClientIt != this->_servedClients.end())
+	{
+		this->_servedClients.erase(removedClientIt);
+		return;
+	}
+
+	std::cerr << "Failed to disconnect client with socket: " << removedClientIt->first << std::endl;
 }
