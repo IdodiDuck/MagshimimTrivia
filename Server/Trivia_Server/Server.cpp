@@ -171,6 +171,7 @@ void Server::introduceClient(SOCKET clientSocket)
 
 	std::cout << "Received from client: " << introductionBuffer << std::endl;
 	std::cout << "Disconnecting client: " << clientSocket << std::endl;
+	removeClient(clientSocket);
 }
 
 void Server::removeClient(SOCKET removedSocket)
