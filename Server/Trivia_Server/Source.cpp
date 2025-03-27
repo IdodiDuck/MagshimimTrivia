@@ -2,7 +2,6 @@
 
 #include "WSAInitializer.h"
 #include "Server.h"
-#include "Constants.h"
 
 #include <iostream>
 #include <exception>
@@ -15,7 +14,7 @@ int main()
 		WSAInitializer wsaInit;
 		Server myServer;
 
-		myServer.run(SERVER_PORT);
+		myServer.run();
 	}
 
 	catch (const std::exception& e)
