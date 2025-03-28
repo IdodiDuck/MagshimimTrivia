@@ -22,7 +22,7 @@ public:
 private:
 	// Attributes - 
 	SOCKET m_serverSocket;
-	std::map <SOCKET, std::shared_ptr<IRequestHandler>> m_clients;
+	std::map <SOCKET, std::unique_ptr<IRequestHandler>> m_clients;
 
 	// Private Methods - 
 	void bindAndListen();
