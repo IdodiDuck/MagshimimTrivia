@@ -2,7 +2,6 @@
 
 #include <string>
 #include <vector>
-#include <ctime>
 
 // =============================
 // Network Constants
@@ -35,25 +34,6 @@ typedef struct ErrorResponse
     std::string message;
 
 } ErrorResponse;
-
-// =============================
-// Handlers Structs
-// =============================
-
-typedef struct RequestResult
-{
-    std::vector<unsigned char> response;
-    IRequestHandler* newHandler;
-
-} RequestResult;
-
-typedef struct RequestInfo
-{
-    int requestID;
-    std::time_t receivalTime;
-    std::vector<unsigned char> buffer;
-
-} RequestInfo;
 
 // =============================
 // Error Codes Constants
