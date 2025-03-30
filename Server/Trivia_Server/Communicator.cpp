@@ -34,7 +34,7 @@ void Communicator::startHandleRequests()
         {
             if (!doesClientExists(clientSocket))
             {
-                m_clients[clientSocket] = std::make_unique<IRequestHandler>();
+                m_clients[clientSocket] = std::make_unique<LoginRequestHandler>();
             }
 
             std::thread(&Communicator::handleNewClient, this, clientSocket).detach();
