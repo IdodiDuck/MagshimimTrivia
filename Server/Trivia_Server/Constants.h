@@ -14,6 +14,20 @@ const std::string EXIT_SERVER = "EXIT";
 const int BUFFER_SIZE = 10; // Remove/Modify later
 
 // =============================
+// Request Codes Constants
+// =============================
+
+const unsigned int SIGNUP_REQUEST_CODE = 100;
+const unsigned int LOGIN_REQUEST_CODE = 101;
+
+// =============================
+// Status Codes Constants
+// =============================
+
+const unsigned int SUCCESS = 0;
+const unsigned int FAILURE = 1;
+
+// =============================
 // Response Structs
 // =============================
 

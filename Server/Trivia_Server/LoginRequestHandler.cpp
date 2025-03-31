@@ -4,13 +4,12 @@
 
 LoginRequestHandler::~LoginRequestHandler()
 {
-    // TODO
+    // TODO later
 }
 
 bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
-    // TODO (Implement this method)
-    return true;
+    return ((info.requestID == SIGNUP_REQUEST_CODE) || (info.requestID == LOGIN_REQUEST_CODE));
 }
 
 RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
