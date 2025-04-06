@@ -5,6 +5,7 @@
 #include <vector>
 
 class IRequestHandler;
+
 // Structures (Related to RequestHandler Interface) -
 typedef struct RequestInfo
 {

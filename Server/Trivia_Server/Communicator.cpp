@@ -1,8 +1,13 @@
 #include "Communicator.h"
+
 #include "Constants.h"
 #include "LoginRequestHandler.h"
+#include "JsonResponsePacketSerializer.h"
+#include "JsonRequestPacketDeserializer.h"
+#include "SocketHelper.h"
 
 #include <iostream>
+#include <ctime>
 
 Communicator::~Communicator()
 {
@@ -68,8 +73,13 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 {
     try
 	{
-		sendHelloToClient(clientSocket);
-		receiveHelloFromClient(clientSocket);
+        RequestInfo info = parseClientRequest(clientSocket);
+        RequestResult res = m_clients[clientSocket]->handleRequest(info);
+        m_clients[clientSocket] = std::move(res.newHandler);
+        std::vector<unsigned char> buffer = res.response;
+        std::string response = std::string(buffer.cbegin(), buffer.cend());
+        SocketHelper::sendData(clientSocket, response);
+		
 		disconnectClient(clientSocket);
 	}
 
@@ -78,51 +88,6 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 		std::cerr << "Error handling client: " << e.what() << std::endl;
 		disconnectClient(clientSocket);
 	}
-}
-
-void Communicator::sendHelloToClient(SOCKET clientSocket)
-{
-    const char* data = "Hello";
-    const int INTRODUCTION_MESSAGE_LENGTH = 6;
-
-    std::cout << "Sending to client socket " << clientSocket << " hello message..." << std::endl;
-
-    if (send(clientSocket, data, INTRODUCTION_MESSAGE_LENGTH, 0) == SOCKET_ERROR)
-    {
-        throw std::exception("Error while sending message to client\n");
-    }
-}
-
-void Communicator::receiveHelloFromClient(SOCKET clientSocket)
-{
-    const int INTRODUCTION_MESSAGE_LENGTH = 6;
-    const int DEFAULT_RECV_FLAGS = 0;
-
-    char introductionBuffer[BUFFER_SIZE] = { 0 };
-    int clientResponse = 0;
-    const char* data = "Hello";
-
-    // Server keeps waiting for hello from the client socket
-    while (true)
-    {
-        clientResponse = recv(clientSocket, introductionBuffer, INTRODUCTION_MESSAGE_LENGTH, DEFAULT_RECV_FLAGS);
-
-        if (clientResponse == SOCKET_ERROR)
-        {
-            std::string errorDescription = "Error while receiving from socket: ";
-            errorDescription += std::to_string(clientSocket) + "\n";
-            throw std::exception(errorDescription.c_str());
-        }
-
-        introductionBuffer[clientResponse] = 0;  // Ensure null termination
-        std::string receivedMessage(introductionBuffer);
-
-        if (receivedMessage == data)
-        {
-            std::cout << "Received from the client: " << receivedMessage << std::endl;
-            return;
-        }
-    }
 }
 
 void Communicator::disconnectClient(SOCKET removedSocket)
@@ -147,4 +112,20 @@ bool Communicator::doesClientExists(const SOCKET clientSocket)
 {
     auto clientIt = m_clients.find(clientSocket);
     return (clientIt != m_clients.cend());
+}
+
+RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
+{
+    const int MESSAGE_CODE_BYTE = 1;
+    const int DEFAULT_RECV_FLAGS = 0;
+    const int MESSAGE_LENGTH_BYTE = 4;
+
+    int msgCode = 0, msgLen = 0;
+
+    msgCode = SocketHelper::getIntPartFromSocket(clientSocket, MESSAGE_CODE_BYTE);
+    msgLen = SocketHelper::getIntPartFromSocket(clientSocket, DEFAULT_RECV_FLAGS);
+
+    std::vector<unsigned char> recievedData = SocketHelper::getData(clientSocket, msgLen);
+
+    return { msgCode, std::time(nullptr), recievedData }; 
 }
