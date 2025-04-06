@@ -29,9 +29,8 @@ private:
 	void handleNewClient(SOCKET clientSocket);
 
 	// Support Methods -
-	void sendHelloToClient(SOCKET clientSocket);
-	void receiveHelloFromClient(SOCKET clientSocket);
 	void disconnectClient(SOCKET removedSocket);
 	bool doesClientExists(const SOCKET clientSocket);
+	RequestInfo parseClientRequest(const SOCKET clientSocket);
 };
 
