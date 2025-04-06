@@ -28,7 +28,7 @@ std::optional<LoginRequest> JsonRequestPacketDeserializer::deserializeLoginReque
             throw std::exception("Error: failed to extract json data");
         }
 
-        return LoginRequest {username, password};
+        return LoginRequest { username, password };
     }
 
     catch (const std::exception& e)
@@ -65,7 +65,7 @@ std::optional<SignupRequest> JsonRequestPacketDeserializer::deserializeSignupReq
             throw std::exception("Error: Failed to extract JSON data");
         }
 
-        return SignupRequest{ username, password, email};
+        return SignupRequest { username, password, email };
     }
 
     catch (const std::exception& e)
