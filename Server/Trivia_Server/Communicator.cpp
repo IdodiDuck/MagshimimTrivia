@@ -71,23 +71,46 @@ void Communicator::bindAndListen()
 
 void Communicator::handleNewClient(SOCKET clientSocket)
 {
-    try
-	{
-        RequestInfo info = parseClientRequest(clientSocket);
-        RequestResult res = m_clients[clientSocket]->handleRequest(info);
-        m_clients[clientSocket] = std::move(res.newHandler);
-        std::vector<unsigned char> buffer = res.response;
-        std::string response = std::string(buffer.cbegin(), buffer.cend());
-        SocketHelper::sendData(clientSocket, response);
-		
-		disconnectClient(clientSocket);
-	}
+    const std::string EMPTY_RESPONSE = "";
+    const int EMPTY = 0;
 
-	catch (const std::exception& e)
-	{
-		std::cerr << "Error handling client: " << e.what() << std::endl;
-		disconnectClient(clientSocket);
-	}
+    while (true)
+    {
+        try
+        {
+            RequestInfo info = parseClientRequest(clientSocket);
+
+            if (m_clients[clientSocket]->isRequestRelevant(info))
+            {
+                std::cout << "Handling the request, getting it's results..." << std::endl;
+                RequestResult res = m_clients[clientSocket]->handleRequest(info);
+
+                std::cout << "Giving the new handler to the client..." << std::endl;
+                m_clients[clientSocket] = std::move(res.newHandler);
+
+                std::cout << "Constructing response to be sent..." << std::endl;
+                std::vector<unsigned char> buffer = res.response;
+                std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
+
+                // Sending back to the client a response, then we disconnect him
+                if (response != EMPTY_RESPONSE)
+                {
+                    std::cout << "Sending back the response to the client" << std::endl;
+                    SocketHelper::sendData(clientSocket, response);
+                    disconnectClient(clientSocket);
+                    break;
+                }
+            }
+
+        }
+
+        catch (const std::exception& e)
+        {
+            std::cerr << "Error handling client: " << e.what() << std::endl;
+            disconnectClient(clientSocket);
+            break;
+        }
+    }
 }
 
 void Communicator::disconnectClient(SOCKET removedSocket)
@@ -117,15 +140,15 @@ bool Communicator::doesClientExists(const SOCKET clientSocket)
 RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
 {
     const int MESSAGE_CODE_BYTE = 1;
-    const int DEFAULT_RECV_FLAGS = 0;
     const int MESSAGE_LENGTH_BYTE = 4;
 
     int msgCode = 0, msgLen = 0;
 
+    // Extracting the type of request (code) and the length of the JSON sent buffer by the protocol
     msgCode = SocketHelper::getIntPartFromSocket(clientSocket, MESSAGE_CODE_BYTE);
-    msgLen = SocketHelper::getIntPartFromSocket(clientSocket, DEFAULT_RECV_FLAGS);
+    msgLen = SocketHelper::getIntPartFromSocket(clientSocket, MESSAGE_LENGTH_BYTE);
 
     std::vector<unsigned char> recievedData = SocketHelper::getData(clientSocket, msgLen);
-
+    
     return { msgCode, std::time(nullptr), recievedData }; 
 }
