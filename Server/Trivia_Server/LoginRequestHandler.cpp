@@ -5,13 +5,16 @@
 
 #include "Constants.h"
 
+#include <iostream>
+
 LoginRequestHandler::~LoginRequestHandler()
 {
-    // TODO later
+    
 }
 
 bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
+    std::cout << "RequestID: " << info.requestID << std::endl;
     return ((info.requestID == SIGNUP_REQUEST_CODE) || (info.requestID == LOGIN_REQUEST_CODE));
 }
 
@@ -31,11 +34,20 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
             response.status = SUCCESS;
             RequestResult result;
             result.response = JsonResponsePacketSerializer::serializeResponse(response);
-            result.newHandler = nullptr; // Modify later and change to next given handler
+            result.newHandler.reset(); // Modify later and change to next given handler
 
             return result;
         }
-        // TODO in-case of failure
+        
+        // Constructing failure message in-case it didn't work
+        RequestResult result;
+        ErrorResponse response;
+        response.message = "Invalid login request format.";
+        std::vector<unsigned char> resultBuffer = JsonResponsePacketSerializer::serializeResponse(response);
+        result.response = resultBuffer;
+        result.newHandler.reset();
+
+        return result;
     }
 
     else if (info.requestID == SIGNUP_REQUEST_CODE)
@@ -52,10 +64,19 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
             response.status = SUCCESS;
             RequestResult result;
             result.response = JsonResponsePacketSerializer::serializeResponse(response);
-            result.newHandler = nullptr; // Modify later and change to next given handler
+            result.newHandler.reset(); // Modify later and change to next given handler
 
             return result;
         }
-        // TODO in-case of failure
+        
+        // Constructing failure message in-case it didn't work
+        RequestResult result;
+        ErrorResponse response;
+        response.message = "Invalid sign-up request format.";
+        std::vector<unsigned char> resultBuffer = JsonResponsePacketSerializer::serializeResponse(response);
+        result.response = resultBuffer;
+        result.newHandler.reset();
+
+        return result;
     }
 }
