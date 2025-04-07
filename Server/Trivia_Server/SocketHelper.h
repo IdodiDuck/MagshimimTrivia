@@ -9,7 +9,6 @@ class SocketHelper
 public:
 
 	static std::vector<unsigned char> getData(const SOCKET sc, const int bytesNum);
-	static int getMessageTypeCode(const SOCKET sc);
 	static int getIntPartFromSocket(const SOCKET sc, const int bytesNum);
 	static std::string getStringPartFromSocket(SOCKET sc, const int bytesNum);
 	static void sendData(const SOCKET sc, const std::string& message);
