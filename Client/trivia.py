@@ -6,8 +6,8 @@ from time import sleep
 def chooseOperation():
     LOGIN_REQUEST = "login"
     SIGN_UP_REQUEST = "signup"
-    LOGIN_REQUEST_CODE = 100
-    SIGN_UP_REQUEST_CODE = 101
+    LOGIN_REQUEST_CODE = 101
+    SIGN_UP_REQUEST_CODE = 100
 
     OPERATION_CODES = { LOGIN_REQUEST: LOGIN_REQUEST_CODE, SIGN_UP_REQUEST: SIGN_UP_REQUEST_CODE }
 
@@ -22,8 +22,8 @@ def chooseOperation():
     return OPERATION_CODES[user_choice.lower()]
 
 def sendRequest(request_code, client_socket):
-    LOGIN_REQUEST_CODE = 100
-    SIGN_UP_REQUEST_CODE = 101
+    LOGIN_REQUEST_CODE = 101
+    SIGN_UP_REQUEST_CODE = 100
 
     if (request_code == LOGIN_REQUEST_CODE):
         return sendLoginRequest(client_socket)
@@ -36,8 +36,7 @@ def sendRequest(request_code, client_socket):
 def sendLoginRequest(client_socket):
     USER_NAME_FIELD = "username"
     PASSWORD_FIELD = "password"
-    LOGIN_REQUEST_CODE = 100
-    BUFFER_SIZE = 1024
+    LOGIN_REQUEST_CODE = 101
 
     print("LOGIN-REQUEST:\n")
     user_name = input("Enter username: ")
@@ -48,20 +47,17 @@ def sendLoginRequest(client_socket):
     json_length = len(login_json)
 
     # Packing the Login request by the protocol B -> 1 Byte of LoginRequestCode, I -> Integer (4 Bytes) and then the JSON encoded
-    login_request = struct.pack(f'!B I {json_length}s', LOGIN_REQUEST_CODE, json_length, login_json.encode())
+    login_request = struct.pack(f'!B I{len(login_json)}s', LOGIN_REQUEST_CODE, json_length, login_json.encode())
     
+    print(login_request)
     print(f"Sending to server: {login_request.decode()}\n")
     client_socket.sendall(login_request)
-    server_msg = client_socket.recv(BUFFER_SIZE)
-
-    print(f"Returned server message: {server_msg}\n")
 
 def sendSignUpRequest(client_socket):
-    SIGN_UP_REQUEST_CODE = 101
+    SIGN_UP_REQUEST_CODE = 100
     USER_NAME_FIELD = "username"
     PASSWORD_FIELD = "password"
     EMAIL_FIELD = "email"
-    BUFFER_SIZE = 1024
 
     print("SIGNUP-REQUEST:\n")
     user_name = input("Enter username: ")
@@ -73,37 +69,33 @@ def sendSignUpRequest(client_socket):
     json_length = len(signup_json)
 
     # Packing the signup request by the protocol 
-    signup_request = struct.pack(f'!B I {json_length}s', SIGN_UP_REQUEST_CODE, json_length, signup_json.encode())
+    signup_request = struct.pack(f'!BI{json_length}s', SIGN_UP_REQUEST_CODE, json_length, signup_json.encode())
 
     print(f"Sending to server: {signup_request.decode()}\n")
     client_socket.sendall(signup_request)
 
-    server_msg = client_socket.recv(BUFFER_SIZE)
-    print(f"Returned server message: {server_msg}\n")
-
 def main():
     SERVER_IP = "127.0.0.1"
     SERVER_PORT = 8820
-    NULL = '\0'
     BUFFER_SIZE = 1024
 
     try:
-        # Create a TCP socket
+        # Create a TCP socket connection to the server -> Close it eventually
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as clientSocket:
+
             # Connecting to trivia server
             server_address = (SERVER_IP, SERVER_PORT)
             clientSocket.connect(server_address)
 
-            server_msg = clientSocket.recv(BUFFER_SIZE)
-            server_msg = server_msg.decode().rstrip(NULL)
-            print("Server message: " + server_msg)
-            sleep(0.5)
-
-            if server_msg == "Hello":
-                clientSocket.sendall("Hello".encode())
-
             request_code = chooseOperation()
             sendRequest(request_code, clientSocket)
+
+            server_msg = clientSocket.recv(BUFFER_SIZE)
+            server_msg = server_msg.decode()
+            print("Server response: " + server_msg)
+            sleep(0.5)
+
+            clientSocket.close()
 
     except socket.error:
         print("failed to connect to server")
