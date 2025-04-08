@@ -12,7 +12,7 @@ public:
 	static std::optional<std::vector<unsigned char>> getData(const SOCKET sc, const int bytesNum);
 	static std::optional<int> getRequestCode(const SOCKET sc);
 	static std::optional<int> getRequestLength(const SOCKET sc);
-	static void sendData(const SOCKET sc, const std::string& message);
+	static void sendData(const SOCKET sc, const std::vector<unsigned char>& data);
 };
 
 
