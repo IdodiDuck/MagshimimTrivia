@@ -2,8 +2,6 @@
 
 #include "Constants.h"
 #include "LoginRequestHandler.h"
-#include "JsonResponsePacketSerializer.h"
-#include "JsonRequestPacketDeserializer.h"
 #include "SocketHelper.h"
 
 #include <iostream>
@@ -145,7 +143,6 @@ RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
 
     auto requestCodeOpt = SocketHelper::getRequestCode(clientSocket);
     if (!requestCodeOpt.has_value())  // If there's an error retrieving the request code
-
     {
         throw std::runtime_error("Error: Failed to read request code from socket.");
     }
@@ -159,6 +156,7 @@ RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
     {
         throw std::runtime_error("Error: Failed to read request length from socket.");
     }
+
     requestLength = requestLengthOpt.value();
 
     // Get the actual JSON data
