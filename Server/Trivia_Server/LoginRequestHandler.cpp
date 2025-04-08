@@ -14,7 +14,6 @@ LoginRequestHandler::~LoginRequestHandler()
 
 bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
-    std::cout << "RequestID: " << info.requestID << std::endl;
     return ((info.requestID == SIGNUP_REQUEST_CODE) || (info.requestID == LOGIN_REQUEST_CODE));
 }
 
