@@ -49,7 +49,6 @@ def sendLoginRequest(client_socket):
     # Packing the Login request by the protocol B -> 1 Byte of LoginRequestCode, I -> Integer (4 Bytes) and then the JSON encoded
     login_request = struct.pack(f'!B I{json_length}s', LOGIN_REQUEST_CODE, json_length, login_json.encode())
     
-    print(login_request)
     print(f"Sending to server: {login_request.decode()}\n")
     client_socket.sendall(login_request)
 
