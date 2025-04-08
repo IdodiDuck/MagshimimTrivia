@@ -1,8 +1,12 @@
 #include "Communicator.h"
+
 #include "Constants.h"
 #include "LoginRequestHandler.h"
+#include "JsonResponsePacketSerializer.h"
+#include "SocketHelper.h"
 
 #include <iostream>
+#include <ctime>
 
 Communicator::~Communicator()
 {
@@ -34,7 +38,7 @@ void Communicator::startHandleRequests()
         {
             if (!doesClientExists(clientSocket))
             {
-                m_clients[clientSocket] = std::make_unique<IRequestHandler>();
+                m_clients[clientSocket] = std::make_unique<LoginRequestHandler>();
             }
 
             std::thread(&Communicator::handleNewClient, this, clientSocket).detach();
@@ -66,61 +70,45 @@ void Communicator::bindAndListen()
 
 void Communicator::handleNewClient(SOCKET clientSocket)
 {
-    try
-	{
-		sendHelloToClient(clientSocket);
-		receiveHelloFromClient(clientSocket);
-		disconnectClient(clientSocket);
-	}
+    const std::string EMPTY_CONTENT = "";
+    const int EMPTY = 0;
 
-	catch (const std::exception& e)
-	{
-		std::cerr << "Error handling client: " << e.what() << std::endl;
-		disconnectClient(clientSocket);
-	}
-}
-
-void Communicator::sendHelloToClient(SOCKET clientSocket)
-{
-    const char* data = "Hello";
-    const int INTRODUCTION_MESSAGE_LENGTH = 6;
-
-    std::cout << "Sending to client socket " << clientSocket << " hello message..." << std::endl;
-
-    if (send(clientSocket, data, INTRODUCTION_MESSAGE_LENGTH, 0) == SOCKET_ERROR)
+    while (m_clients[clientSocket] != nullptr)
     {
-        throw std::exception("Error while sending message to client\n");
-    }
-}
-
-void Communicator::receiveHelloFromClient(SOCKET clientSocket)
-{
-    const int INTRODUCTION_MESSAGE_LENGTH = 6;
-    const int DEFAULT_RECV_FLAGS = 0;
-
-    char introductionBuffer[BUFFER_SIZE] = { 0 };
-    int clientResponse = 0;
-    const char* data = "Hello";
-
-    // Server keeps waiting for hello from the client socket
-    while (true)
-    {
-        clientResponse = recv(clientSocket, introductionBuffer, INTRODUCTION_MESSAGE_LENGTH, DEFAULT_RECV_FLAGS);
-
-        if (clientResponse == SOCKET_ERROR)
+        try
         {
-            std::string errorDescription = "Error while receiving from socket: ";
-            errorDescription += std::to_string(clientSocket) + "\n";
-            throw std::exception(errorDescription.c_str());
+            RequestInfo info = parseClientRequest(clientSocket);
+
+            std::cout << "Handling the request, getting its results..." << std::endl;
+            RequestResult res = m_clients[clientSocket]->handleRequest(info);
+
+            std::cout << "Giving the new handler to the client..." << std::endl;
+            m_clients[clientSocket] = std::move(res.newHandler);
+
+            std::cout << "Constructing response to be sent..." << std::endl;
+            std::vector<unsigned char> buffer = res.response;
+            std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
+
+            if (response != EMPTY_CONTENT)
+            {
+                sendClientResponse(clientSocket, buffer);
+            }
+
+            else
+            {
+                std::cout << "Client requested invalid type of request..." << std::endl;
+                sendErrorResponse(clientSocket, "Error: Invalid type of request.");
+                break;
+            }
+
         }
 
-        introductionBuffer[clientResponse] = 0;  // Ensure null termination
-        std::string receivedMessage(introductionBuffer);
-
-        if (receivedMessage == data)
+        catch (const std::exception& e)
         {
-            std::cout << "Received from the client: " << receivedMessage << std::endl;
-            return;
+            std::cerr << "Error handling client: " << e.what() << std::endl;
+
+            disconnectClient(clientSocket);
+            break;
         }
     }
 }
@@ -147,4 +135,62 @@ bool Communicator::doesClientExists(const SOCKET clientSocket)
 {
     auto clientIt = m_clients.find(clientSocket);
     return (clientIt != m_clients.cend());
+}
+
+RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
+{
+    int requestCode = 0, requestLength = 0;
+
+    // Extracting the type of request (code) and the length of the JSON sent buffer by the protocol
+
+    auto requestCodeOpt = SocketHelper::getRequestCode(clientSocket);
+    if (!requestCodeOpt.has_value())  // If there's an error retrieving the request code
+    {
+        throw std::runtime_error("Error: Failed to read request code from socket.");
+    }
+
+    requestCode = requestCodeOpt.value();
+
+    // Get the request length
+    auto requestLengthOpt = SocketHelper::getRequestLength(clientSocket);
+
+    if (!requestLengthOpt.has_value())  // If there's an error retrieving the request length
+    {
+        throw std::runtime_error("Error: Failed to read request length from socket.");
+    }
+
+    requestLength = requestLengthOpt.value();
+
+    // Get the actual JSON data
+    auto requestJSONDataOpt = SocketHelper::getData(clientSocket, requestLength);
+    if (!requestJSONDataOpt.has_value())  // If there's an error receiving the JSON data
+    {
+        throw std::runtime_error("Error: Failed to read JSON data from socket.");
+    }
+
+    std::vector<unsigned char> requestJSONData = requestJSONDataOpt.value();
+
+    // Return the parsed request info
+    return { requestCode, std::time(nullptr), requestJSONData };
+}
+
+void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage)
+{
+    std::cout << "Client requested invalid type of request..." << std::endl;
+
+    ErrorResponse errResponse;
+    errResponse.message = errorMessage;
+
+    std::vector<unsigned char> error = JsonResponsePacketSerializer::serializeResponse(errResponse);
+
+    SocketHelper::sendData(clientSocket, error);
+    disconnectClient(clientSocket);
+}
+
+void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<unsigned char>& response)
+{
+    std::cout << "Sending back the response to the client" << std::endl;
+
+    SocketHelper::sendData(clientSocket, response);
+    disconnectClient(clientSocket);
 }

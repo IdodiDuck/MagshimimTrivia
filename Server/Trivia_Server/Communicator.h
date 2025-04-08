@@ -7,6 +7,7 @@
 #include <thread>
 #include <map>
 #include <memory>
+#include <string>
 
 // Local Files Importations - 
 #include "IRequestHandler.h"
@@ -29,9 +30,10 @@ private:
 	void handleNewClient(SOCKET clientSocket);
 
 	// Support Methods -
-	void sendHelloToClient(SOCKET clientSocket);
-	void receiveHelloFromClient(SOCKET clientSocket);
 	void disconnectClient(SOCKET removedSocket);
 	bool doesClientExists(const SOCKET clientSocket);
+	RequestInfo parseClientRequest(const SOCKET clientSocket);
+	void sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage);
+	void sendClientResponse(SOCKET clientSocket, const std::vector<unsigned char>& response);
 };
 
