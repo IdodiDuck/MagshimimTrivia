@@ -2,45 +2,60 @@
 
 using std::string;
 
-std::vector<unsigned char> SocketHelper::getData(const SOCKET sc, const int bytesNum)
+std::optional<std::vector<unsigned char>> SocketHelper::getData(const SOCKET sc, const int bytesNum)
 {
 	const int DEFAULT_FLAG = 0;
 
 	std::vector<unsigned char> data(bytesNum);
 
 	int res = recv(sc, reinterpret_cast<char*>(data.data()), bytesNum, DEFAULT_FLAG);
+
 	if (res == INVALID_SOCKET)
 	{
-		std::string s = "Error while receiving from socket: ";
-		s += std::to_string(sc);
-		throw std::exception(s.c_str());
+		return std::nullopt;
 	}
 
 	return data;
 
 }
 
-int SocketHelper::getRequestCode(const SOCKET sc)
+std::optional<int> SocketHelper::getRequestCode(const SOCKET sc)
 {
 	const int REQUEST_CODE_BYTES = 1;
 
-	std::vector<unsigned char> header = getData(sc, REQUEST_CODE_BYTES);
-	return header[0]; // The received vector is supposed to have only the first byte (which is the code of request)
+	auto headerOpt = getData(sc, REQUEST_CODE_BYTES);  // Get data from socket
+
+	if (!headerOpt)  // If no data received or error occurred
+	{
+		return std::nullopt;
+	}
+
+	return headerOpt.value()[0]; // Return the first byte as the request code
 
 }
 
-int SocketHelper::getRequestLength(const SOCKET sc)
+std::optional<int> SocketHelper::getRequestLength(const SOCKET sc)
 {
-	const int REQUEST_LENGTH_BYTES = 4;
+	const int REQUEST_LENGTH_BYTES = 4, BYTE_SIZE = 8;
 
-	std::vector<unsigned char> header = getData(sc, REQUEST_LENGTH_BYTES);
+	auto headerOpt = getData(sc, REQUEST_LENGTH_BYTES);
 
-	int messageCode = 0;
-	for (int currentByte = 0; currentByte < REQUEST_LENGTH_BYTES; currentByte++)
+	if (!headerOpt)  // If no data received or error occurred
 	{
-		messageCode |= (header[currentByte] << (8 * (REQUEST_LENGTH_BYTES - currentByte - 1)));
+		return std::nullopt;
 	}
 
+	const std::vector<unsigned char>& header = headerOpt.value();
+
+	int messageCode = 0;
+
+	// Shifting and performing OR logical operation on the bytes to assemble the message code
+	for (int currentByte = 0; currentByte < REQUEST_LENGTH_BYTES; currentByte++)
+	{
+		messageCode |= (header[currentByte] << (BYTE_SIZE * (REQUEST_LENGTH_BYTES - currentByte - 1)));
+	}
+
+	// Return the last byte as the request length
 	int requestLength = header[REQUEST_LENGTH_BYTES - 1];
 	return requestLength;
 }
