@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <optional>
 #include <WinSock2.h>
 
 class SocketHelper
@@ -9,14 +10,9 @@ class SocketHelper
 public:
 
 	static std::vector<unsigned char> getData(const SOCKET sc, const int bytesNum);
-	static int getIntPartFromSocket(const SOCKET sc, const int bytesNum);
-	static std::string getStringPartFromSocket(SOCKET sc, const int bytesNum);
+	static int getRequestCode(const SOCKET sc);
+	static int getRequestLength(const SOCKET sc);
 	static void sendData(const SOCKET sc, const std::string& message);
-
-private:
-	static std::string getPartFromSocket(const SOCKET sc, const int bytesNum);
-	static std::string getPartFromSocket(const SOCKET sc, const int bytesNum, const int flags);
-
 };
 
 

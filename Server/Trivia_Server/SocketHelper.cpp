@@ -1,8 +1,4 @@
 #include "SocketHelper.h"
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-#include <sstream>
 
 using std::string;
 
@@ -24,37 +20,29 @@ std::vector<unsigned char> SocketHelper::getData(const SOCKET sc, const int byte
 
 }
 
-// recieve data from socket according byteSize
-// returns the data as int
-int SocketHelper::getIntPartFromSocket(const SOCKET sc, const int bytesNum)
+int SocketHelper::getRequestCode(const SOCKET sc)
 {
-	std::string valueAsString = (getPartFromSocket(sc, bytesNum, 0).c_str());
-	char* value = valueAsString.data();
-	unsigned char* numericValues = (unsigned char*)(value);
+	const int REQUEST_CODE_BYTES = 1;
 
-	int currentByteDecimalValue = 0;
+	std::vector<unsigned char> header = getData(sc, REQUEST_CODE_BYTES);
+	return header[0]; // The received vector is supposed to have only the first byte (which is the code of request)
 
-	for (int currentByte = 0; currentByte < bytesNum; currentByte++)
+}
+
+int SocketHelper::getRequestLength(const SOCKET sc)
+{
+	const int REQUEST_LENGTH_BYTES = 4;
+
+	std::vector<unsigned char> header = getData(sc, REQUEST_LENGTH_BYTES);
+
+	int messageCode = 0;
+	for (int currentByte = 0; currentByte < REQUEST_LENGTH_BYTES; currentByte++)
 	{
-		currentByteDecimalValue += (int)(numericValues[currentByte]);
+		messageCode |= (header[currentByte] << (8 * (REQUEST_LENGTH_BYTES - currentByte - 1)));
 	}
 
-	return currentByteDecimalValue;
-}
-
-// recieve data from socket according byteSize
-// returns the data as string
-string SocketHelper::getStringPartFromSocket(const SOCKET sc, const int bytesNum)
-{
-	return getPartFromSocket(sc, bytesNum, 0);
-}
-
-
-// recieve data from socket according byteSize
-// this is private function
-std::string SocketHelper::getPartFromSocket(const SOCKET sc, const int bytesNum)
-{
-	return getPartFromSocket(sc, bytesNum, 0);
+	int requestLength = header[REQUEST_LENGTH_BYTES - 1];
+	return requestLength;
 }
 
 // send data to socket
@@ -67,26 +55,4 @@ void SocketHelper::sendData(const SOCKET sc, const std::string& message)
 	{
 		throw std::exception("Error while sending message to client");
 	}
-}
-
-std::string SocketHelper::getPartFromSocket(const SOCKET sc, const int bytesNum, const int flags)
-{
-	if (bytesNum == 0)
-	{
-		return "";
-	}
-
-	char* data = new char[bytesNum + 1];
-	int res = recv(sc, data, bytesNum, flags);
-	if (res == INVALID_SOCKET)
-	{
-		std::string s = "Error while recieving from socket: ";
-		s += std::to_string(sc);
-		throw std::exception(s.c_str());
-	}
-
-	data[bytesNum] = 0;
-	std::string received(data);
-	delete[] data;
-	return received;
 }
