@@ -139,16 +139,13 @@ bool Communicator::doesClientExists(const SOCKET clientSocket)
 
 RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
 {
-    const int MESSAGE_CODE_BYTE = 1;
-    const int MESSAGE_LENGTH_BYTE = 4;
-
-    int msgCode = 0, msgLen = 0;
+    int requestCode = 0, requestLength = 0;
 
     // Extracting the type of request (code) and the length of the JSON sent buffer by the protocol
-    msgCode = SocketHelper::getIntPartFromSocket(clientSocket, MESSAGE_CODE_BYTE);
-    msgLen = SocketHelper::getIntPartFromSocket(clientSocket, MESSAGE_LENGTH_BYTE);
+    requestCode = SocketHelper::getRequestCode(clientSocket);
+    requestLength = SocketHelper::getRequestLength(clientSocket);
 
-    std::vector<unsigned char> recievedData = SocketHelper::getData(clientSocket, msgLen);
+    std::vector<unsigned char> requestJSONData = SocketHelper::getData(clientSocket, requestLength);
     
-    return { msgCode, std::time(nullptr), recievedData }; 
+    return { requestCode, std::time(nullptr), requestJSONData };
 }
