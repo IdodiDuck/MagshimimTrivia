@@ -142,10 +142,34 @@ RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
     int requestCode = 0, requestLength = 0;
 
     // Extracting the type of request (code) and the length of the JSON sent buffer by the protocol
-    requestCode = SocketHelper::getRequestCode(clientSocket);
-    requestLength = SocketHelper::getRequestLength(clientSocket);
 
-    std::vector<unsigned char> requestJSONData = SocketHelper::getData(clientSocket, requestLength);
-    
+    auto requestCodeOpt = SocketHelper::getRequestCode(clientSocket);
+    if (!requestCodeOpt.has_value())  // If there's an error retrieving the request code
+
+    {
+        throw std::runtime_error("Error: Failed to read request code from socket.");
+    }
+
+    requestCode = requestCodeOpt.value();
+
+    // Get the request length
+    auto requestLengthOpt = SocketHelper::getRequestLength(clientSocket);
+
+    if (!requestLengthOpt.has_value())  // If there's an error retrieving the request length
+    {
+        throw std::runtime_error("Error: Failed to read request length from socket.");
+    }
+    requestLength = requestLengthOpt.value();
+
+    // Get the actual JSON data
+    auto requestJSONDataOpt = SocketHelper::getData(clientSocket, requestLength);
+    if (!requestJSONDataOpt.has_value())  // If there's an error receiving the JSON data
+    {
+        throw std::runtime_error("Error: Failed to read JSON data from socket.");
+    }
+
+    std::vector<unsigned char> requestJSONData = requestJSONDataOpt.value();
+
+    // Return the parsed request info
     return { requestCode, std::time(nullptr), requestJSONData };
 }
