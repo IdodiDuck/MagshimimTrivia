@@ -47,7 +47,7 @@ def sendLoginRequest(client_socket):
     json_length = len(login_json)
 
     # Packing the Login request by the protocol B -> 1 Byte of LoginRequestCode, I -> Integer (4 Bytes) and then the JSON encoded
-    login_request = struct.pack(f'!B I{len(login_json)}s', LOGIN_REQUEST_CODE, json_length, login_json.encode())
+    login_request = struct.pack(f'!B I{json_length}s', LOGIN_REQUEST_CODE, json_length, login_json.encode())
     
     print(login_request)
     print(f"Sending to server: {login_request.decode()}\n")
@@ -68,8 +68,8 @@ def sendSignUpRequest(client_socket):
     signup_json = json.dumps(signup_data)
     json_length = len(signup_json)
 
-    # Packing the signup request by the protocol 
-    signup_request = struct.pack(f'!BI{json_length}s', SIGN_UP_REQUEST_CODE, json_length, signup_json.encode())
+    # Packing the signup request by the protocol
+    signup_request = struct.pack(f'!B I{json_length}s', SIGN_UP_REQUEST_CODE, json_length, signup_json.encode())
 
     print(f"Sending to server: {signup_request.decode()}\n")
     client_socket.sendall(signup_request)
