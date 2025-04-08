@@ -21,6 +21,16 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
 {
     RequestResult result;
 
+    if (!(isRequestRelevant(info)))
+    {
+        ErrorResponse errorResponse;
+        errorResponse.message = "Error: Invalid request type.";
+        result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
+        result.newHandler.reset();
+
+        return result; 
+    }
+
     switch (static_cast<RequestCode>(info.requestID))
     {
         case RequestCode::LOGIN_REQUEST:
@@ -81,7 +91,7 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
         {
             // Handle unknown request type (optional)
             ErrorResponse errorResponse;
-            errorResponse.message = "Unknown request type.";
+            errorResponse.message = "Error: Unknown request type.";
             result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
             result.newHandler.reset();
 
