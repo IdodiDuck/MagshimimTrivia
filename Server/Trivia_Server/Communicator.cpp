@@ -2,6 +2,7 @@
 
 #include "Constants.h"
 #include "LoginRequestHandler.h"
+#include "JsonResponsePacketSerializer.h"
 #include "SocketHelper.h"
 
 #include <iostream>
@@ -69,7 +70,7 @@ void Communicator::bindAndListen()
 
 void Communicator::handleNewClient(SOCKET clientSocket)
 {
-    const std::string EMPTY_RESPONSE = "";
+    const std::string EMPTY_CONTENT = "";
     const int EMPTY = 0;
 
     while (true)
@@ -91,13 +92,19 @@ void Communicator::handleNewClient(SOCKET clientSocket)
                 std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
 
                 // Sending back to the client a response, then we disconnect him
-                if (response != EMPTY_RESPONSE)
+                if (response != EMPTY_CONTENT)
                 {
-                    std::cout << "Sending back the response to the client" << std::endl;
-                    SocketHelper::sendData(clientSocket, response);
-                    disconnectClient(clientSocket);
+                    sendClientResponse(clientSocket, buffer);
                     break;
                 }
+            }
+
+            // In-case the client has sent a request with invalid code
+            if (info.buffer.size() != EMPTY)
+            {
+                std::cout << "Client requested invalid type of request..." << std::endl;
+                sendErrorResponse(clientSocket, "Error: Invalid type of request.");
+                break;
             }
 
         }
@@ -170,4 +177,25 @@ RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
 
     // Return the parsed request info
     return { requestCode, std::time(nullptr), requestJSONData };
+}
+
+void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage)
+{
+    std::cout << "Client requested invalid type of request..." << std::endl;
+
+    ErrorResponse errResponse;
+    errResponse.message = errorMessage;
+
+    std::vector<unsigned char> error = JsonResponsePacketSerializer::serializeResponse(errResponse);
+
+    SocketHelper::sendData(clientSocket, error);
+    disconnectClient(clientSocket);
+}
+
+void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<unsigned char>& response)
+{
+    std::cout << "Sending back the response to the client" << std::endl;
+
+    SocketHelper::sendData(clientSocket, response);
+    disconnectClient(clientSocket);
 }
