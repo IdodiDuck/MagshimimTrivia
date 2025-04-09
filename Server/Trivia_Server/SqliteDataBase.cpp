@@ -123,7 +123,7 @@ int SqliteDataBase::doesUserExist(const std::string& user)
 
 int SqliteDataBase::doesPasswordMatch(const std::string& user, const std::string& password)
 {
-    if (!(isDataBaseOpen))
+    if (!(isDataBaseOpen()))
     {
         std::cerr << "Error: Database isn't open!" << std::endl;
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
