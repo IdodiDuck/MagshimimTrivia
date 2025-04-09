@@ -15,7 +15,7 @@ enum class DatabaseResult
 };
 
 
-class SqliteDataBase : IDatabase
+class SqliteDataBase : public IDatabase
 {
 
 public:
