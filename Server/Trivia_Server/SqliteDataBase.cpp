@@ -5,7 +5,7 @@
 
 SqliteDataBase::SqliteDataBase(): _dataBaseName("trivia.db"), _dataBase(nullptr)
 {
-
+    open();
 }
 
 SqliteDataBase::~SqliteDataBase()
@@ -50,22 +50,22 @@ bool SqliteDataBase::open()
 
         catch (const std::runtime_error& e)
         {
-            std::cerr << "Error during database initialization: " << e.what() << std::endl;
+            std::cerr << "DataBase: [ERROR] during database initialization: " << e.what() << std::endl;
             close();
             return false;
         }
     }
 
-    std::cout << "Database opened successfully!" << std::endl;
+    std::cout << "DataBase: Database opened successfully!" << std::endl;
     return true;
 }
 
 bool SqliteDataBase::close()
 {
-    std::cout << "DATABASE: Attempting to close database..." << std::endl;
+    std::cout << "DataBase: Attempting to close database..." << std::endl;
     if (!isDataBaseOpen())
     {
-        std::cerr << "Error: Trivia DataBase is not currently open!\n";
+        std::cerr << "DataBase: [ERROR]: Trivia DataBase is not currently open!\n";
         return false;
     }
 
@@ -73,13 +73,13 @@ bool SqliteDataBase::close()
 
     if (result != SQLITE_OK)
     {
-        std::cerr << "Error: Failed to close database: " << sqlite3_errmsg(this->_dataBase) << "\n";
+        std::cerr << "DataBase: [ERROR]: Failed to close database: " << sqlite3_errmsg(this->_dataBase) << "\n";
         this->_dataBase = nullptr;
         return false;
     }
 
     this->_dataBase = nullptr;
-    std::cout << "Database closed successfully!" << std::endl;
+    std::cout << "DataBase: Database closed successfully!" << std::endl;
     return true;
 }
 
@@ -87,7 +87,7 @@ int SqliteDataBase::doesUserExist(const std::string& user)
 {
     if (!isDataBaseOpen())
     {
-        std::cerr << "Error: Database isn't open!" << std::endl;
+        std::cerr << "DataBase: [ERROR] Database isn't open!" << std::endl;
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
@@ -112,7 +112,7 @@ int SqliteDataBase::doesUserExist(const std::string& user)
 
     if (sqlite3_exec(this->_dataBase, SQLQuery.c_str(), callback, &userExists, &errMsg) != SQLITE_OK)
     {
-        std::cerr << "SQL error: " << errMsg << std::endl;
+        std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
         sqlite3_free(errMsg);
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
@@ -125,13 +125,13 @@ int SqliteDataBase::doesPasswordMatch(const std::string& user, const std::string
 {
     if (!(isDataBaseOpen()))
     {
-        std::cerr << "Error: Database isn't open!" << std::endl;
+        std::cerr << "DataBase: [ERROR]: Database isn't open!" << std::endl;
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
     if ((user.empty()) || (password.empty()))
     {
-        std::cerr << "Error: Empty username or password provided!\n";
+        std::cerr << "DataBase: [ERROR]: Empty username or password provided!\n";
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
@@ -157,7 +157,7 @@ int SqliteDataBase::doesPasswordMatch(const std::string& user, const std::string
     // Execute the query and process the result using the callback
     if (sqlite3_exec(this->_dataBase, query.c_str(), callback, &storedPassword, &errMsg) != SQLITE_OK)
     {
-        std::cerr << "SQL error: " << errMsg << std::endl;
+        std::cerr << "DataBase: [ERORR]: " << errMsg << std::endl;
         sqlite3_free(errMsg);
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
@@ -180,13 +180,13 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
 {
     if (!this->_dataBase)
     {
-        std::cerr << "Error: Database isn't open!\n";
+        std::cerr << "DataBase: [ERROR]: Database isn't open!\n";
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
     if (user.empty() || password.empty() || email.empty())
     {
-        std::cerr << "Error: Empty user, password, or email provided!\n";
+        std::cerr << "DataBase: [ERROR]: Empty user, password, or email provided!\n";
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
@@ -210,7 +210,7 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
     if (sqlite3_exec(this->_dataBase, "BEGIN TRANSACTION;", nullptr, nullptr, &errMessage) != SQLITE_OK)
     {
         sqlite3_free(errMessage);
-        std::cerr << "Error: Failed to begin transaction\n";
+        std::cerr << "DataBase: [ERROR]: Failed to begin transaction\n";
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
@@ -219,7 +219,7 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
     // Execute the insertion query
     if (executeQuery(sql) == static_cast<int>(DatabaseResult::DATABASE_ERROR))
     {
-        std::cerr << "Error: Failed to add user\n";
+        std::cerr << "DataBase: [ERROR]: Failed to add user\n";
         sqlite3_exec(this->_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
@@ -228,7 +228,7 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
     if (sqlite3_exec(this->_dataBase, "COMMIT;", nullptr, nullptr, &errMessage) != SQLITE_OK)
     {
         sqlite3_free(errMessage);
-        std::cerr << "Error: Failed to commit transaction\n";
+        std::cerr << "DataBase: [ERROR]: Failed to commit transaction\n";
         sqlite3_exec(this->_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
@@ -242,7 +242,7 @@ int SqliteDataBase::executeQuery(const std::string& executedSQLQuery)
 
     if (sqlite3_exec(this->_dataBase, executedSQLQuery.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK)
     {
-        std::cerr << "SQL error: " << errMsg << std::endl;
+        std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
         sqlite3_free(errMsg);
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
