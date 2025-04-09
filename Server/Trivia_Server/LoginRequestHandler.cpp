@@ -5,6 +5,9 @@
 
 #include "Constants.h"
 
+#include "LoginManager.h"
+#include "SqliteDataBase.h"
+
 #include <iostream>
 
 LoginRequestHandler::~LoginRequestHandler()
@@ -20,6 +23,12 @@ bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
 {
     RequestResult result;
+    auto SQLitedatabase = std::make_shared<SqliteDataBase>(); // Creating the data base and opening it in it's C'tor
+
+    std::shared_ptr<IDatabase> database = SQLitedatabase; // Converting the pointer to IDatabase so it can work with LoginManager
+    std::weak_ptr<IDatabase> weakDatabase = database;
+
+    LoginManager loginManager(weakDatabase);
 
     switch (static_cast<RequestCode>(info.requestID))
     {
@@ -30,13 +39,14 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
             // Valid login request
             if (loginRequest.has_value())
             {
-                LoginRequest request = loginRequest.value();
-                // Database Login Validation here (V1.0.3)
+                LoginRequest request = loginRequest.value(); // Accessing the login result from the returned optional
+
+                LoginStatus loginStatus = loginManager.login(request.username, request.password);
 
                 LoginResponse response;
-                response.status = SUCCESS;
+                response.status = (loginStatus == LoginStatus::SUCCESS ? SUCCESS : FAILURE);
                 result.response = JsonResponsePacketSerializer::serializeResponse(response);
-                result.newHandler.reset(); // Modify later and change to next given handler
+                result.newHandler.reset(); // Change to next handler if needed
 
                 return result;
             }
@@ -57,18 +67,20 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
             // Valid signup request
             if (signupRequest.has_value())
             {
-                SignupRequest request = signupRequest.value();
-                // Database Signup Validation here (V1.0.3)
+                SignupRequest request = signupRequest.value(); // Accessing the signup result from the returned optional
+
+                // Validate signup through LoginManager
+                SignUpStatus signUpStatus = loginManager.signUp(request.username, request.password, request.email);
 
                 SignupResponse response;
-                response.status = SUCCESS;
+                response.status = (signUpStatus == SignUpStatus::SUCCESS ? SUCCESS : FAILURE);
                 result.response = JsonResponsePacketSerializer::serializeResponse(response);
                 result.newHandler.reset(); // Modify later and change to next given handler
 
                 return result;
             }
 
-            // Constructing failure message in-case it didn't work
+            // If the signup request format is invalid
             ErrorResponse errorResponse;
             errorResponse.message = "Invalid sign-up request format.";
             result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
