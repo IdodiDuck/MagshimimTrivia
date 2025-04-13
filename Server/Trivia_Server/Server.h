@@ -4,6 +4,8 @@
 #include "Communicator.h"
 #include "RequestHandlerFactory.h"
 
+#include <memory>
+
 class Server
 {
 
@@ -13,6 +15,6 @@ public:
 private:
 	// Attributes - 
 	Communicator m_communicator;
-	IDatabase* m_database;
+	std::weak_ptr<IDatabase> m_database;
 	RequestHandlerFactory m_handlerFactory;
 };
