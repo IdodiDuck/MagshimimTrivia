@@ -11,6 +11,12 @@
 
 Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
 {
+    this->m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (m_serverSocket == INVALID_SOCKET)
+    {
+        throw std::runtime_error("Error: Failed to create server socket.");
+    }
 }
 
 Communicator::~Communicator()
