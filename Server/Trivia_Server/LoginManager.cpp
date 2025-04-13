@@ -30,10 +30,10 @@ SignUpStatus LoginManager::signUp(const std::string& username, const std::string
 
         int dataBaseResult = dataBase->addNewUser(username, password, email);
 
-        return (dataBaseResult == static_cast<int>(DatabaseResult::DATABASE_SUCCESS) ? SignUpStatus::SUCCESS : SignUpStatus::ERROR);
+        return (dataBaseResult == static_cast<int>(DatabaseResult::DATABASE_SUCCESS) ? SignUpStatus::SUCCESS : SignUpStatus::SIGNUP_ERROR);
     }
 
-    return SignUpStatus::ERROR;
+    return SignUpStatus::SIGNUP_ERROR;
 }
 
 LoginStatus LoginManager::login(const std::string& username, const std::string& password)
@@ -71,7 +71,7 @@ LoginStatus LoginManager::login(const std::string& username, const std::string& 
     }
 
     std::cerr << "LoginManager: [ERROR]: Error with database!" << std::endl;
-    return LoginStatus::ERROR;
+    return LoginStatus::LOGIN_ERROR;
 }
 
 void LoginManager::logOut(const std::string& username)

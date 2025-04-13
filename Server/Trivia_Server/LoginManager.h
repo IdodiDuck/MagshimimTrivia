@@ -9,14 +9,14 @@
 
 enum class SignUpStatus
 {
-	ERROR = -1,
+	SIGNUP_ERROR = -1,
     SUCCESS,
     USER_ALREADY_EXISTS,
 };
 
 enum class LoginStatus 
 {
-    ERROR = -1,
+    LOGIN_ERROR = -1,
     SUCCESS,
     DISMATCHING_PASSWORD,
     USER_NOT_EXISTS,
