@@ -13,6 +13,6 @@ public:
 
 private:
 	LoginManager m_loginManager;
-	std::weak_ptr <IDatabase*> m_database;
+	std::weak_ptr<IDatabase> m_database;
 
 };
