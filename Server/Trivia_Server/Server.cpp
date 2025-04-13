@@ -15,7 +15,7 @@ m_communicator(m_handlerFactory)
 
 Server::~Server()
 {
-
+    
 }
 
 void Server::run()

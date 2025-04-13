@@ -3,9 +3,23 @@
 #include <algorithm>
 #include <iostream>
 
-LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase) : m_dataBase(dataBase)
+LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase)
+    : m_dataBase(dataBase), m_isDbValid(false)
 {
+    if (auto db = m_dataBase.lock())
+    {
+        m_isDbValid = db->open();
 
+        if (!m_isDbValid)
+        {
+            std::cerr << "LoginManager: [ERROR] Failed to open database in constructor.\n";
+        }
+    }
+
+    else
+    {
+        std::cerr << "LoginManager: [ERROR] Database pointer expired.\n";
+    }
 }
 
 LoginManager::~LoginManager()
@@ -16,16 +30,17 @@ LoginManager::~LoginManager()
 SignUpStatus LoginManager::signUp(const std::string& username, const std::string& password, const std::string& email)
 {
     std::cout << "Attempting to signup user with username: " << username << std::endl;
+
+    if (!m_isDbValid)
+    {
+        std::cerr << "LoginManager: [ERROR] Cannot sign up. Database not available.\n";
+        return SignUpStatus::SIGNUP_ERROR;
+    }
+
     if (auto dataBase = m_dataBase.lock())
     {
-        if (!dataBase->open())
-        {
-            return SignUpStatus::SIGNUP_ERROR;
-        }
-
-        int dataBaseResult = dataBase->addNewUser(username, password, email);
-
-        return (dataBaseResult == static_cast<int>(DatabaseResult::DATABASE_SUCCESS) ? SignUpStatus::SUCCESS : SignUpStatus::SIGNUP_ERROR);
+        int result = dataBase->addNewUser(username, password, email);
+        return (result == static_cast<int>(DatabaseResult::DATABASE_SUCCESS)) ? SignUpStatus::SUCCESS : SignUpStatus::SIGNUP_ERROR;
     }
 
     return SignUpStatus::SIGNUP_ERROR;
@@ -33,45 +48,41 @@ SignUpStatus LoginManager::signUp(const std::string& username, const std::string
 
 LoginStatus LoginManager::login(const std::string& username, const std::string& password)
 {
-    std::cout << "Attempting to login user with username: " << username << " with password: " << password << std::endl;
+    std::cout << "Attempting to login user with username: " << username << std::endl;
 
     if (isUserAlreadyLogged(username))
     {
-        std::cerr << "LoginManager: [ERROR]: User is already logged in!" << std::endl;
+        std::cerr << "LoginManager: [ERROR] User is already logged in.\n";
         return LoginStatus::USER_ALREADY_LOGGED_IN;
+    }
+
+    if (!m_isDbValid)
+    {
+        std::cerr << "LoginManager: [ERROR] Cannot login. Database not available.\n";
+        return LoginStatus::LOGIN_ERROR;
     }
 
     if (auto dataBase = m_dataBase.lock())
     {
-        if (!dataBase->open())
+        if (dataBase->doesUserExist(username) == static_cast<int>(DatabaseResult::USER_NOT_FOUND))
         {
-            return LoginStatus::LOGIN_ERROR;
-        }
-
-        int userExists = dataBase->doesUserExist(username);
-
-        if (userExists == static_cast<int>(DatabaseResult::USER_NOT_FOUND))
-        {
-            std::cerr << "LoginManager: [ERROR]: User doesn't exist!" << std::endl;
+            std::cerr << "LoginManager: [ERROR] User doesn't exist.\n";
             return LoginStatus::USER_NOT_EXISTS;
         }
 
-        int passwordState = dataBase->doesPasswordMatch(username, password);
-
-        if (passwordState == static_cast<int>(DatabaseResult::PASSWORD_MATCH))
+        if (dataBase->doesPasswordMatch(username, password) == static_cast<int>(DatabaseResult::PASSWORD_MATCH))
         {
-            std::cout << "User successfully logged in!" << std::endl;
+            std::cout << "User successfully logged in.\n";
             std::lock_guard<std::mutex> lock(this->m_loggedUsersMutex);
-            this->m_loggedUsers.push_back(LoggedUser(username));
-
+            this->m_loggedUsers.emplace_back(username);
             return LoginStatus::SUCCESS;
         }
 
-        std::cerr << "LoginManager: [ERROR]: Incorrect password!" << std::endl;
+        std::cerr << "LoginManager: [ERROR] Incorrect password.\n";
         return LoginStatus::DISMATCHING_PASSWORD;
     }
 
-    std::cerr << "LoginManager: [ERROR]: Error with database!" << std::endl;
+    std::cerr << "LoginManager: [ERROR] Database reference expired.\n";
     return LoginStatus::LOGIN_ERROR;
 }
 
@@ -79,15 +90,12 @@ void LoginManager::logOut(const std::string& username)
 {
     std::lock_guard<std::mutex> lock(this->m_loggedUsersMutex);
 
-    auto loggedOutUserIt = std::find_if(this->m_loggedUsers.begin(), this->m_loggedUsers.end(), [&](const LoggedUser& user)
-        {
-            return user.getUserName() == username;
-        });
+    auto loggedOutUserIt = std::find_if(this->m_loggedUsers.begin(), this->m_loggedUsers.end(),
+        [&](const LoggedUser& user) { return user.getUserName() == username; });
 
-    // If we found the user we remove it from the logged users
-    if (loggedOutUserIt != m_loggedUsers.cend())
+    if (loggedOutUserIt != m_loggedUsers.end())
     {
-        std::cout << "Logging out user with username: " << username << std::endl;
+        std::cout << "Logging out user: " << username << std::endl;
         this->m_loggedUsers.erase(loggedOutUserIt);
     }
 }
@@ -96,10 +104,6 @@ bool LoginManager::isUserAlreadyLogged(const std::string& username)
 {
     std::lock_guard<std::mutex> lock(this->m_loggedUsersMutex);
 
-    auto userAlreadyLoggedIn = std::find_if(this->m_loggedUsers.begin(), this->m_loggedUsers.end(), [&](const LoggedUser& user)
-        {
-            return user.getUserName() == username;
-        });
-
-    return (userAlreadyLoggedIn != m_loggedUsers.cend());
+    return std::any_of(this->m_loggedUsers.begin(), this->m_loggedUsers.end(),
+        [&](const LoggedUser& user) { return user.getUserName() == username; });
 }

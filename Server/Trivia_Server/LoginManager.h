@@ -39,6 +39,7 @@ private:
 	std::weak_ptr<IDatabase> m_dataBase;
 	std::vector<LoggedUser> m_loggedUsers;
     std::mutex m_loggedUsersMutex;
+    bool m_isDbValid;
 
     bool isUserAlreadyLogged(const std::string& username);
 
