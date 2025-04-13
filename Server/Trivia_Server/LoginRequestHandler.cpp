@@ -10,13 +10,14 @@
 
 #include <iostream>
 
+LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
+{
+
+}
+
 LoginRequestHandler::~LoginRequestHandler()
 {
     
-}
-
-LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
-{
 }
 
 bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
