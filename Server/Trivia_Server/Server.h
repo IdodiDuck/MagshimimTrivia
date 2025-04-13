@@ -2,6 +2,7 @@
 
 // Local Libraries Importation - 
 #include "Communicator.h"
+#include "RequestHandlerFactory.h"
 
 class Server
 {
@@ -12,4 +13,6 @@ public:
 private:
 	// Attributes - 
 	Communicator m_communicator;
+	IDatabase* m_database;
+	RequestHandlerFactory m_handlerFactory;
 };

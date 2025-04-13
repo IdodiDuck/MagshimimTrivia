@@ -11,6 +11,7 @@
 
 // Local Files Importations - 
 #include "IRequestHandler.h"
+#include "RequestHandlerFactory.h"
 
 class Communicator
 {
@@ -24,6 +25,7 @@ private:
 	// Attributes - 
 	SOCKET m_serverSocket;
 	std::map <SOCKET, std::unique_ptr<IRequestHandler>> m_clients;
+	RequestHandlerFactory& m_handlerFactory;
 
 	// Private Methods - 
 	void bindAndListen();

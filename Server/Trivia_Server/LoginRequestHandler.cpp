@@ -15,6 +15,10 @@ LoginRequestHandler::~LoginRequestHandler()
     
 }
 
+LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
+{
+}
+
 bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
     return ((info.requestID == static_cast<unsigned int>(RequestCode::SIGNUP_REQUEST)) || (info.requestID == static_cast<unsigned int>(RequestCode::LOGIN_REQUEST)));
@@ -100,4 +104,43 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
             return result;
         }
     }
+}
+
+RequestResult LoginRequestHandler::login(RequestInfo request)
+{
+    LoginRequest loginRequest = JsonRequestPacketDeserializer::deserializeLoginRequest(request.buffer).value();
+
+    if (m_handlerFactory.getLoginManager().login(loginRequest.username, loginRequest.password) == LoginStatus::SUCCESS)
+    {
+        return 
+        { 
+            JsonResponsePacketSerializer::serializeResponse(LoginResponse()), 
+            (std::unique_ptr<IRequestHandler>)std::make_unique<LoginRequestHandler>(m_handlerFactory)
+        };
+    }
+    return 
+    { 
+        JsonResponsePacketSerializer::serializeResponse(ErrorResponse()), 
+        (std::unique_ptr<IRequestHandler>)std::make_unique<LoginRequestHandler>(m_handlerFactory)
+     };
+
+}
+
+RequestResult LoginRequestHandler::signup(RequestInfo request)
+{
+    SignupRequest signupRequest = JsonRequestPacketDeserializer::deserializeSignupRequest(request.buffer).value();
+
+    if (m_handlerFactory.getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email) == SignUpStatus::SUCCESS)
+    {
+        return 
+        { 
+            JsonResponsePacketSerializer::serializeResponse(SignupResponse()), 
+            (std::unique_ptr<IRequestHandler>)std::make_unique<LoginRequestHandler>(m_handlerFactory) 
+        };
+    }
+    return 
+    { 
+        JsonResponsePacketSerializer::serializeResponse(ErrorResponse()),
+        (std::unique_ptr<IRequestHandler>)std::make_unique<LoginRequestHandler>(m_handlerFactory) 
+    };
 }
