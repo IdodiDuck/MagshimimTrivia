@@ -17,7 +17,7 @@ class Communicator
 {
 
 public:
-
+	Communicator(RequestHandlerFactory& handlerFactory);
 	~Communicator();
 	void startHandleRequests();
 

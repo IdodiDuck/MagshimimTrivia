@@ -4,9 +4,20 @@
 #include "LoginRequestHandler.h"
 #include "JsonResponsePacketSerializer.h"
 #include "SocketHelper.h"
+#include "RequestHandlerFactory.h"
 
 #include <iostream>
 #include <ctime>
+
+Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
+{
+    this->m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (m_serverSocket == INVALID_SOCKET)
+    {
+        throw std::runtime_error("Error: Failed to create server socket.");
+    }
+}
 
 Communicator::~Communicator()
 {
@@ -38,7 +49,7 @@ void Communicator::startHandleRequests()
         {
             if (!doesClientExists(clientSocket))
             {
-                m_clients[clientSocket] = std::make_unique<LoginRequestHandler>();
+                m_clients[clientSocket] = this->m_handlerFactory.createLoginRequestHandler();
             }
 
             std::thread(&Communicator::handleNewClient, this, clientSocket).detach();

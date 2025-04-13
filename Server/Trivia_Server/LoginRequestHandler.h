@@ -8,8 +8,8 @@ class LoginRequestHandler: public IRequestHandler
 
 public:
 
-	virtual ~LoginRequestHandler();
 	LoginRequestHandler(RequestHandlerFactory& handlerFactory);
+	virtual ~LoginRequestHandler();
 
 	bool isRequestRelevant(const RequestInfo& info) override;
 	RequestResult handleRequest(RequestInfo& info) override;
@@ -17,7 +17,7 @@ public:
 private:
 	RequestHandlerFactory& m_handlerFactory;
 
-	RequestResult login(RequestInfo request);
-	RequestResult signup(RequestInfo request);
+	RequestResult login(const RequestInfo& request);
+	RequestResult signup(const RequestInfo& request);
 
 };

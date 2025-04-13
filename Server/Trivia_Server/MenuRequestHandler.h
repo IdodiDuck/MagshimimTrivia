@@ -4,5 +4,12 @@
 
 class MenuRequestHandler : public IRequestHandler
 {
-	// empty class for now
+
+public:
+
+	MenuRequestHandler();
+	virtual ~MenuRequestHandler();
+
+	bool isRequestRelevant(const RequestInfo& info) override;
+	RequestResult handleRequest(RequestInfo& info) override;
 };
