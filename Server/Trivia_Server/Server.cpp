@@ -1,12 +1,25 @@
 #include "Server.h"
+
+#include "SqliteDataBase.h"
 #include "Constants.h"
 
 #include <iostream>
 #include <thread>
 
+Server::Server(): m_database(std::make_shared<SqliteDataBase>()),
+m_handlerFactory(m_database),
+m_communicator(m_handlerFactory)
+{
+
+}
+
+Server::~Server()
+{
+
+}
+
 void Server::run()
 {
-    m_database.lock()->open();
     // Launching communicator thread which handles new clients' requests
     std::thread communicatorThread(&Communicator::startHandleRequests, &m_communicator);
     communicatorThread.detach();
@@ -27,5 +40,4 @@ void Server::run()
         std::cout << "Server listening on port " << SERVER_PORT << std::endl << std::endl;
 
     }
-    m_database.lock()->close();
 }

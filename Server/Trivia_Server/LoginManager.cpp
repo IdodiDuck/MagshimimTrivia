@@ -1,31 +1,26 @@
 #include "LoginManager.h"
-
 #include "SqliteDataBase.h"
-
 #include <algorithm>
 #include <iostream>
 
-LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase): m_dataBase(dataBase)
+LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase) : m_dataBase(dataBase)
 {
 
 }
 
 LoginManager::~LoginManager()
 {
-	this->m_loggedUsers.clear();
+    this->m_loggedUsers.clear();
 }
 
 SignUpStatus LoginManager::signUp(const std::string& username, const std::string& password, const std::string& email)
 {
     std::cout << "Attempting to signup user with username: " << username << std::endl;
-    if (auto dataBase = m_dataBase.lock()) 
+    if (auto dataBase = m_dataBase.lock())
     {
-        int userExists = dataBase->doesUserExist(username);
-
-        if (userExists == static_cast<int>(DatabaseResult::USER_EXISTS))
+        if (!dataBase->open())
         {
-            std::cerr << "LoginManager: [ERROR]: User is already exists" << std::endl;
-            return SignUpStatus::USER_ALREADY_EXISTS;
+            return SignUpStatus::SIGNUP_ERROR;
         }
 
         int dataBaseResult = dataBase->addNewUser(username, password, email);
@@ -39,6 +34,7 @@ SignUpStatus LoginManager::signUp(const std::string& username, const std::string
 LoginStatus LoginManager::login(const std::string& username, const std::string& password)
 {
     std::cout << "Attempting to login user with username: " << username << " with password: " << password << std::endl;
+
     if (isUserAlreadyLogged(username))
     {
         std::cerr << "LoginManager: [ERROR]: User is already logged in!" << std::endl;
@@ -47,6 +43,11 @@ LoginStatus LoginManager::login(const std::string& username, const std::string& 
 
     if (auto dataBase = m_dataBase.lock())
     {
+        if (!dataBase->open())
+        {
+            return LoginStatus::LOGIN_ERROR;
+        }
+
         int userExists = dataBase->doesUserExist(username);
 
         if (userExists == static_cast<int>(DatabaseResult::USER_NOT_FOUND))
@@ -59,7 +60,7 @@ LoginStatus LoginManager::login(const std::string& username, const std::string& 
 
         if (passwordState == static_cast<int>(DatabaseResult::PASSWORD_MATCH))
         {
-            std::cout << "User sucessfully logged in!" << std::endl;
+            std::cout << "User successfully logged in!" << std::endl;
             std::lock_guard<std::mutex> lock(this->m_loggedUsersMutex);
             this->m_loggedUsers.push_back(LoggedUser(username));
 
@@ -78,15 +79,15 @@ void LoginManager::logOut(const std::string& username)
 {
     std::lock_guard<std::mutex> lock(this->m_loggedUsersMutex);
 
-    auto loggedOutUserIt = std::find_if(this->m_loggedUsers.begin(), this->m_loggedUsers.end(), [&](const LoggedUser& user) 
-    {
-        return user.getUserName() == username;
-    });
+    auto loggedOutUserIt = std::find_if(this->m_loggedUsers.begin(), this->m_loggedUsers.end(), [&](const LoggedUser& user)
+        {
+            return user.getUserName() == username;
+        });
 
     // If we found the user we remove it from the logged users
     if (loggedOutUserIt != m_loggedUsers.cend())
     {
-        std::cout << "Logging out user with username: "  << username << std::endl;
+        std::cout << "Logging out user with username: " << username << std::endl;
         this->m_loggedUsers.erase(loggedOutUserIt);
     }
 }
@@ -96,9 +97,9 @@ bool LoginManager::isUserAlreadyLogged(const std::string& username)
     std::lock_guard<std::mutex> lock(this->m_loggedUsersMutex);
 
     auto userAlreadyLoggedIn = std::find_if(this->m_loggedUsers.begin(), this->m_loggedUsers.end(), [&](const LoggedUser& user)
-    {
-        return user.getUserName() == username;
-    });
+        {
+            return user.getUserName() == username;
+        });
 
     return (userAlreadyLoggedIn != m_loggedUsers.cend());
 }

@@ -10,11 +10,14 @@ class Server
 {
 
 public:
+	Server();
+	~Server();
+
 	void run();
 
 private:
 	// Attributes - 
 	Communicator m_communicator;
-	std::weak_ptr<IDatabase> m_database;
+	std::shared_ptr<IDatabase> m_database;
 	RequestHandlerFactory m_handlerFactory;
 };

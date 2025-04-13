@@ -5,7 +5,7 @@
 
 SqliteDataBase::SqliteDataBase(): _dataBaseName("trivia.db"), _dataBase(nullptr)
 {
-    open();
+
 }
 
 SqliteDataBase::~SqliteDataBase()
