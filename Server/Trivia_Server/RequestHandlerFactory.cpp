@@ -13,6 +13,11 @@ std::unique_ptr<LoginRequestHandler> RequestHandlerFactory::createLoginRequestHa
 	return std::make_unique<LoginRequestHandler>(*this);
 }
 
+std::unique_ptr<MenuRequestHandler> RequestHandlerFactory::createMenuRequestHanndler()
+{
+	return std::unique_ptr<MenuRequestHandler>(); // Will be changed...
+}
+
 LoginManager& RequestHandlerFactory::getLoginManager()
 {
 	return this->m_loginManager;
