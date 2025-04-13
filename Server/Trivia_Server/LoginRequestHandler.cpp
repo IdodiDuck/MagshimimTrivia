@@ -42,40 +42,52 @@ RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
 RequestResult LoginRequestHandler::login(const RequestInfo& request)
 {
     LoginRequest loginRequest = JsonRequestPacketDeserializer::deserializeLoginRequest(request.buffer).value();
+    LoginStatus status = m_handlerFactory.getLoginManager().login(loginRequest.username, loginRequest.password);
+    LoginResponse response;
 
-    if (m_handlerFactory.getLoginManager().login(loginRequest.username, loginRequest.password) == LoginStatus::SUCCESS)
+    if (status == LoginStatus::SUCCESS)
     {
+        response.status = SUCCESS;
+
         return
         {
-            JsonResponsePacketSerializer::serializeResponse(LoginResponse()),
-            (std::unique_ptr<IRequestHandler>)(this->m_handlerFactory.createMenuRequestHandler())
+            JsonResponsePacketSerializer::serializeResponse(response),
+            std::unique_ptr<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
         };
     }
 
-    return 
-    { 
-        JsonResponsePacketSerializer::serializeResponse(ErrorResponse()), 
-        (std::unique_ptr<IRequestHandler>)std::make_unique<LoginRequestHandler>(m_handlerFactory)
-     };
+    response.status = FAILURE;
 
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<LoginRequestHandler>(m_handlerFactory)
+    };
 }
 
 RequestResult LoginRequestHandler::signup(const RequestInfo& request)
 {
     SignupRequest signupRequest = JsonRequestPacketDeserializer::deserializeSignupRequest(request.buffer).value();
+    SignUpStatus status = m_handlerFactory.getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email);
 
-    if (m_handlerFactory.getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email) == SignUpStatus::SUCCESS)
+    SignupResponse response;
+
+    if (status == SignUpStatus::SUCCESS)
     {
-        return 
-        { 
-            JsonResponsePacketSerializer::serializeResponse(SignupResponse()), 
-            (std::unique_ptr<IRequestHandler>)(this->m_handlerFactory.createMenuRequestHandler())
+        response.status = SUCCESS;
+
+        return
+        {
+            JsonResponsePacketSerializer::serializeResponse(response),
+            std::unique_ptr<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
         };
     }
 
-    return 
-    { 
-        JsonResponsePacketSerializer::serializeResponse(ErrorResponse()),
-        (std::unique_ptr<IRequestHandler>)std::make_unique<LoginRequestHandler>(m_handlerFactory) 
+    response.status = FAILURE;
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<LoginRequestHandler>(m_handlerFactory)
     };
 }
