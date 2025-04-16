@@ -9,7 +9,7 @@
 #include <iostream>
 #include <ctime>
 
-Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory)
+Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory), m_isRunning(true)
 {
     this->m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -21,15 +21,16 @@ Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFac
 
 Communicator::~Communicator()
 {
+    std::lock_guard<std::mutex> lock(m_clientsMutex);
     for (auto& client : this->m_clients)
     {
         disconnectClient(client.first); // Closing remained clients that weren't disconnected unexpectedly
     }
 
     // Closing the server socket (if it isn't closed yet)
-    if (m_serverSocket != INVALID_SOCKET)
+    if (this->m_serverSocket != INVALID_SOCKET)
     {
-        closesocket(m_serverSocket);
+        closesocket(this->m_serverSocket);
     }
 
     WSACleanup();
@@ -40,9 +41,9 @@ void Communicator::startHandleRequests()
 {
     bindAndListen();
 
-    while (true)
+    while (this->m_isRunning)
     {
-        SOCKET clientSocket = accept(m_serverSocket, NULL, NULL);
+        SOCKET clientSocket = accept(this->m_serverSocket, NULL, NULL);
 
         // If a valid client would like to have a connection we accept him and handle his communication
         if (clientSocket != INVALID_SOCKET)
@@ -83,12 +84,23 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 {
     const std::string EMPTY_CONTENT = "";
     const int EMPTY = 0;
+    RequestInfo info;
 
     while (true)
     {
         try
         {
-            RequestInfo info = parseClientRequest(clientSocket);
+            try
+            {
+                info = parseClientRequest(clientSocket);
+            }
+
+            catch (const std::exception& e)
+            {
+                std::cerr << "[Parser Error] " << e.what() << std::endl;
+                disconnectClient(clientSocket);
+                break;
+            }
 
             if (m_clients[clientSocket]->isRequestRelevant(info))
             {
@@ -131,24 +143,24 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 
 void Communicator::disconnectClient(SOCKET removedSocket)
 {
-    std::cout << "Disconnecting client: " << removedSocket << std::endl << std::endl;
-
-    auto removedSocketIt = m_clients.find(removedSocket);
-    
-    // If we found the socket we remove it from the map and after we close it
-    if (removedSocketIt != m_clients.end())
+    try
     {
-        m_clients.erase(removedSocketIt);
-        closesocket(removedSocket);
-
-        return;
+        if (doesClientExists(removedSocket))
+        {
+            m_clients.erase(removedSocket);
+            closesocket(removedSocket);
+        }
     }
 
-    std::cerr << "Failed to disconnect client" << std::endl;
+    catch (...)
+    {
+        std::cerr << "Failed to disconnect client with socket: " << removedSocket << std::endl;
+    }
 }
 
 bool Communicator::doesClientExists(const SOCKET clientSocket)
 {
+    std::lock_guard<std::mutex> lock(m_clientsMutex);
     auto clientIt = m_clients.find(clientSocket);
     return (clientIt != m_clients.cend());
 }
@@ -190,6 +202,26 @@ RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
     return { requestCode, std::time(nullptr), requestJSONData };
 }
 
+void Communicator::processClientRequest(SOCKET clientSocket, RequestInfo& info)
+{
+    const std::string EMPTY_CONTENT = "";
+
+    std::cout << "Handling the request, getting its results..." << std::endl;
+    RequestResult res = m_clients[clientSocket]->handleRequest(info);
+
+    std::cout << "Giving the new handler to the client..." << std::endl;
+    m_clients[clientSocket] = std::move(res.newHandler);
+
+    std::cout << "Constructing response to be sent..." << std::endl;
+    std::vector<unsigned char> buffer = res.response;
+    std::string response = (buffer.empty() ? "" : std::string(buffer.begin(), buffer.end()));
+
+    if (response != EMPTY_CONTENT)
+    {
+        sendClientResponse(clientSocket, buffer);
+    }
+}
+
 void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage)
 {
     std::cout << "Client requested invalid type of request..." << std::endl;
@@ -209,4 +241,18 @@ void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<uns
 
     SocketHelper::sendData(clientSocket, response);
     disconnectClient(clientSocket);
+    std::cout << std::endl;
+}
+
+void Communicator::stopCommunicating()
+{
+    this->m_isRunning = false;
+
+    // Closing the server socket in order to release accept so the communicator and server can shut down
+    if (this->m_serverSocket != INVALID_SOCKET)
+    {
+        closesocket(this->m_serverSocket);
+    }
+
+    WSACleanup();
 }
