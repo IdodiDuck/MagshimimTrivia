@@ -97,7 +97,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 
             catch (const std::exception& e)
             {
-                std::cerr << "[Parser Error] " << e.what() << std::endl;
+                std::cerr << "[PARSER ERROR]: " << e.what() << std::endl;
                 disconnectClient(clientSocket);
                 break;
             }

@@ -40,7 +40,6 @@ private:
 	bool doesClientExists(const SOCKET clientSocket);
 
 	RequestInfo parseClientRequest(const SOCKET clientSocket);
-	RequestInfo safeParseClientRequest(SOCKET clientSocket);
 
 	void processClientRequest(SOCKET clientSocket, RequestInfo& info);
 	void sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage);
