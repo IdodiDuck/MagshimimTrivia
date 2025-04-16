@@ -2,6 +2,9 @@
 
 #include <io.h>
 #include <iostream>
+#include <unordered_map>
+
+#include <curl/curl.h> // Used for processing HTTP Responses
 
 SqliteDataBase::SqliteDataBase(): _dataBaseName("trivia.db"), _dataBase(nullptr)
 {
@@ -306,4 +309,160 @@ void SqliteDataBase::initializeTriviaDB()
 bool SqliteDataBase::isDataBaseOpen()
 {
     return (this->_dataBase != nullptr);
+}
+
+// Inserting 10 random questions Methods - (V2)
+void SqliteDataBase::addQuestionsFromOpenTDB()
+{
+    CURL* curl;
+    CURLcode res;
+
+    std::string responseData;
+
+    // Initializing the global libcurl environment
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl = curl_easy_init();
+
+    // Checking if the CURL handle was created successfully
+    if (curl) 
+    {
+        std::string url = "https://opentdb.com/api.php?amount=10&type=multiple";
+
+        // Setting the desired URL, the callback method and the buffer container for the returned response of HTTP Get Request
+        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeGETResponse);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseData);
+
+        // Sending HTTP Request
+        res = curl_easy_perform(curl);
+
+        if (res != CURLE_OK)
+        {
+            std::cerr << "[DATABASE]: ERROR: " << curl_easy_strerror(res) << std::endl;
+        }
+
+        curl_easy_cleanup(curl); // Cleanup CURL handle allocated memory
+    }
+
+    // Cleanup CURL global environment
+    curl_global_cleanup();
+
+    try
+    {
+        auto jsonResponse = nlohmann::json::parse(responseData)["results"];
+
+        std::cout << "[DATABASE]: Successfully parsed " << jsonResponse.size() << " questions." << std::endl;
+        insertQuestionsIntoDataBase(jsonResponse);
+    }
+
+    // Catching JSON Errors
+    catch (const nlohmann::json::parse_error& e)
+    {
+        std::cerr << "[DATABASE]: JSON parse error: " << e.what() << std::endl;
+        std::cerr << "Raw response:\n" << responseData << std::endl;
+    }
+
+    // Catching Database Errors
+    catch (const std::exception& e)
+    {
+        std::cerr << "[DATABASE]: " << e.what() << std::endl;
+    }
+    
+}
+
+void SqliteDataBase::insertQuestionsIntoDataBase(const nlohmann::json& jsonResponse)
+{
+    const int WRONG_ANSWERS_AMOUNT = 3;
+    const int MAX_QUESTIONS = 10;
+
+    int questionCount = 0;
+
+    std::cout << "[DATABASE]: Inserting 10 random questions from OpenTDB Website" << std::endl;
+    for (const auto& currentQuestionJSON : jsonResponse)
+    {
+        if (questionCount >= MAX_QUESTIONS)
+        {
+            std::cout << "[DATABASE]: Reached max number of questions to insert (10)." << std::endl;
+            break;  // Exit the loop after inserting 10 questions
+        }
+
+        // Extracting each question's fields in order to construct the SQL Query and insert the question into database
+        std::string question = decodeHtmlCharacters(currentQuestionJSON.at("question").get<std::string>());
+        std::string correctAnswer = decodeHtmlCharacters(currentQuestionJSON.at("correct_answer").get<std::string>());
+        std::vector<std::string> incorrectAnswers = currentQuestionJSON.at("incorrect_answers").get<std::vector<std::string>>();
+
+        prepareSQLQuery(question);
+        prepareSQLQuery(correctAnswer);
+        // Decoding each answer in the returned vector (some of them may have HTML special characters)
+        for (auto& ans : incorrectAnswers)
+        {
+            ans = decodeHtmlCharacters(ans);
+            prepareSQLQuery(ans);
+        }
+
+        // Building the SQL Insertion query for the current question with the given answers
+        std::string currentQuestionQuery = "INSERT INTO QUESTIONS (QUESTION, CORRECT_ANSWER, WRONG_ANSWER1, WRONG_ANSWER2, WRONG_ANSWER3) VALUES ('" +
+            question + "', '" + correctAnswer + "', '" +
+            incorrectAnswers[0] + "', '" +
+            incorrectAnswers[1] + "', '" +
+            incorrectAnswers[2] + "');";
+
+        if (executeQuery(currentQuestionQuery) != static_cast<int>(DatabaseResult::DATABASE_SUCCESS))
+        {
+            std::cerr << "[DATABASE]: Failed to insert question: " << question << std::endl;
+            questionCount--;
+        }
+
+        questionCount++;
+    }
+}
+
+size_t SqliteDataBase::writeGETResponse(void* ptr, size_t size, size_t nmemb, void* data)
+{
+    // Extracting the total size of the each chunk, then adding it to the full response
+    size_t total_size = size * nmemb;
+
+    // Saving all the returned response in the given string arguement
+    static_cast<std::string*>(data)->append(static_cast<char*>(ptr), total_size);
+
+    return total_size;
+}
+
+std::string SqliteDataBase::decodeHtmlCharacters(const std::string& input)
+{
+    std::unordered_map<std::string, std::string> HtmlCharacters =
+    {
+        {"&amp;", "&"},
+        {"&lt;", "<"},
+        {"&gt;", ">"},
+        {"&quot;", "\""},
+        {"&apos;", "\'"},
+        {"&#039;", "\'"},
+        {"&nbsp;", " "},
+    };
+
+    std::string result = input;
+
+    for (const auto& entity : HtmlCharacters)
+    {
+        size_t pos = 0;
+
+        // We replace in the result string the HTML special characters for each special character
+        while ((pos = result.find(entity.first, pos)) != std::string::npos) 
+        {
+            result.replace(pos, entity.first.length(), entity.second);
+
+            pos += entity.second.length();
+        }
+    }
+    
+    return result;
+}
+
+void SqliteDataBase::prepareSQLQuery(std::string& input)
+{
+    // Removing any problematic characters which may cause errors with SQL query
+    input.erase(std::remove(input.begin(), input.end(), '"'), input.end());
+    input.erase(std::remove(input.begin(), input.end(), '\''), input.end());
+    input.erase(std::remove(input.begin(), input.end(), ';'), input.end());
 }

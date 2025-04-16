@@ -4,6 +4,8 @@
 
 #include "sqlite3.h"
 
+#include <nlohmann/json.hpp>
+
 enum class DatabaseResult
 {
 	DATABASE_ERROR = -1,
@@ -38,4 +40,11 @@ private:
 	int executeQuery(const std::string& sql);
 	void initializeTriviaDB();
 	bool isDataBaseOpen();
+
+	// Adding 10 Questions to Database (V2.0.0)
+	void addQuestionsFromOpenTDB();
+	void insertQuestionsIntoDataBase(const nlohmann::json& jsonResponse);
+	size_t writeGETResponse(void* ptr, size_t size, size_t nmemb, void* data);
+	std::string decodeHtmlCharacters(const std::string& input);
+	void prepareSQLQuery(std::string& input);
 };
