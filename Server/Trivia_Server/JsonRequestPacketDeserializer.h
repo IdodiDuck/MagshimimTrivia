@@ -8,6 +8,7 @@
 // Request Structs
 // ===========================
 
+// Login and SignUp Structs (V1) - 
 typedef struct LoginRequest
 {
 	std::string username;
@@ -23,6 +24,27 @@ typedef struct SignupRequest
 
 } SignupRequest;
 
+// Room Structs (V2) - 
+typedef struct GetPlayersInRoomRequest
+{
+	unsigned int roomId;
+
+} GetPlayersInRoomRequest;
+
+typedef struct JoinRoomRequest
+{
+	unsigned int roomId;
+
+} JoinRoomRequest;
+
+typedef struct CreateRoomRequest
+{
+	std::string roomName;
+	unsigned int maxUsers;
+	unsigned int questionCount;
+	unsigned int answerTimeout;
+
+} CreateRoomRequest;
 
 
 class JsonRequestPacketDeserializer
