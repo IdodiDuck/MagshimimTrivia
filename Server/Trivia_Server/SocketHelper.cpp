@@ -10,7 +10,7 @@ std::optional<std::vector<unsigned char>> SocketHelper::getData(const SOCKET sc,
 
 	int res = recv(sc, reinterpret_cast<char*>(data.data()), bytesNum, DEFAULT_FLAG);
 
-	if (res == INVALID_SOCKET)
+	if (res == SOCKET_ERROR)
 	{
 		return std::nullopt;
 	}
@@ -47,6 +47,12 @@ std::optional<int> SocketHelper::getRequestLength(const SOCKET sc)
 
 	const std::vector<unsigned char>& header = headerOpt.value();
 
+	// If we didn't received enough bytes for reading
+	if (header.size() < REQUEST_LENGTH_BYTES)
+	{
+		return std::nullopt;
+	}
+
 	int messageCode = 0;
 
 	// Shifting and performing OR logical operation on the bytes to assemble the message code
@@ -55,8 +61,7 @@ std::optional<int> SocketHelper::getRequestLength(const SOCKET sc)
 		messageCode |= (header[currentByte] << (BYTE_SIZE * (REQUEST_LENGTH_BYTES - currentByte - 1)));
 	}
 
-	// Return the last byte as the request length
-	int requestLength = header[REQUEST_LENGTH_BYTES - 1];
+	int requestLength = header[REQUEST_LENGTH_BYTES - 1];  // Might want to check if this logic is correct
 	return requestLength;
 }
 
