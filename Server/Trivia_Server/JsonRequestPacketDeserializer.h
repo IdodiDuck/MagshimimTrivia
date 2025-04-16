@@ -50,8 +50,13 @@ typedef struct CreateRoomRequest
 class JsonRequestPacketDeserializer
 {
 public: 
+	// V1 Deserializations - 
 	static std::optional<LoginRequest> deserializeLoginRequest(const std::vector<unsigned char>& buffer);
 	static std::optional<SignupRequest> deserializeSignupRequest(const std::vector<unsigned char>& buffer);
 
+	// V2 Deserializations -
+	static std::optional<GetPlayersInRoomRequest> deserializeGetPlayersRequest(const std::vector<unsigned char>& buffer);
+	static std::optional<JoinRoomRequest> deserializeJoinRoomRequest(const std::vector<unsigned char>& buffer);
+	static std::optional<CreateRoomRequest> deserializeCreateRoomRequest(const std::vector<unsigned char>& buffer);
 };
 
