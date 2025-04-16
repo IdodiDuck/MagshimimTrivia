@@ -254,11 +254,19 @@ void SqliteDataBase::initializeTriviaDB()
 {
     std::cout << "Initializing database...\n";
 
+    // Database tables creation queries - 
     const char* CREATE_USERS = "CREATE TABLE IF NOT EXISTS \"USERS\" ("
-        "\"USERNAME\" TEXT PRIMARY KEY,"
-        "\"PASSWORD\" TEXT NOT NULL,"
-        "\"EMAIL\" TEXT NOT NULL UNIQUE"
-        "); ";
+        "\"USERNAME\" TEXT PRIMARY KEY, "
+        "\"PASSWORD\" TEXT NOT NULL, "
+        "\"EMAIL\" TEXT NOT NULL UNIQUE); ";
+
+    const char* CREATE_QUESTIONS = "CREATE TABLE IF NOT EXISTS \"QUESTIONS\" ("
+        "\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "\"QUESTION\" TEXT NOT NULL, "
+        "CORRECT_ANSWER TEXT NOT NULL, "
+        "WRONG_ANSWER1 TEXT NOT NULL, "
+        "WRONG_ANSWER2 TEXT NOT NULL, "
+        "WRONG_ANSWER3 TEXT NOT NULL); ";
 
     char* errMessage = nullptr;
 
@@ -275,6 +283,7 @@ void SqliteDataBase::initializeTriviaDB()
     {
         // Trying to create users database table
         executeQuery(CREATE_USERS);
+        executeQuery(CREATE_QUESTIONS);
 
         // Commit the transaction if the query was successful
         const std::string COMMIT_QUERY = "COMMIT;";
