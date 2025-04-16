@@ -114,7 +114,7 @@ def main():
                 clientSocket.close()
 
         except socket.error:
-            print("failed to connect to server")
+            print("[ERROR]: Failed to connect to server")
             break
 
     print("Exiting client...")
