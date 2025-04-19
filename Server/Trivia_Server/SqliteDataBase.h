@@ -45,6 +45,9 @@ public:
 	int getNumOfPlayerGames(const std::string& username) override;
 	int getPlayerScore(const std::string& username) override;
 
+	// Global Stats - 
+	std::vector<std::string> getHighScores() override;
+
 private:
 	sqlite3* _dataBase;
 	std::string _dataBaseName;
@@ -57,7 +60,9 @@ private:
 	// Adding 10 Questions to Database (V2.0.0)
 	void addQuestionsFromOpenTDB();
 	void insertQuestionsIntoDataBase(const nlohmann::json& jsonResponse);
-	size_t writeGETResponse(void* ptr, size_t size, size_t nmemb, void* data);
+	
 	std::string decodeHtmlCharacters(const std::string& input);
 	void prepareSQLQuery(std::string& input);
+
+	static size_t writeGETResponse(void* ptr, size_t size, size_t nmemb, void* data);
 };
