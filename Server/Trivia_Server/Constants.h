@@ -52,6 +52,64 @@ typedef struct ErrorResponse
 
 } ErrorResponse;
 
+typedef struct RoomData // relocate to room.h when added
+{
+    unsigned int id;
+    std::string name;
+    unsigned int maxPlayers;
+    unsigned int numOfQuestionsInGame;
+    unsigned int timePerQuestion;
+    //RoomStatus status;
+
+} RoomData;
+
+// v2.0.0
+
+typedef struct LogoutResponse
+{
+    unsigned int status;
+
+} LogoutResponse;
+
+typedef struct GetRoomsResponse
+{
+    unsigned int status;
+    std::vector<RoomData> rooms;
+
+} GetRoomsResponse;
+
+typedef struct GetPlayersInRoomResponse
+{
+    std::vector<std::string> players;
+
+} GetPlayersInRoomResponse;
+
+typedef struct getHighScoreResponse
+{
+    unsigned int status;
+    std::vector<std::string> statistics;
+
+} getHighScoreResponse;
+
+typedef struct getPersonalStatsResponse
+{
+    unsigned int status;
+    std::vector<std::string> statistics;
+
+} getPersonalStatsResponse;
+
+typedef struct JoinRoomResponse
+{
+    unsigned int status;
+
+} JoinRoomResponse;
+
+typedef struct CreateRoomResponse
+{
+    unsigned int status;
+
+} CreateRoomResponse;
+
 // =============================
 // Error Codes Constants
 // =============================
