@@ -269,6 +269,11 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
     return 0;
 }
 
+std::vector<std::string> SqliteDataBase::getHighScores()
+{
+    return std::vector<std::string>();
+}
+
 int SqliteDataBase::executeQuery(const std::string& executedSQLQuery)
 {
     char* errMsg = nullptr;
