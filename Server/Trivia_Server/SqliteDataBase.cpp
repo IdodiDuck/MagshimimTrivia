@@ -239,6 +239,36 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
     return static_cast<int>(DatabaseResult::DATABASE_SUCCESS);
 }
 
+std::list<Question> SqliteDataBase::getQuestions(const int questionsAmount)
+{
+    return std::list<Question>();
+}
+
+float SqliteDataBase::getPlayerAverageAnswerTime(const std::string& username)
+{
+    return 0.0f;
+}
+
+int SqliteDataBase::getNumOfCorrectAnswers(const std::string& username)
+{
+    return 0;
+}
+
+int SqliteDataBase::getNumOfTotalAnswers(const std::string& username)
+{
+    return 0;
+}
+
+int SqliteDataBase::getNumOfPlayerGames(const std::string& username)
+{
+    return 0;
+}
+
+int SqliteDataBase::getPlayerScore(const std::string& username)
+{
+    return 0;
+}
+
 int SqliteDataBase::executeQuery(const std::string& executedSQLQuery)
 {
     char* errMsg = nullptr;

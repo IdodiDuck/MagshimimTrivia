@@ -22,15 +22,28 @@ class SqliteDataBase : public IDatabase
 
 public:
 
+	// C'tor & D'tor - 
 	SqliteDataBase();
 	virtual ~SqliteDataBase();
 
+	// Connection -
 	bool open() override;
 	bool close() override;
 
+	// User handling - 
 	int doesUserExist(const std::string& user) override;
 	int doesPasswordMatch(const std::string& user, const std::string& password) override;
 	int addNewUser(const std::string& user, const std::string& password, const std::string& email) override;
+
+	// Questions - 
+	std::list<Question> getQuestions(const int questionsAmount) override;
+
+	// Player statistics - 
+	float getPlayerAverageAnswerTime(const std::string& username) override;
+	int getNumOfCorrectAnswers(const std::string& username) override;
+	int getNumOfTotalAnswers(const std::string& username) override;
+	int getNumOfPlayerGames(const std::string& username) override;
+	int getPlayerScore(const std::string& username) override;
 
 private:
 	sqlite3* _dataBase;
