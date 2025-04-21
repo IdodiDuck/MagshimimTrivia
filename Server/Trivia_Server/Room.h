@@ -7,7 +7,7 @@
 
 enum class RoomStatus : unsigned int
 {
-    OPEN = 0,
+    OPENED = 0,
     CLOSED
 };
 
@@ -26,9 +26,12 @@ class Room
 {
 
 public:
+    Room(const RoomData& roomData);
+
     void addUser(LoggedUser user);
     void removeUser(LoggedUser user);
     std::set<std::string> getAllUsers();
+    RoomData getRoomData() const;
 
 private:
     RoomData m_metadata;

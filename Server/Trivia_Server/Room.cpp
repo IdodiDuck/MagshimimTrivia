@@ -1,5 +1,9 @@
 #include "Room.h"
 
+Room::Room(const RoomData& roomData) : m_metadata(roomData), m_users()
+{
+}
+
 void Room::addUser(LoggedUser user)
 {
 	m_users.insert(user);
@@ -22,3 +26,7 @@ std::set<std::string> Room::getAllUsers()
     return usernames;
 }
 
+RoomData Room::getRoomData() const
+{
+    return m_metadata;
+}
