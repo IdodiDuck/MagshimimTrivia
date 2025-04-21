@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Constants.h"
+#include "Room.h"
 
 typedef struct LoginResponse
 {
@@ -21,17 +22,6 @@ typedef struct ErrorResponse
     std::string message;
 
 } ErrorResponse;
-
-typedef struct RoomData // relocate to room.h when added
-{
-    unsigned int id;
-    std::string name;
-    unsigned int maxPlayers;
-    unsigned int numOfQuestionsInGame;
-    unsigned int timePerQuestion;
-    //RoomStatus status;
-
-} RoomData;
 
 // v2.0.0
 
