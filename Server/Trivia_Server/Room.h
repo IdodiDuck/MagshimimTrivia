@@ -2,7 +2,7 @@
 
 #include "LoggedUser.h"
 
-#include <vector>
+#include <set>
 #include <string>
 
 enum class RoomStatus : unsigned int
@@ -27,12 +27,12 @@ class Room
 
 public:
     void addUser(LoggedUser user);
-    void removeUser(LoggedUser);
-    std::vector<std::string> getAllUsers();
+    void removeUser(LoggedUser user);
+    std::set<std::string> getAllUsers();
 
 private:
     RoomData m_metadata;
-    std::vector<LoggedUser> m_users;
+    std::set<LoggedUser> m_users;
 
 };
 
