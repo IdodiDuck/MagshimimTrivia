@@ -28,8 +28,8 @@ class Room
 public:
     Room(const RoomData& roomData);
 
-    void addUser(LoggedUser user);
-    void removeUser(LoggedUser user);
+    void addUser(const LoggedUser& user);
+    void removeUser(const LoggedUser& user);
     std::set<std::string> getAllUsers();
     RoomData getRoomData() const;
 

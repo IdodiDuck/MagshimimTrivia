@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-void RoomManager::createRoom(LoggedUser user, RoomData data)
+void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
     if (data.id <= 0) 
     {

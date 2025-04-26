@@ -2,16 +2,16 @@
 
 #include "Room.h"
 
-#include <map>
 #include <vector>
 #include <optional>
+#include <unordered_map>
 
 class RoomManager
 {
 
 public:
 
-	void createRoom(LoggedUser user, RoomData data);
+	void createRoom(const LoggedUser& user, const RoomData& data);
 	void deleteRoom(int ID);
 
 	RoomStatus getRoomState(int ID) const;
@@ -20,7 +20,6 @@ public:
 
 private:
 
-	std::map<const unsigned int, Room> m_rooms;
+	std::unordered_map<const unsigned int, Room> m_rooms;
 
 };
-
