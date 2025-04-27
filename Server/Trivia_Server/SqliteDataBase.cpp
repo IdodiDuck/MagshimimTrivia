@@ -365,7 +365,43 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
 
 std::vector<std::string> SqliteDataBase::getHighScores()
 {
-    return std::vector<std::string>();
+    std::vector<std::pair<std::string, int>> playersScores; // vector of pairs of username and his score
+
+    if (!isDataBaseOpen())
+    {
+        std::cerr << "[ERROR] Database not open!" << std::endl;
+        return std::vector<std::string>();
+    }
+
+    const std::string GET_SCORES_QUERY = "SELECT USERNAME FROM STATISTICS;";
+
+    char* errMsg = nullptr;
+
+    // Passing this pointer as data to the callback
+    if (sqlite3_exec(_dataBase, GET_SCORES_QUERY.c_str(), processScoresCallback, this, &errMsg) != SQLITE_OK)
+    {
+        std::cerr << "[ERROR] SQLite: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
+        return std::vector<std::string>(); // Return empty vector if an error occurred with database
+    }
+
+    if (playersScores.empty())
+    {
+        std::cerr << "[INFO] No players found in the database." << std::endl;
+        return std::vector<std::string>(); // Return empty vector if there're no players
+    }
+    
+    sortHighestScores(playersScores);
+
+    const int TOP_PLAYERS_AMOUNT = 5;
+
+    std::vector<std::string> highScores;
+    for (int currentPlayer = 0; currentPlayer < min(TOP_PLAYERS_AMOUNT, static_cast<int>(playersScores.size())); currentPlayer++)
+    {
+        highScores.push_back(playersScores[currentPlayer].first); // Pushing top 5 usernames (Or less if we don't have 5 yet)
+    }
+
+    return highScores;
 }
 
 int SqliteDataBase::executeQuery(const std::string& executedSQLQuery)
@@ -448,6 +484,30 @@ void SqliteDataBase::initializeTriviaDB()
 bool SqliteDataBase::isDataBaseOpen()
 {
     return (this->_dataBase != nullptr);
+}
+
+void SqliteDataBase::sortHighestScores(std::vector<std::pair<std::string, int>>& playersScores)
+{
+    // Sort players by score in descending order
+    std::sort(playersScores.begin(), playersScores.end(), [](const std::pair<std::string, int>& currentPlayer, const std::pair<std::string, int>& otherPlayer)
+    {
+        return currentPlayer.second > otherPlayer.second; // Sorting by the score
+    });
+}
+
+int SqliteDataBase::processScoresCallback(void* data, int argc, char** argv, char** colNames)
+{
+    SqliteDataBase* dbInstance = static_cast<SqliteDataBase*>(data);
+
+    if (argv[0] != nullptr) 
+    {
+        std::vector<std::pair<std::string, int>>* scores = static_cast<std::vector<std::pair<std::string, int>>*>(data);
+        std::string username = argv[0];
+
+        int score = dbInstance->getPlayerScore(username);
+        scores->push_back({ username, score });
+    }
+    return 0; // Success code
 }
 
 // Inserting 10 random questions Methods - (V2)

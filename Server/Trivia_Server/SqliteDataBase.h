@@ -56,6 +56,10 @@ private:
 	int executeQuery(const std::string& sql);
 	void initializeTriviaDB();
 	bool isDataBaseOpen();
+	void sortHighestScores(std::vector<std::pair<std::string, int>>& playersScores);
+
+	// Callbacks - 
+	static int processScoresCallback(void* data, int argc, char** argv, char** colNames);
 
 	// Adding 10 Questions to Database (V2.0.0)
 	void addQuestionsFromOpenTDB();
