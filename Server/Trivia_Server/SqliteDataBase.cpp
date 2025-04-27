@@ -308,10 +308,11 @@ void SqliteDataBase::initializeTriviaDB()
 
     const char* CREATE_STATISTICS = "CREATE TABLE IF NOT EXISTS \"STATISTICS\" ("
         "\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "\"USERNAME\" TEXT NOT NULL, "
+        "\"USERNAME\" TEXT NOT NULL UNIQUE, "
         "\"CORRECT_ANSWERS\" INTEGER NOT NULL, "
         "\"TOTAL_ANSWERS\" INTEGER NOT NULL, "
         "\"AVG_ANSWER_TIME\" REAL NOT NULL, "
+        "\"TOTAL_GAMES\" INTEGER NOT NULL, "
         "FOREIGN KEY (\"USERNAME\") REFERENCES USERS(\"USERNAME\"));";
 
     char* errMessage = nullptr;
