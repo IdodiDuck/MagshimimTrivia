@@ -3,6 +3,8 @@
 #include <io.h>
 #include <iostream>
 #include <unordered_map>
+#include <algorithm>
+#include <random>
 
 #include <curl/curl.h> // Used for processing HTTP Responses
 
@@ -543,6 +545,7 @@ void SqliteDataBase::sortHighestScores(std::vector<std::pair<std::string, int>>&
 int SqliteDataBase::getAmountOfQuestions()
 {
     const std::string COUNT_QUERY = "SELECT COUNT(*) FROM QUESTIONS;";
+    const int SUCCESS = 0;
 
     int totalQuestions = 0;
 
@@ -555,11 +558,11 @@ int SqliteDataBase::getAmountOfQuestions()
             *static_cast<int*>(data) = std::stoi(argv[0]);  // Set the count of questions
         }
 
-        return 0; // Success code
+        return SUCCESS; // Success code
     };
 
     // Execute the query to get the number of questions
-    if (sqlite3_exec(_dataBase, COUNT_QUERY.c_str(), countCallback, &totalQuestions, &errMsg) != SQLITE_OK)
+    if (sqlite3_exec(this->_dataBase, COUNT_QUERY.c_str(), countCallback, &totalQuestions, &errMsg) != SQLITE_OK)
     {
         std::cerr << "[ERROR] SQLite: " << errMsg << std::endl;
         sqlite3_free(errMsg);
@@ -571,6 +574,8 @@ int SqliteDataBase::getAmountOfQuestions()
 
 int SqliteDataBase::processScoresCallback(void* data, int argc, char** argv, char** colNames)
 {
+    const int SUCCESS = 0;
+
     SqliteDataBase* dbInstance = static_cast<SqliteDataBase*>(data);
 
     if (argv[0] != nullptr) 
@@ -581,17 +586,20 @@ int SqliteDataBase::processScoresCallback(void* data, int argc, char** argv, cha
         int score = dbInstance->getPlayerScore(username);
         scores->push_back({ username, score });
     }
-    return 0; // Success code
+    return SUCCESS; // Success code
 }
 
 int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, char** colNames)
 {
+    const int SUCCESS = 0, FAILURE = 1;
+
     // Checking if there's an answer
     if (argc > 0)
     {
         const int QUESTION_TEXT_INDEX = 1, CORRECT_ANSWER_INDEX = 2, WRONG_ANSWER1_INDEX = 3, WRONG_ANSWER2_INDEX = 4, WRONG_ANSWER3_INDEX = 5;
         // Extracting all data from database
         std::string questionText = argv[QUESTION_TEXT_INDEX];
+        std::string correctAnswer = argv[CORRECT_ANSWER_INDEX];
 
         std::vector<std::string> possibleAnswers;
         possibleAnswers.push_back(argv[CORRECT_ANSWER_INDEX]);
@@ -599,14 +607,29 @@ int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, 
         possibleAnswers.push_back(argv[WRONG_ANSWER2_INDEX]);
         possibleAnswers.push_back(argv[WRONG_ANSWER3_INDEX]);
 
-        int correctAnswerId = std::stoi(argv[5]);
+        std::random_device rd;
+        std::shuffle(possibleAnswers.begin(), possibleAnswers.end(), rd);
 
-        // Creating the question based on the extracted data and adding it to the lists of questions
-        Question question(questionText, possibleAnswers, correctAnswerId);
-        static_cast<std::list<Question>*>(data)->push_back(question);
+        auto correctAnswerIdIt = std::find(possibleAnswers.cbegin(), possibleAnswers.cend(), correctAnswer);
+
+        // If the correct answer is found, calculate its index
+        if (correctAnswerIdIt != possibleAnswers.end())
+        {
+            int correctAnswerId = std::distance(possibleAnswers.cbegin(), correctAnswerIdIt);
+
+            // Creating the question based on the extracted data and adding it to the lists of questions
+            Question question(questionText, possibleAnswers, correctAnswerId);
+            static_cast<std::list<Question>*>(data)->push_back(question);
+        }
+
+        else
+        {
+            std::cerr << "Database: [ERROR]: Correct answer not found for question: " << questionText << std::endl;
+            return FAILURE;
+        }
     }
 
-    return 0;  // Success code
+    return SUCCESS;
 }
 
 // Inserting 10 random questions Methods - (V2)
