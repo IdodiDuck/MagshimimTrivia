@@ -306,6 +306,14 @@ void SqliteDataBase::initializeTriviaDB()
         "WRONG_ANSWER2 TEXT NOT NULL, "
         "WRONG_ANSWER3 TEXT NOT NULL); ";
 
+    const char* CREATE_STATISTICS = "CREATE TABLE IF NOT EXISTS \"STATISTICS\" ("
+        "\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "\"USERNAME\" TEXT NOT NULL, "
+        "\"CORRECT_ANSWERS\" INTEGER NOT NULL, "
+        "\"TOTAL_ANSWERS\" INTEGER NOT NULL, "
+        "\"AVG_ANSWER_TIME\" REAL NOT NULL, "
+        "FOREIGN KEY (\"USERNAME\") REFERENCES USERS(\"USERNAME\"));";
+
     char* errMessage = nullptr;
 
     int result = sqlite3_exec(this->_dataBase, "BEGIN TRANSACTION;", nullptr, nullptr, &errMessage);
@@ -319,9 +327,10 @@ void SqliteDataBase::initializeTriviaDB()
 
     try
     {
-        // Trying to create users database table
+        // Trying to create all database tables
         executeQuery(CREATE_USERS);
         executeQuery(CREATE_QUESTIONS);
+        executeQuery(CREATE_STATISTICS);
 
         // Commit the transaction if the query was successful
         const std::string COMMIT_QUERY = "COMMIT;";
