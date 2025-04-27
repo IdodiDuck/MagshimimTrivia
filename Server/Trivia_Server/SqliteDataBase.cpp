@@ -317,10 +317,10 @@ int SqliteDataBase::getNumOfPlayerGames(const std::string& username)
     int correctAnswers = 0;
 
     auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
-        {
-            *static_cast<int*>(data) = std::stoi(argv[0]);
-            return 0; // Success code
-        };
+    {
+        *static_cast<int*>(data) = std::stoi(argv[0]);
+        return 0; // Success code
+    };
 
     char* errMsg = nullptr;
     if (sqlite3_exec(this->_dataBase, GAMES_PLAYED_QUERY.c_str(), callback, &correctAnswers, &errMsg) != SQLITE_OK)
@@ -335,7 +335,32 @@ int SqliteDataBase::getNumOfPlayerGames(const std::string& username)
 
 int SqliteDataBase::getPlayerScore(const std::string& username)
 {
-    return 0;
+    const int CORRECT_ANSWERS_POINTS = 10, ANSWER_TIME_PENALTY_POINTS = 2;
+    
+    if (!isDataBaseOpen())
+    {
+        std::cerr << "[ERROR] Database not open!" << std::endl;
+        return static_cast<int>(DatabaseResult::DATABASE_ERROR);
+    }
+
+    int correctAnswers = getNumOfCorrectAnswers(username);
+    int totalAnswers = getNumOfTotalAnswers(username);
+    float avgAnswerTime = getPlayerAverageAnswerTime(username);
+
+    if (correctAnswers == static_cast<int>(DatabaseResult::DATABASE_ERROR) || totalAnswers == static_cast<int>(DatabaseResult::DATABASE_ERROR) || avgAnswerTime < 0)
+    {
+        std::cerr << "[ERROR] Invalid data for user: " << username << std::endl;
+        return static_cast<int>(DatabaseResult::DATABASE_ERROR);
+    }
+
+    // Calculating the total score by the amount of correct answers
+    int score = correctAnswers * CORRECT_ANSWERS_POINTS;
+
+    // Deducting from the score depends on the time it took for the user to answer
+    score -= static_cast<int>(avgAnswerTime * ANSWER_TIME_PENALTY_POINTS);
+
+    score = max(0, score); // Negative amount of points is considered as zero
+    return score;
 }
 
 std::vector<std::string> SqliteDataBase::getHighScores()
