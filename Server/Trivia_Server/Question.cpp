@@ -25,3 +25,8 @@ int Question::getCorrectAnswerId() const
 {
 	return this->m_correctAnswerId;
 }
+
+bool Question::operator==(const Question& other) const
+{
+	return (this->m_question == other.getQuestion());
+}

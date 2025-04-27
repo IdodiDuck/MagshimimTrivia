@@ -16,6 +16,9 @@ public:
 	std::vector<std::string> getPossibleAnswers() const;
 	int getCorrectAnswerId() const;
 
+	// Operators - 
+	bool operator==(const Question& other) const;
+
 private:
 	// Attributes - 
 	std::string m_question;
