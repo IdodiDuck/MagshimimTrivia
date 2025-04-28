@@ -18,6 +18,9 @@ public:
 	std::unique_ptr<MenuRequestHandler> createMenuRequestHandler(const LoggedUser& user);
 	LoginManager& getLoginManager();
 
+	StatisticsManager& getStatisticsManager();
+	RoomManager& getRoomManager();
+
 private:
 	LoginManager m_loginManager;
 	std::weak_ptr<IDatabase> m_database;
