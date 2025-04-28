@@ -3,6 +3,8 @@
 #include "JsonRequestPacketDeserializer.h"
 #include "JsonResponsePacketSerializer.h"
 
+#include "LoggedUser.h"
+
 LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory): m_handlerFactory(handlerFactory)
 {
 
@@ -52,7 +54,7 @@ RequestResult LoginRequestHandler::login(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(loginRequest.username))
+            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(LoggedUser(loginRequest.username)))
         };
     }
 
@@ -79,7 +81,7 @@ RequestResult LoginRequestHandler::signup(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(signupRequest.username))
+            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(LoggedUser(signupRequest.username)))
         };
     }
 

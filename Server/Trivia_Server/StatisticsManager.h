@@ -1,9 +1,10 @@
 #pragma once
 
 #include "IDatabase.h"
+
 #include <string>
 #include <vector>
-
+#include <memory>
 
 class StatisticsManager
 {
