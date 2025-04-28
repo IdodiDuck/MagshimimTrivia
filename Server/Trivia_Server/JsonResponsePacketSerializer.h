@@ -80,7 +80,7 @@ public:
 
     static std::vector<unsigned char> serializeResponse(const LogoutResponse& loguotResponse);
     static std::vector<unsigned char> serializeResponse(const GetRoomsResponse& getRoomsResponse);
-    static std::vector<unsigned char> serializerResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse);
+    static std::vector<unsigned char> serializeResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse);
     static std::vector<unsigned char> serializeResponse(const JoinRoomResponse& joinRoomResponse);
     static std::vector<unsigned char> serializeResponse(const CreateRoomResponse& createRoomResponse);
     static std::vector<unsigned char> serializeResponse(const getHighScoreResponse& getHighScoreResponse);

@@ -4,7 +4,7 @@
 #include "MenuRequestHandler.h"
 
 RequestHandlerFactory::RequestHandlerFactory(std::weak_ptr<IDatabase> database):
-	m_database(database), m_loginManager(database)
+	m_database(database), m_loginManager(database), m_roomManager(), m_StatisticsManager(database)
 {
 
 }

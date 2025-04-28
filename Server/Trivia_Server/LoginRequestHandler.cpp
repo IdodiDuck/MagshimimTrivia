@@ -52,7 +52,7 @@ RequestResult LoginRequestHandler::login(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
+            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(loginRequest.username))
         };
     }
 
@@ -79,7 +79,7 @@ RequestResult LoginRequestHandler::signup(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
+            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(signupRequest.username))
         };
     }
 

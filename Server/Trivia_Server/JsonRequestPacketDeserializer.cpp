@@ -121,7 +121,7 @@ std::optional<JoinRoomRequest> JsonRequestPacketDeserializer::deserializeJoinRoo
     if (jsonData.is_discarded())
     {
         std::cerr << "Error: Failed to parse JSON data for GetPlayersInRoomRequest." << std::endl;
-        return {};
+        return JoinRoomRequest{ 0 };
     }
 
     try
@@ -135,7 +135,7 @@ std::optional<JoinRoomRequest> JsonRequestPacketDeserializer::deserializeJoinRoo
     catch (const std::exception& e)
     {
         std::cerr << "Error extracting GetPlayersInRoomRequest data: " << e.what() << std::endl;
-        return {};
+        return  JoinRoomRequest{ 0 };
     }
 }
 
@@ -153,7 +153,7 @@ std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreat
     if (jsonData.is_discarded())
     {
         std::cerr << "Error: Failed to parse JSON data for GetPlayersInRoomRequest." << std::endl;
-        return {};
+        return CreateRoomRequest{ "", 0, 0, 0 };
     }
 
     try
@@ -170,6 +170,6 @@ std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreat
     catch (const std::exception& e)
     {
         std::cerr << "Error extracting GetPlayersInRoomRequest data: " << e.what() << std::endl;
-        return {};
+        return CreateRoomRequest{"", 0, 0, 0};
     }
 }

@@ -2,6 +2,7 @@
 
 #include "Constants.h"
 #include "JsonResponsePacketSerializer.h"
+#include "JsonRequestPacketDeserializer.h"
 
 #include <memory>
 
@@ -77,30 +78,87 @@ RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
 {
-    return RequestResult();
+    GetRoomsResponse response;
+    response.status = SUCCESS;
+    
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+    };
 }
 
 RequestResult MenuRequestHandler::getPlayersInRoom(const RequestInfo& info)
 {
-    return RequestResult();
+    GetPlayersInRoomRequest request = JsonRequestPacketDeserializer::deserializeGetPlayersRequest(info.buffer).value();
+    Room currentRoom = m_handlerFactory.getRoomManager().getRoom(request.roomId).value();
+    GetPlayersInRoomResponse response;
+    
+    for (const auto& username : currentRoom.getAllUsers())
+    {
+        response.players.push_back(username);
+    }
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+    };
+
 }
 
 RequestResult MenuRequestHandler::getPersonalStats(const RequestInfo& info)
 {
-    return RequestResult();
+    getPersonalStatsResponse response;
+    response.status = SUCCESS;
+    response.statistics = this->m_handlerFactory.getStatisticsManager().getUserStatistics(this->m_user.getUserName());
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+    };
 }
 
 RequestResult MenuRequestHandler::getHighScore(const RequestInfo& info)
 {
-    return RequestResult();
+    getHighScoreResponse response;
+    response.status = SUCCESS;
+    response.statistics = this->m_handlerFactory.getStatisticsManager().getUserStatistics(this->m_user.getUserName());
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+    };
 }
 
 RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
 {
-    return RequestResult();
+    const unsigned int INVALID_ROOM_ID = 0;
+
+    JoinRoomRequest request = JsonRequestPacketDeserializer::deserializeJoinRoomRequest(info.buffer).value();
+    JoinRoomResponse response;
+
+    response.status = (request.roomId != INVALID_ROOM_ID) ? SUCCESS : FAILURE;
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+    };
 }
 
 RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
 {
-    return RequestResult();
+    CreateRoomRequest request = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(info.buffer).value();
+    CreateRoomResponse response;
+
+    response.status = (request.roomName != "") ? SUCCESS : FAILURE;
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+    };
 }

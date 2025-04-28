@@ -51,8 +51,8 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
             {"id", room.id},
             {"name", room.name},
             {"maxPlayers", room.maxPlayers},
-            {"timePerQuestion", room.timePerQuestion}
-            //{"status", room.status}
+            {"timePerQuestion", room.timePerQuestion},
+            {"status", room.status}
             });
     }
     // Creating the JSON Object
@@ -63,7 +63,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
 }
 
-std::vector<unsigned char> JsonResponsePacketSerializer::serializerResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse) 
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse) 
 {
     // Creating the JSON Object
     nlohmann::json jsonResponse = {{"players", getPlayersInRoomResponse.players}};
