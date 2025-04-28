@@ -20,7 +20,16 @@ const int BUFFER_SIZE = 10; // Remove/Modify later
 enum class RequestCode : unsigned int 
 {
     SIGNUP_REQUEST = 100,
-    LOGIN_REQUEST = 101
+    LOGIN_REQUEST,
+
+    SIGNOUT_REQUEST = 200,
+    ROOMS_REQUEST,
+    PLAYERS_IN_ROOM_REQUEST,
+    PERSONAL_STATS_REQUEST,
+    HIGH_SCORE_REQUEST,
+    JOIN_ROOM_REQUEST,
+    CREATE_ROOM_REQUEST
+
 };
 
 // =============================

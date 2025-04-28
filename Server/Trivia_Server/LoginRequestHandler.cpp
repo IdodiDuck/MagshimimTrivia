@@ -18,7 +18,7 @@ bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
     return ((info.requestID == static_cast<unsigned int>(RequestCode::SIGNUP_REQUEST)) || (info.requestID == static_cast<unsigned int>(RequestCode::LOGIN_REQUEST)));
 }
 
-RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
+RequestResult LoginRequestHandler::handleRequest(const RequestInfo& info)
 {
     switch (static_cast<RequestCode>(info.requestID))
     {
@@ -52,7 +52,7 @@ RequestResult LoginRequestHandler::login(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::unique_ptr<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
+            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
         };
     }
 
@@ -79,7 +79,7 @@ RequestResult LoginRequestHandler::signup(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::unique_ptr<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
+            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
         };
     }
 

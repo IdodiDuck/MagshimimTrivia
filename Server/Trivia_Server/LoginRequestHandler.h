@@ -12,7 +12,7 @@ public:
 	virtual ~LoginRequestHandler();
 
 	bool isRequestRelevant(const RequestInfo& info) override;
-	RequestResult handleRequest(RequestInfo& info) override;
+	RequestResult handleRequest(const RequestInfo& info) override;
 
 private:
 	RequestHandlerFactory& m_handlerFactory;
