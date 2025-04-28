@@ -15,13 +15,13 @@ public:
 	RequestHandlerFactory(std::weak_ptr<IDatabase> database);
 
 	std::unique_ptr<LoginRequestHandler> createLoginRequestHandler();
-	std::unique_ptr<MenuRequestHandler> createMenuRequestHandler();
+	std::unique_ptr<MenuRequestHandler> createMenuRequestHandler(const LoggedUser& user);
 	LoginManager& getLoginManager();
 
 private:
 	LoginManager m_loginManager;
 	std::weak_ptr<IDatabase> m_database;
-	//RoomManager m_roomManager;
-	//StatisticsManager m_StatisticsManager;
+	RoomManager m_roomManager;
+	StatisticsManager m_StatisticsManager;
 
 };
