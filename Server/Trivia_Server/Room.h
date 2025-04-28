@@ -30,7 +30,7 @@ public:
 
     void addUser(const LoggedUser& user);
     void removeUser(const LoggedUser& user);
-    std::set<std::string> getAllUsers();
+    std::set<std::string> getAllUsers() const;
     RoomData getRoomData() const;
 
 private:

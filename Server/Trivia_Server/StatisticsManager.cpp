@@ -2,33 +2,34 @@
 
 #include <algorithm>
 #include <sstream>
+#include <iostream>
+
+StatisticsManager::StatisticsManager(std::weak_ptr<IDatabase> dataBase): m_database(dataBase)
+{
+
+}
+
+StatisticsManager::~StatisticsManager()
+{
+
+}
 
 std::vector<std::string> StatisticsManager::getHighScore()
 {
-    std::vector<std::string> scores = m_database->getHighScores();
-
-    std::sort(scores.begin(), scores.end(), [](const std::string& a, const std::string& b) 
-        {
-            return std::stoi(a) > std::stoi(b);
-        });
-
-    if (scores.size() > 5) 
-    {
-        scores.resize(5);
-    }
-
-    return scores;
+    auto db = m_database.lock();
+    return db->getHighScores();
 }
 
 std::vector<std::string> StatisticsManager::getUserStatistics(const std::string& username)
 {
     std::vector<std::string> stats;
+    auto db = m_database.lock();
 
-    const int totalGames = m_database->getNumOfPlayerGames(username);
-    const int correctAnswers = m_database->getNumOfCorrectAnswers(username);
-    const int totalAnswers = m_database->getNumOfTotalAnswers(username);
-    const float avgAnswerTime = m_database->getPlayerAverageAnswerTime(username);
-    const int playerScore = m_database->getPlayerScore(username);
+    const int totalGames = db->getNumOfPlayerGames(username);
+    const int correctAnswers = db->getNumOfCorrectAnswers(username);
+    const int totalAnswers = db->getNumOfTotalAnswers(username);
+    const float avgAnswerTime = db->getPlayerAverageAnswerTime(username);
+    const int playerScore = db->getPlayerScore(username);
     const float accuracy = (totalAnswers > 0) ? (static_cast<float>(correctAnswers) / totalAnswers) * 100 : 0.0f;
 
     stats.push_back("Player: " + username);

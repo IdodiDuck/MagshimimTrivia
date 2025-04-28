@@ -14,7 +14,7 @@ void Room::removeUser(const LoggedUser& user)
 	m_users.erase(user);
 }
 
-std::set<std::string> Room::getAllUsers()
+std::set<std::string> Room::getAllUsers() const
 {
     std::set<std::string> usernames;
 
