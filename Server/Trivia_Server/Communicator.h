@@ -19,7 +19,7 @@ class Communicator
 {
 
 public:
-	Communicator(RequestHandlerFactory& handlerFactory);
+	Communicator(std::weak_ptr<RequestHandlerFactory> handlerFactory);
 	~Communicator();
 	void startHandleRequests();
 
@@ -27,7 +27,7 @@ private:
 	// Attributes - 
 	SOCKET m_serverSocket;
 	std::unordered_map <SOCKET, std::unique_ptr<IRequestHandler>> m_clients;
-	RequestHandlerFactory& m_handlerFactory;
+	std::weak_ptr<RequestHandlerFactory> m_handlerFactory;
 	std::atomic<bool> m_isRunning; // Used to synchronize between the threads if the server is still active
 	std::mutex m_clientsMutex;
 

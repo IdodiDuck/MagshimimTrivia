@@ -9,7 +9,7 @@
 #include <iostream>
 #include <ctime>
 
-Communicator::Communicator(RequestHandlerFactory& handlerFactory) : m_handlerFactory(handlerFactory), m_isRunning(true)
+Communicator::Communicator(std::weak_ptr<RequestHandlerFactory> handlerFactory): m_handlerFactory(handlerFactory), m_isRunning(true)
 {
     this->m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -50,10 +50,9 @@ void Communicator::startHandleRequests()
         {
             if (!doesClientExists(clientSocket))
             {
-                m_clients[clientSocket] = this->m_handlerFactory.createLoginRequestHandler();
+                m_clients[clientSocket] = this->m_handlerFactory.lock()->createLoginRequestHandler();
+                std::thread(&Communicator::handleNewClient, this, clientSocket).detach();
             }
-
-            std::thread(&Communicator::handleNewClient, this, clientSocket).detach();
         }
     }
 }

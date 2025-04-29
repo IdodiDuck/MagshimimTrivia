@@ -3,9 +3,9 @@
 #include "JsonRequestPacketDeserializer.h"
 #include "JsonResponsePacketSerializer.h"
 
-#include "LoggedUser.h"
+#include "RequestHandlerFactory.h"
 
-LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory): m_handlerFactory(handlerFactory)
+LoginRequestHandler::LoginRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory): m_handlerFactory(handlerFactory)
 {
 
 }
@@ -44,7 +44,7 @@ RequestResult LoginRequestHandler::handleRequest(const RequestInfo& info)
 RequestResult LoginRequestHandler::login(const RequestInfo& request)
 {
     LoginRequest loginRequest = JsonRequestPacketDeserializer::deserializeLoginRequest(request.buffer).value();
-    LoginStatus status = m_handlerFactory.getLoginManager().login(loginRequest.username, loginRequest.password);
+    LoginStatus status = getFactorySafely()->getLoginManager().login(loginRequest.username, loginRequest.password);
     LoginResponse response;
 
     if (status == LoginStatus::SUCCESS)
@@ -54,7 +54,7 @@ RequestResult LoginRequestHandler::login(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(LoggedUser(loginRequest.username)))
+            getFactorySafely()->createMenuRequestHandler(LoggedUser(loginRequest.username))
         };
     }
 
@@ -70,7 +70,7 @@ RequestResult LoginRequestHandler::login(const RequestInfo& request)
 RequestResult LoginRequestHandler::signup(const RequestInfo& request)
 {
     SignupRequest signupRequest = JsonRequestPacketDeserializer::deserializeSignupRequest(request.buffer).value();
-    SignUpStatus status = m_handlerFactory.getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email);
+    SignUpStatus status = getFactorySafely()->getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email);
 
     SignupResponse response;
 
@@ -81,7 +81,7 @@ RequestResult LoginRequestHandler::signup(const RequestInfo& request)
         return
         {
             JsonResponsePacketSerializer::serializeResponse(response),
-            std::make_unique<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler(LoggedUser(signupRequest.username)))
+            getFactorySafely()->createMenuRequestHandler(LoggedUser(signupRequest.username))
         };
     }
 
@@ -92,4 +92,14 @@ RequestResult LoginRequestHandler::signup(const RequestInfo& request)
         JsonResponsePacketSerializer::serializeResponse(response),
         std::make_unique<LoginRequestHandler>(m_handlerFactory)
     };
+}
+
+std::shared_ptr<RequestHandlerFactory> LoginRequestHandler::getFactorySafely()
+{
+    if (auto factory = m_handlerFactory.lock())
+    {
+        return factory;
+    }
+
+    throw std::runtime_error("LoginRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
 }

@@ -17,7 +17,7 @@ public:
 
 private:
 	// Attributes - 
-	Communicator m_communicator;
 	std::shared_ptr<IDatabase> m_database;
-	RequestHandlerFactory m_handlerFactory;
+	std::shared_ptr<RequestHandlerFactory> m_handlerFactory;
+	Communicator m_communicator;
 };

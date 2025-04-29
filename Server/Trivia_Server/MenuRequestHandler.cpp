@@ -1,12 +1,12 @@
 #include "MenuRequestHandler.h"
 
 #include "Constants.h"
+#include "RequestHandlerFactory.h"
+
 #include "JsonResponsePacketSerializer.h"
 #include "JsonRequestPacketDeserializer.h"
 
-#include <memory>
-
-MenuRequestHandler::MenuRequestHandler(const LoggedUser& user, RequestHandlerFactory& handlerFactory): m_user(user), m_handlerFactory(handlerFactory)
+MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user): m_user(user), m_handlerFactory(handlerFactory)
 {
 
 }
@@ -71,9 +71,8 @@ RequestResult MenuRequestHandler::signout(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(this->m_handlerFactory.createLoginRequestHandler())
+        getFactorySafely()->createLoginRequestHandler()
     };
-
 }
 
 RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
@@ -84,16 +83,16 @@ RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+        nullptr // To do - appoint to a new handler when added
     };
 }
 
 RequestResult MenuRequestHandler::getPlayersInRoom(const RequestInfo& info)
 {
     GetPlayersInRoomRequest request = JsonRequestPacketDeserializer::deserializeGetPlayersRequest(info.buffer).value();
-    Room currentRoom = m_handlerFactory.getRoomManager().getRoom(request.roomId).value();
+    Room currentRoom = getFactorySafely()->getRoomManager().getRoom(request.roomId).value();
     GetPlayersInRoomResponse response;
-    
+
     for (const auto& username : currentRoom.getAllUsers())
     {
         response.players.push_back(username);
@@ -102,7 +101,7 @@ RequestResult MenuRequestHandler::getPlayersInRoom(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+        nullptr
     };
 
 }
@@ -111,12 +110,12 @@ RequestResult MenuRequestHandler::getPersonalStats(const RequestInfo& info)
 {
     getPersonalStatsResponse response;
     response.status = SUCCESS;
-    response.statistics = this->m_handlerFactory.getStatisticsManager().getUserStatistics(this->m_user.getUserName());
+    response.statistics = getFactorySafely()->getStatisticsManager().getUserStatistics(m_user.getUserName());
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+        nullptr
     };
 }
 
@@ -124,12 +123,12 @@ RequestResult MenuRequestHandler::getHighScore(const RequestInfo& info)
 {
     getHighScoreResponse response;
     response.status = SUCCESS;
-    response.statistics = this->m_handlerFactory.getStatisticsManager().getUserStatistics(this->m_user.getUserName());
+    response.statistics = getFactorySafely()->getStatisticsManager().getUserStatistics(m_user.getUserName());
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+        nullptr
     };
 }
 
@@ -145,7 +144,7 @@ RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+        nullptr // To do - appoint to a new handler when added
     };
 }
 
@@ -159,6 +158,16 @@ RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<IRequestHandler>(nullptr) // To do - appoint to a new handler when added
+        nullptr // To do - appoint to a new handler when added
     };
+}
+
+std::shared_ptr<RequestHandlerFactory> MenuRequestHandler::getFactorySafely()
+{
+    if (auto factory = m_handlerFactory.lock())
+    {
+        return factory;
+    }
+
+    throw std::runtime_error("MenuRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
 }
