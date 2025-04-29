@@ -370,6 +370,7 @@ int SqliteDataBase::getNumOfPlayerGames(const std::string& username)
     };
 
     char* errMsg = nullptr;
+
     if (sqlite3_exec(this->_dataBase, GAMES_PLAYED_QUERY.c_str(), callback, &correctAnswers, &errMsg) != SQLITE_OK)
     {
         std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
@@ -381,9 +382,7 @@ int SqliteDataBase::getNumOfPlayerGames(const std::string& username)
 }
 
 int SqliteDataBase::getPlayerScore(const std::string& username)
-{
-    const int CORRECT_ANSWERS_POINTS = 10, ANSWER_TIME_PENALTY_POINTS = 2;
-    
+{    
     if (!isDataBaseOpen())
     {
         std::cerr << "DataBase: [ERROR]: Database not open!" << std::endl;
@@ -392,6 +391,8 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
 
     int correctAnswers = getNumOfCorrectAnswers(username);
     int totalAnswers = getNumOfTotalAnswers(username);
+    int gamesPlayed = getNumOfPlayerGames(username);
+    int wrongAnswers = totalAnswers - correctAnswers;
     float avgAnswerTime = getPlayerAverageAnswerTime(username);
 
     if (correctAnswers == static_cast<int>(DatabaseResult::DATABASE_ERROR) || totalAnswers == static_cast<int>(DatabaseResult::DATABASE_ERROR) || avgAnswerTime < 0)
@@ -400,11 +401,12 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    // Calculating the total score by the amount of correct answers
-    int score = correctAnswers * CORRECT_ANSWERS_POINTS;
+    // In-case any part of the denominator is zero it will be 1 (Avoids division by zero) 
+    double safeWrongAnswers = max(1, wrongAnswers);
+    double safeAvgTime = max(1.0, avgAnswerTime);
 
-    // Deducting from the score depends on the time it took for the user to answer
-    score -= static_cast<int>(avgAnswerTime * ANSWER_TIME_PENALTY_POINTS);
+    // Calculating the total score by the amount of correct answers
+    int score = static_cast<int>((totalAnswers + gamesPlayed) / (safeWrongAnswers * safeAvgTime));
 
     score = max(0, score); // Negative amount of points is considered as zero
     return score;
