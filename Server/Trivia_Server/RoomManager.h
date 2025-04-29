@@ -20,6 +20,6 @@ public:
 
 private:
 
-	std::unordered_map<const unsigned int, Room> m_rooms;
+	std::unordered_map<unsigned int, Room> m_rooms;
 
 };
