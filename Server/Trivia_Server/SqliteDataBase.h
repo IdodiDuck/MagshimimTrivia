@@ -49,6 +49,7 @@ public:
 	std::vector<std::string> getHighScores() override;
 
 private:
+	// Attributes - 
 	sqlite3* _dataBase;
 	std::string _dataBaseName;
 
@@ -56,11 +57,17 @@ private:
 	int executeQuery(const std::string& sql);
 	void initializeTriviaDB();
 	bool isDataBaseOpen();
+	void sortHighestScores(std::vector<std::pair<std::string, int>>& playersScores);
+	int getAmountOfQuestions();
+
+	// Static Callbacks - 
+	static int processScoresCallback(void* data, int argc, char** argv, char** colNames);
+	static int processQuestionsCallback(void* data, int argc, char** argv, char** colNames);
 
 	// Adding 10 Questions to Database (V2.0.0)
 	void addQuestionsFromOpenTDB();
 	void insertQuestionsIntoDataBase(const nlohmann::json& jsonResponse);
-
+	
 	std::string decodeHtmlCharacters(const std::string& input);
 	void prepareSQLQuery(std::string& input);
 

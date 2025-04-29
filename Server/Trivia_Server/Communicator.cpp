@@ -84,6 +84,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 {
     const std::string EMPTY_CONTENT = "";
     const int EMPTY = 0;
+
     RequestInfo info;
 
     while (true)
@@ -104,32 +105,15 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 
             if (m_clients[clientSocket]->isRequestRelevant(info))
             {
-                std::cout << "Handling the request, getting it's results..." << std::endl;
-                RequestResult res = m_clients[clientSocket]->handleRequest(info);
-
-                std::cout << "Giving the new handler to the client..." << std::endl;
-                m_clients[clientSocket] = std::move(res.newHandler);
-
-                std::cout << "Constructing response to be sent..." << std::endl;
-                std::vector<unsigned char> buffer = res.response;
-                std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
-
-                // Sending back to the client a response, then we disconnect him
-                if (response != EMPTY_CONTENT)
-                {
-                    sendClientResponse(clientSocket, buffer);
-                    break;
-                }
-            }
-
-            // In-case the client has sent a request with invalid code
-            if (info.buffer.size() != EMPTY)
-            {
-                std::cout << "Client requested invalid type of request..." << std::endl;
-                sendErrorResponse(clientSocket, "Error: Invalid type of request.");
+                processClientRequest(clientSocket, info);
                 break;
             }
 
+            if (!info.buffer.empty())
+            {
+                sendErrorResponse(clientSocket, "Error: Invalid type of request.");
+                break;
+            }
         }
 
         catch (const std::exception& e)
