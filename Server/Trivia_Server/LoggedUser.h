@@ -15,7 +15,7 @@ public:
 
 	// Operators - 
 	bool operator==(const LoggedUser& otherUser) const;
-
+	bool operator<(const LoggedUser& other) const;
 
 private:
 	// Attributes - 

@@ -14,3 +14,8 @@ bool LoggedUser::operator==(const LoggedUser& otherUser) const
 {
 	return (this->m_username == otherUser.getUserName());
 }
+
+bool LoggedUser::operator<(const LoggedUser& other) const
+{
+	return (m_username < other.m_username);
+}
