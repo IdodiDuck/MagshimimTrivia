@@ -2,6 +2,11 @@
 
 #include <stdexcept>
 
+RoomManager::~RoomManager()
+{
+    this->m_rooms.clear();
+}
+
 void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
     const int MIN_VALID_ID = 1;
