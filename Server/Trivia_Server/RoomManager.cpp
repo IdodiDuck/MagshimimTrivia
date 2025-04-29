@@ -4,7 +4,8 @@
 
 void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
-    if (data.id <= 0) 
+    const int MIN_VALID_ID = 1;
+    if (data.id < MIN_VALID_ID)
     {
         throw std::invalid_argument("Error: Invalid room ID");
     }
@@ -22,24 +23,24 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 
 void RoomManager::deleteRoom(int ID)
 {
-    auto it = m_rooms.find(ID);
-    if (it == m_rooms.cend()) 
+    auto roomIt = m_rooms.find(ID);
+    if (roomIt == m_rooms.cend())
     {
         throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
     }
 
-    m_rooms.erase(it);
+    m_rooms.erase(roomIt);
 }
 
-RoomStatus RoomManager::getRoomState(int ID) const
+RoomStatus RoomManager::getRoomState(const int ID) const
 {
-    auto it = m_rooms.find(ID);
-    if (it == m_rooms.cend()) 
+    auto roomIt = m_rooms.find(ID);
+    if (roomIt == m_rooms.cend())
     {
         throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
     }
 
-    return it->second.getRoomData().status;
+    return roomIt->second.getRoomData().status;
 }
 
 std::vector<RoomData> RoomManager::getRooms() const
@@ -54,12 +55,13 @@ std::vector<RoomData> RoomManager::getRooms() const
     return rooms;
 }
 
-std::optional<const Room&> RoomManager::getRoom(int ID) const
+std::optional<std::reference_wrapper<const Room>> RoomManager::getRoom(const int ID) const
 {
-    auto it = m_rooms.find(ID);
-    if (it != m_rooms.cend())
+    auto roomIt = m_rooms.find(ID);
+    if (roomIt != m_rooms.end())
     {
-        return std::optional<const Room&>(it->second);
+        return std::cref(roomIt->second); // Returning constant reference
     }
+
     return std::nullopt;
 }

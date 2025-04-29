@@ -16,7 +16,7 @@ public:
 
 	RoomStatus getRoomState(const int ID) const;
 	std::vector<RoomData> getRooms() const;
-	std::optional<const Room&> getRoom(const int ID) const;
+	std::optional<std::reference_wrapper<const Room>> getRoom(const int ID) const;
 
 private:
 
