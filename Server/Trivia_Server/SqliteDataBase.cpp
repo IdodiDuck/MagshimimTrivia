@@ -389,9 +389,7 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    int correctAnswers = getNumOfCorrectAnswers(username);
-    int totalAnswers = getNumOfTotalAnswers(username);
-    int gamesPlayed = getNumOfPlayerGames(username);
+    int correctAnswers = getNumOfCorrectAnswers(username), totalAnswers = getNumOfTotalAnswers(username), gamesPlayed = getNumOfPlayerGames(username);
     int wrongAnswers = totalAnswers - correctAnswers;
     float avgAnswerTime = getPlayerAverageAnswerTime(username);
 
@@ -401,14 +399,19 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    // In-case any part of the denominator is zero it will be 1 (Avoids division by zero) 
-    double safeWrongAnswers = max(1, wrongAnswers);
-    double safeAvgTime = max(1.0, avgAnswerTime);
+    const int SCORE_FACTOR_POINTS = 10;
 
-    // Calculating the total score by the amount of correct answers
-    int score = static_cast<int>((totalAnswers + gamesPlayed) / (safeWrongAnswers * safeAvgTime));
+    // Avoid division by zero
+    double safeWrongAnswers = max(1.0, static_cast<double>(wrongAnswers));
+    double safeAvgTime = max(1.0, static_cast<double>(avgAnswerTime));
 
-    score = max(0, score); // Negative amount of points is considered as zero
+    // Calculate score
+    double rawScore = (totalAnswers + gamesPlayed) / (safeWrongAnswers * safeAvgTime);
+    int score = static_cast<int>(std::round(rawScore * SCORE_FACTOR_POINTS));
+
+    // Ensure minimum score of 1 if user participated
+    score = (totalAnswers > 0) ? max(1, score) : 0;
+
     return score;
 }
 
