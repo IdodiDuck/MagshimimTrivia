@@ -33,5 +33,10 @@ namespace TriviaClient
         {
 
         }
+
+        private void RoomsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
+        }
     }
 }
