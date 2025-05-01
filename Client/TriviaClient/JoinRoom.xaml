@@ -15,6 +15,12 @@
 
         </Grid.ColumnDefinitions>
 
+        <TextBlock Text="Rooms" FontSize="14" FontWeight="Bold" 
+               Margin="10,10,0,0" Grid.Column="0" VerticalAlignment="Top"/>
+
+        <TextBlock Text="Users in Room" FontSize="14" FontWeight="Bold" 
+               Margin="10,10,0,0" Grid.Column="1" VerticalAlignment="Top"/>
+
         <ListBox x:Name="RoomsList" Margin="10,40,10,60" SelectionMode="Single"
              Grid.Column="0" SelectionChanged="RoomsList_SelectionChanged"/>
 
