@@ -26,7 +26,8 @@
         <!-- Texts Headers -->
         <TextBlock Text="Rooms" FontSize="14" FontWeight="Bold" Margin="10" Grid.Column="0" Grid.Row="0"/>
         <TextBlock Text="Users in Room" FontSize="14" FontWeight="Bold" Margin="10" Grid.Column="1" Grid.Row="0"/>
-
+        <TextBlock x:Name="NoRoomsText" Text="No rooms available" Foreground="Gray" FontStyle="Italic" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" Grid.Column="0" Grid.Row="1" Panel.ZIndex="1"/>    
+         
         <!-- ListBoxes -->
         <ListBox x:Name="RoomsList" Grid.Column="0" Grid.Row="1" Margin="10"
              SelectionMode="Single" SelectionChanged="RoomsList_SelectionChanged"/>
