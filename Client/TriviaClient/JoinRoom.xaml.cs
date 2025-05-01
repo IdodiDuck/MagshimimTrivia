@@ -26,17 +26,22 @@ namespace TriviaClient
 
         private void JoinButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // TODO -> (Move to the Room Waiting For Game Window)
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // Return back to Menu Window
         }
 
         private void RoomsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
+            // TODO
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            // Return back to Menu Window
         }
     }
 }
