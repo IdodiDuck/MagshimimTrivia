@@ -10,29 +10,28 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace TriviaClient
 {
     /// <summary>
-    /// Interaction logic for Login.xaml
+    /// Interaction logic for Signup.xaml
     /// </summary>
-    public partial class Login : Window
+    public partial class Signup : Window
     {
-        public Login()
+        public Signup()
         {
             InitializeComponent();
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private void SignUpButton_Click(object sender, RoutedEventArgs e)
         {
-             // TODO -> validate login info and go to menu
+            // TODO -> validate signup info and go to menu
         }
 
-        private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void Login_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // go to signup page
+            // return to login window
         }
     }
 }
