@@ -48,6 +48,12 @@
                         Content="Personal Statistics"
                         Click="StatisticsBtn_Click"
                         Margin="0,0,0,20"/>
+
+                <!-- Best Scores Button -->
+                <Button x:Name="BestScoresBtn"
+                    Content="Best Scores"
+                    Click="BestScoresBtn_click"
+                    Margin="0,0,0,20"/>
             </StackPanel>
         </Grid>
 

@@ -43,5 +43,10 @@ namespace TriviaClient
         {
             // signout
         }
+
+        private void BestScoresBtn_click(object sender, RoutedEventArgs e)
+        {
+            // go to HighScores
+        }
     }
 }
