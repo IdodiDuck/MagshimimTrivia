@@ -6,8 +6,7 @@
         xmlns:local="clr-namespace:TriviaClient"
         mc:Ignorable="d"
         Title="Signup" Height="500" Width="800" 
-        WindowStartupLocation="CenterScreen"
-        ResizeMode="NoResize">
+        WindowStartupLocation="CenterScreen">
 
     <Grid Background="#E5E5E5E5">
         <!-- Main content container -->
