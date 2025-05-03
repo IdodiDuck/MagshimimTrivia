@@ -26,22 +26,22 @@ namespace TriviaClient
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            // go to CreateRoom
         }
 
         private void JoinRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            // go to JoinRoom
         }
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-            
+            // go to PersonalStatistics
         }
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            
+            // signout
         }
     }
 }
