@@ -3,10 +3,94 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TriviaClient"
         mc:Ignorable="d"
-        Title="PersonalStatistics" Height="450" Width="800">
+        Title="Personal Statistics" Height="450" Width="800"
+        Background="White"
+        Closed="Window_Closed">
+
     <Grid>
+        <!-- Main Panel -->
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Width="636"
+                    Margin="0,28,0,0"
+                    Orientation="Vertical" Height="341">
+            <!-- Headers -->
+            <TextBlock Text="Personal Statistics"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       TextAlignment="Center"
+                       Margin="0,10,0,20"
+                       HorizontalAlignment="Center"/>
+            
+            <!-- Statistics Headers & Data -->
+            <Grid Margin="0,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Games Played:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+            </Grid>
+
+            <Grid Margin="0,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Correct Answers:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+            </Grid>
+
+            <Grid Margin="0,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Wrong Answers:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+            </Grid>
+
+            <Grid Margin="0,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Average Answer Time:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+            </Grid>
+
+        </StackPanel>
         
+        <!-- Buttons -->
+        <Button Content="Back to Menu"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Width="150"
+                Height="40"
+                Margin="0,0,20,20"
+                Background="White" Foreground="Black"
+                Click="BackToMenu_Click"/>
+
     </Grid>
 </Window>

@@ -23,5 +23,15 @@ namespace TriviaClient
         {
             InitializeComponent();
         }
+
+        private void BackToMenu_Click(object sender, RoutedEventArgs e)
+        {
+            // Return back to Menu Window
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            // Send Exit Message
+        }
     }
 }
