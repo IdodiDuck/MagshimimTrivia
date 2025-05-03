@@ -67,6 +67,7 @@ RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 {
     LogoutResponse response;
     response.status = SUCCESS;
+    getFactorySafely()->getLoginManager().logOut(this->m_user.getUserName());
 
     return
     {
