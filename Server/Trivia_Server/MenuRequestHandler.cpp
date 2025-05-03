@@ -65,8 +65,8 @@ RequestResult MenuRequestHandler::handleRequest(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 {
-    LogoutResponse response;
-    response.status = SUCCESS;
+    LogoutResponse response { SUCCESS };
+
     getFactorySafely()->getLoginManager().logOut(this->m_user.getUserName());
 
     return
@@ -78,8 +78,7 @@ RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
 {
-    GetRoomsResponse response;
-    response.status = SUCCESS;
+    GetRoomsResponse response { SUCCESS };
     
     return
     {
@@ -138,7 +137,7 @@ RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
     const unsigned int INVALID_ROOM_ID = 0;
 
     JoinRoomRequest request = JsonRequestPacketDeserializer::deserializeJoinRoomRequest(info.buffer).value();
-    JoinRoomResponse response;
+    JoinRoomResponse response {};
 
     response.status = (request.roomId != INVALID_ROOM_ID) ? SUCCESS : FAILURE;
 
@@ -152,7 +151,7 @@ RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
 RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
 {
     CreateRoomRequest request = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(info.buffer).value();
-    CreateRoomResponse response;
+    CreateRoomResponse response {};
 
     response.status = (request.roomName != "") ? SUCCESS : FAILURE;
 
