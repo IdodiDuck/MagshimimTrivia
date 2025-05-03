@@ -41,7 +41,7 @@ namespace TriviaClient
 
         private void Window_Closed(object sender, EventArgs e)
         {
-            // Return back to Menu Window
+            // Send Exit Message
         }
     }
 }
