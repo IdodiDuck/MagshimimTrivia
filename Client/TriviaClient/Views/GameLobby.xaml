@@ -1,0 +1,113 @@
+﻿<Window x:Class="TriviaClient.GameLobby"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TriviaClient"
+        mc:Ignorable="d"
+        Title="GameLobby" Height="450" Width="800"
+        WindowStartupLocation="CenterScreen"
+        Closed="Window_Closed">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#E5E5E5E5" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="RoomText" 
+                           Text="Room: " 
+                           Foreground="Black"
+                           FontSize="18"
+                           FontWeight="Bold"/>
+
+                <TextBlock x:Name="RoomNameText"
+                           Text="'room name'"
+                           Foreground="Black"
+                           FontSize="16"
+                           Margin="20,0,0,0"/>
+                
+                <TextBlock x:Name="RoomStatusText"
+                           Text="Waiting for players..."
+                           Foreground="Black"
+                           FontSize="16"
+                           Margin="20,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Players List -->
+            <Border Grid.Column="0" Margin="20" CornerRadius="5" BorderBrush="#FFDDDDDD" BorderThickness="1">
+                <StackPanel>
+                    <TextBlock Text="Players in Room:" 
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Margin="10,10,10,5"/>
+
+                    <ListView x:Name="PlayersListView"
+                              Height="300"
+                              BorderThickness="0"
+                              Background="Transparent">
+                    </ListView>
+                </StackPanel>
+            </Border>
+
+            <!-- Game Info -->
+            <StackPanel Grid.Column="1" Width="250" Margin="0,20,20,20">
+                <Border CornerRadius="5" BorderBrush="#FFDDDDDD" BorderThickness="1" Padding="10" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Game Settings:" 
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Margin="0,0,0,10"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Questions:" Width="120"/>
+                            <TextBlock x:Name="QuestionCountText" Text="0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Time per question:" Width="120"/>
+                            <TextBlock x:Name="TimePerQuestionText" Text="0s"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Max players:" Width="120"/>
+                            <TextBlock x:Name="MaxPlayersText" Text="0/0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Start Game Button (Only visible to admin) -->
+                <Button x:Name="StartGameButton"
+                         Content="START GAME"
+                         Height="50"
+                         FontSize="16"
+                         FontWeight="Bold"
+                         Background="#FF007ACC"
+                         Foreground="White"
+                         BorderThickness="0"
+                         Visibility="Collapsed"
+                         Click="StartGameButton_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#FFEEEEEE" Padding="10">
+            <Button x:Name="LeaveButton"
+                    Content="LEAVE ROOM"
+                    HorizontalAlignment="Right"
+                    Width="120"
+                    Click="LeaveButton_Click"/>
+        </Border>
+    </Grid>
+</Window>
