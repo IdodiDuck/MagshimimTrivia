@@ -15,32 +15,32 @@ namespace TriviaClient.Constants
 
         public class LoginResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
         }
 
         public class SignupResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
         }
 
         public class LogoutResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
         }
 
         public class RoomData
         {
-            public int Id { get; set; }
+            public uint Id { get; set; }
             public string Name { get; set; }
-            public int MaxPlayers { get; set; }
-            public int NumOfQuestionsInGame { get; set; }
-            public int TimePerQuestion { get; set; }
-            public int Status { get; set; }
+            public uint MaxPlayers { get; set; }
+            public uint NumOfQuestionsInGame { get; set; }
+            public uint TimePerQuestion { get; set; }
+            public uint Status { get; set; }
         }
 
         public class GetRoomsResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
             public List<RoomData> Rooms { get; set; }
         }
 
@@ -51,23 +51,23 @@ namespace TriviaClient.Constants
 
         public class JoinRoomResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
         }
 
         public class CreateRoomResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
         }
 
         public class GetHighScoreResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
             public List<string> Statistics { get; set; }
         }
 
         public class GetPersonalStatsResponse
         {
-            public int Status { get; set; }
+            public uint Status { get; set; }
             public List<string> Statistics { get; set; }
         }
 
