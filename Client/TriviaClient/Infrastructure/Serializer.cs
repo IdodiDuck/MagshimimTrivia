@@ -13,6 +13,7 @@ namespace TriviaClient.Infrastructure
 {
     internal static class Serializer
     {
+        // V1 Serializations - 
         public static byte[] SerializeRequest(LoginRequest loginRequest)
         {
             const byte REQUEST_CODE = (byte)RequestCode.LoginRequest;
@@ -27,6 +28,7 @@ namespace TriviaClient.Infrastructure
             return BuildRequest(REQUEST_CODE, json);
         }
 
+        // V2 Serializations - 
         public static byte[] SerializeRequest(GetPlayersInRoomRequest getPlayersInRoomRequest)
         {
             const byte REQUEST_CODE = (byte)RequestCode.PlayersInRoomRequest;
@@ -48,6 +50,7 @@ namespace TriviaClient.Infrastructure
             return BuildRequest(REQUEST_CODE, json);
         }
 
+        // Support Methods - 
         private static byte[] BuildRequest(byte requestCode, string json)
         {
             const uint HEADERS_LENGTH = 5, CODE_BYTE_INDEX = 0, MESSAGE_LENGTH_INDEX = 1;

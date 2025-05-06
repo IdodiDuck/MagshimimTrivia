@@ -32,6 +32,7 @@ namespace TriviaClient.Infrastructure
                 throw new Exception("Communicator: [ERROR]: Could not connect to server.", ex);
             }
         }
+        // Communication Methods - 
         public byte[] SendAndReceiveFromServer(byte[] message)
         {
             const int BUFFER_SIZE = 1024;
@@ -58,7 +59,7 @@ namespace TriviaClient.Infrastructure
             catch (Exception ex)
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
-                return Array.Empty<byte>();  // Return an empty array on failure
+                return Array.Empty<byte>();
             }
         }
 
