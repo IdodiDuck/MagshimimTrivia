@@ -29,18 +29,13 @@ namespace TriviaClient
             // Send Exit Message
         }
 
-        private void ReadyCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
         private void LeaveButton_Click(object sender, RoutedEventArgs e)
-        {
+        { 
 
         }
     }
