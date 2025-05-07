@@ -1,14 +1,12 @@
-﻿<Window x:Class="TriviaClient.PersonalStatistics"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
-        Title="Personal Statistics" Height="450" Width="800"
-        Background="White"
-        Closed="Window_Closed">
+﻿<Page x:Class="TriviaClient.PersonalStatistics"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      mc:Ignorable="d"
+      Title="Personal Statistics">
 
-    <Grid>
+    <Grid Background="White">
         <!-- Main Panel -->
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Top"
@@ -22,7 +20,7 @@
                        TextAlignment="Center"
                        Margin="0,10,0,20"
                        HorizontalAlignment="Center"/>
-            
+
             <!-- Statistics Headers & Data -->
             <Grid Margin="0,15">
                 <Grid.RowDefinitions>
@@ -81,7 +79,7 @@
             </Grid>
 
         </StackPanel>
-        
+
         <!-- Buttons -->
         <Button Content="Back to Menu"
                 HorizontalAlignment="Right"
@@ -93,4 +91,4 @@
                 Click="BackToMenu_Click"/>
 
     </Grid>
-</Window>
+</Page>

@@ -11,30 +11,18 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Navigation;
 
 namespace TriviaClient
 {
     /// <summary>
-    /// Interaction logic for CreateRoom.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class CreateRoom : Page
+    public partial class MainWindow : Window
     {
-        public CreateRoom()
+        public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void CreateButton_Click(object sender, RoutedEventArgs e)
-        {
-            // TODO create room
-        }
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            // go back to menu
+            // MainFrame.Navigate(PAGE_CONSTRUCTOR_HERE);
         }
     }
-
-
 }

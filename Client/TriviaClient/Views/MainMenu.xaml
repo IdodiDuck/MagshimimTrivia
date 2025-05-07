@@ -1,13 +1,11 @@
-﻿<Window x:Class="TriviaClient.MainMenu"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:TriviaClient"
-        mc:Ignorable="d"
-        Title="Trivia Game - Main Menu" Height="450" Width="800"
-        WindowStartupLocation="CenterScreen"
-        Background="#FBFBFBFB">
+﻿<Page x:Class="TriviaClient.MainMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:local="clr-namespace:TriviaClient"
+      mc:Ignorable="d"
+      Title="Trivia Game - Main Menu">
 
     <Grid>
         <!-- Main layout container -->
@@ -67,7 +65,7 @@
         </Border>
     </Grid>
 
-    <Window.Resources>
+    <Page.Resources>
         <!-- Button Styles -->
         <Style x:Key="MenuButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="White"/>
@@ -120,5 +118,5 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-    </Window.Resources>
-</Window>
+    </Page.Resources>
+</Page>

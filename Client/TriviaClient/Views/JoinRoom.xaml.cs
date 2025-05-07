@@ -11,13 +11,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
 
 namespace TriviaClient
 {
     /// <summary>
     /// Interaction logic for JoinRoom.xaml
     /// </summary>
-    public partial class JoinRoom : Window
+    public partial class JoinRoom : Page
     {
         public JoinRoom()
         {
@@ -37,11 +38,6 @@ namespace TriviaClient
         private void RoomsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // TODO
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            // Send Exit Message
         }
     }
 }

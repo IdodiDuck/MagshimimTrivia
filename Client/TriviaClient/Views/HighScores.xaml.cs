@@ -11,22 +11,18 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
 
 namespace TriviaClient
 {
     /// <summary>
     /// Interaction logic for HighScores.xaml
     /// </summary>
-    public partial class HighScores : Window
+    public partial class HighScores : Page
     {
         public HighScores()
         {
             InitializeComponent();
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            // Send Exit Message
         }
 
         private void BackToMenu_Click(object sender, RoutedEventArgs e)

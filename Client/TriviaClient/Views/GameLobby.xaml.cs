@@ -11,22 +11,18 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
 
 namespace TriviaClient
 {
     /// <summary>
     /// Interaction logic for GameLobby.xaml
     /// </summary>
-    public partial class GameLobby : Window
+    public partial class GameLobby : Page
     {
         public GameLobby()
         {
             InitializeComponent();
-        }
-
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            // Send Exit Message
         }
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)

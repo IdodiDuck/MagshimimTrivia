@@ -11,13 +11,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Navigation;
 
 namespace TriviaClient
 {
     /// <summary>
     /// Interaction logic for PersonalStatistics.xaml
     /// </summary>
-    public partial class PersonalStatistics : Window
+    public partial class PersonalStatistics : Page
     {
         public PersonalStatistics()
         {
@@ -29,9 +30,5 @@ namespace TriviaClient
             // Return back to Menu Window
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            // Send Exit Message
-        }
     }
 }

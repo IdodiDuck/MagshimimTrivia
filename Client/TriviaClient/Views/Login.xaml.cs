@@ -18,11 +18,16 @@ namespace TriviaClient
     /// <summary>
     /// Interaction logic for Login.xaml
     /// </summary>
-    public partial class Login : Window
+    public partial class Login : Page
     {
         public Login()
         {
             InitializeComponent();
+        }
+
+        private void InputChanged(object sender, RoutedEventArgs e)
+        {
+            // TODO
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
