@@ -8,18 +8,18 @@ namespace TriviaClient.Constants
 {
     public class LoginRequest
     {
-        public string username { get; set; }
+        public string username { get; set; } = string.Empty;
 
-        public string password { get; set; }
+        public string password { get; set; } = string.Empty;
     }
 
     public class SignupRequest
     {
-        public string username { get; set; }
+        public string username { get; set; } = string.Empty;
 
-        public string password { get; set; }
+        public string password { get; set; } = string.Empty;
 
-        public string email { get; set; }
+        public string email { get; set; } = string.Empty;
     }
 
     public class GetPlayersInRoomRequest
@@ -34,7 +34,7 @@ namespace TriviaClient.Constants
 
     public class CreateRoomRequest
     {
-        public string roomName { get; set; }
+        public string roomName { get; set; } = string.Empty;
 
         public uint maxUsers { get; set; }
 

@@ -32,7 +32,7 @@ namespace TriviaClient
 
         private void Login_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // return to login window
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/Login.xaml", UriKind.Relative));
         }
     }
 }

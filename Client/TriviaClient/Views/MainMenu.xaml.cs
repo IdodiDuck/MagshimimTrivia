@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
+using TriviaClient.Infrastructure;
 
 namespace TriviaClient
 {
@@ -20,6 +21,7 @@ namespace TriviaClient
     /// </summary>
     public partial class MainMenu : Page
     {
+
         public MainMenu()
         {
             InitializeComponent();
@@ -42,7 +44,7 @@ namespace TriviaClient
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            // signout
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/Login.xaml", UriKind.Relative));
         }
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)

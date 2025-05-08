@@ -12,6 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static TriviaClient.Constants.Responses;
+using TriviaClient.Constants;
+
+using TriviaClient.Infrastructure;
+using System.Net.Sockets;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -20,24 +26,82 @@ namespace TriviaClient
     /// </summary>
     public partial class Login : Page
     {
+
         public Login()
         {
             InitializeComponent();
         }
 
-        private void InputChanged(object sender, RoutedEventArgs e)
-        {
-            // TODO
-        }
-
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-             // TODO -> validate login info and go to menu
+            try
+            {
+                var loginRequest = new LoginRequest
+                {
+                    username = UsernameTextBox.Text,
+                    password = PasswordBox.Password
+                };
+
+                byte[] serializedRequest = Serializer.SerializeRequest(loginRequest);
+
+                byte[] serverResponse = GlobalCommunicator.Communicator.SendAndReceiveFromServer(serializedRequest);
+
+                var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
+
+                if (response == null)
+                {
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (response.Status == StatusCodes.SUCCESS)
+                {
+                    NavigationService?.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
+
+                }
+                else
+                {
+                    MessageBox.Show("Invalid username or password.", "Login Failed",
+                                   MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (SocketException ex)
+            {
+                MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void Input_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateLoginButtonState();
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateLoginButtonState();
+        }
+
+        private void UpdateLoginButtonState()
+        {
+            LoginButton.IsEnabled = !string.IsNullOrWhiteSpace(UsernameTextBox.Text) &&
+                                   !string.IsNullOrWhiteSpace(PasswordBox.Password);
         }
 
         private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // go to signup page
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/Signup.xaml", UriKind.Relative));
         }
     }
 }
