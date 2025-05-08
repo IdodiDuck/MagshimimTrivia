@@ -12,11 +12,6 @@ Server::Server() : m_database(std::make_shared<SqliteDataBase>()), m_handlerFact
 
 }
 
-Server::~Server()
-{
-    
-}
-
 void Server::run()
 {
     // Launching communicator thread which handles new clients' requests

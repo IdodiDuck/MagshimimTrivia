@@ -11,11 +11,6 @@ MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> hand
 
 }
 
-MenuRequestHandler::~MenuRequestHandler()
-{
-
-}
-
 bool MenuRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
     return (info.requestID == static_cast<unsigned int>(RequestCode::SIGNOUT_REQUEST)) ||
