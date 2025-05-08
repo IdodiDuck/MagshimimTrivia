@@ -3,9 +3,10 @@
 #include "JsonRequestPacketDeserializer.h"
 #include "JsonResponsePacketSerializer.h"
 
-#include "Constants.h"
+LoginRequestHandler::LoginRequestHandler(RequestHandlerFactory& handlerFactory): m_handlerFactory(handlerFactory)
+{
 
-#include <iostream>
+}
 
 LoginRequestHandler::~LoginRequestHandler()
 {
@@ -19,83 +20,74 @@ bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 
 RequestResult LoginRequestHandler::handleRequest(RequestInfo& info)
 {
-    RequestResult result;
-
-    if (!(isRequestRelevant(info)))
-    {
-        ErrorResponse errorResponse;
-        errorResponse.message = "Error: Invalid request type.";
-        result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
-        result.newHandler.reset();
-
-        return result; 
-    }
-
     switch (static_cast<RequestCode>(info.requestID))
     {
         case RequestCode::LOGIN_REQUEST:
-        {
-            auto loginRequest = JsonRequestPacketDeserializer::deserializeLoginRequest(info.buffer);
-
-            // Valid login request
-            if (loginRequest.has_value())
-            {
-                LoginRequest request = loginRequest.value();
-                // Database Login Validation here (V1.0.3)
-
-                LoginResponse response;
-                response.status = SUCCESS;
-                result.response = JsonResponsePacketSerializer::serializeResponse(response);
-                result.newHandler.reset(); // Modify later and change to next given handler
-
-                return result;
-            }
-
-            // Constructing failure message in-case it didn't work
-            ErrorResponse errorResponse;
-            errorResponse.message = "Invalid login request format.";
-            result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
-            result.newHandler.reset();
-
-            return result;
-        }
+            return login(info);
 
         case RequestCode::SIGNUP_REQUEST:
-        {
-            auto signupRequest = JsonRequestPacketDeserializer::deserializeSignupRequest(info.buffer);
-
-            // Valid signup request
-            if (signupRequest.has_value())
-            {
-                SignupRequest request = signupRequest.value();
-                // Database Signup Validation here (V1.0.3)
-
-                SignupResponse response;
-                response.status = SUCCESS;
-                result.response = JsonResponsePacketSerializer::serializeResponse(response);
-                result.newHandler.reset(); // Modify later and change to next given handler
-
-                return result;
-            }
-
-            // Constructing failure message in-case it didn't work
-            ErrorResponse errorResponse;
-            errorResponse.message = "Invalid sign-up request format.";
-            result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
-            result.newHandler.reset();
-
-            return result;
-        }
+            return signup(info);
 
         default:
-        {
-            // Handle unknown request type (optional)
             ErrorResponse errorResponse;
-            errorResponse.message = "Error: Unknown request type.";
-            result.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
-            result.newHandler.reset();
-
-            return result;
-        }
+            errorResponse.message = "Unknown request type.";
+            return 
+            {
+                JsonResponsePacketSerializer::serializeResponse(errorResponse),
+                nullptr
+            };
     }
+}
+
+RequestResult LoginRequestHandler::login(const RequestInfo& request)
+{
+    LoginRequest loginRequest = JsonRequestPacketDeserializer::deserializeLoginRequest(request.buffer).value();
+    LoginStatus status = m_handlerFactory.getLoginManager().login(loginRequest.username, loginRequest.password);
+    LoginResponse response;
+
+    if (status == LoginStatus::SUCCESS)
+    {
+        response.status = SUCCESS;
+
+        return
+        {
+            JsonResponsePacketSerializer::serializeResponse(response),
+            std::unique_ptr<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
+        };
+    }
+
+    response.status = FAILURE;
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<LoginRequestHandler>(m_handlerFactory)
+    };
+}
+
+RequestResult LoginRequestHandler::signup(const RequestInfo& request)
+{
+    SignupRequest signupRequest = JsonRequestPacketDeserializer::deserializeSignupRequest(request.buffer).value();
+    SignUpStatus status = m_handlerFactory.getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email);
+
+    SignupResponse response;
+
+    if (status == SignUpStatus::SUCCESS)
+    {
+        response.status = SUCCESS;
+
+        return
+        {
+            JsonResponsePacketSerializer::serializeResponse(response),
+            std::unique_ptr<IRequestHandler>(this->m_handlerFactory.createMenuRequestHandler())
+        };
+    }
+
+    response.status = FAILURE;
+
+    return
+    {
+        JsonResponsePacketSerializer::serializeResponse(response),
+        std::make_unique<LoginRequestHandler>(m_handlerFactory)
+    };
 }
