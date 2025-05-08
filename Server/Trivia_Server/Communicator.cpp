@@ -86,7 +86,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
     const int EMPTY = 0;
     RequestInfo info;
 
-    while (true)
+    while (m_clients[clientSocket] != nullptr)
     {
         try
         {
@@ -102,28 +102,22 @@ void Communicator::handleNewClient(SOCKET clientSocket)
                 break;
             }
 
-            if (m_clients[clientSocket]->isRequestRelevant(info))
+            std::cout << "Handling the request, getting its results..." << std::endl;
+            RequestResult res = m_clients[clientSocket]->handleRequest(info);
+
+            std::cout << "Giving the new handler to the client..." << std::endl;
+            m_clients[clientSocket] = std::move(res.newHandler);
+
+            std::cout << "Constructing response to be sent..." << std::endl;
+            std::vector<unsigned char> buffer = res.response;
+            std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
+
+            if (response != EMPTY_CONTENT)
             {
-                std::cout << "Handling the request, getting it's results..." << std::endl;
-                RequestResult res = m_clients[clientSocket]->handleRequest(info);
-
-                std::cout << "Giving the new handler to the client..." << std::endl;
-                m_clients[clientSocket] = std::move(res.newHandler);
-
-                std::cout << "Constructing response to be sent..." << std::endl;
-                std::vector<unsigned char> buffer = res.response;
-                std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
-
-                // Sending back to the client a response, then we disconnect him
-                if (response != EMPTY_CONTENT)
-                {
-                    sendClientResponse(clientSocket, buffer);
-                    break;
-                }
+                sendClientResponse(clientSocket, buffer);
             }
 
-            // In-case the client has sent a request with invalid code
-            if (info.buffer.size() != EMPTY)
+            else
             {
                 std::cout << "Client requested invalid type of request..." << std::endl;
                 sendErrorResponse(clientSocket, "Error: Invalid type of request.");
@@ -135,6 +129,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
         catch (const std::exception& e)
         {
             std::cerr << "Error handling client: " << e.what() << std::endl;
+
             disconnectClient(clientSocket);
             break;
         }
