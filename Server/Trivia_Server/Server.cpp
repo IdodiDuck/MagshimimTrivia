@@ -6,15 +6,10 @@
 #include <iostream>
 #include <thread>
 
-Server::Server(): m_database(std::make_shared<SqliteDataBase>()), m_handlerFactory(m_database),
-m_communicator(m_handlerFactory)
+Server::Server() : m_database(std::make_shared<SqliteDataBase>()), m_handlerFactory(std::make_shared<RequestHandlerFactory>(m_database)),
+    m_communicator(m_handlerFactory)
 {
 
-}
-
-Server::~Server()
-{
-    
 }
 
 void Server::run()

@@ -20,7 +20,16 @@ const int BUFFER_SIZE = 10; // Remove/Modify later
 enum class RequestCode : unsigned int 
 {
     SIGNUP_REQUEST = 100,
-    LOGIN_REQUEST = 101
+    LOGIN_REQUEST,
+
+    SIGNOUT_REQUEST = 200,
+    ROOMS_REQUEST,
+    PLAYERS_IN_ROOM_REQUEST,
+    PERSONAL_STATS_REQUEST,
+    HIGH_SCORE_REQUEST,
+    JOIN_ROOM_REQUEST,
+    CREATE_ROOM_REQUEST
+
 };
 
 // =============================
@@ -29,28 +38,6 @@ enum class RequestCode : unsigned int
 
 const unsigned int SUCCESS = 0;
 const unsigned int FAILURE = 1;
-
-// =============================
-// Response Structs
-// =============================
-
-typedef struct LoginResponse
-{
-    unsigned int status;
-
-} LoginResponse;
-
-typedef struct SignupResponse
-{
-    unsigned int status;
-
-} SignupResponse;
-
-typedef struct ErrorResponse
-{
-    std::string message;
-
-} ErrorResponse;
 
 // =============================
 // Error Codes Constants

@@ -67,7 +67,8 @@ std::optional<int> SocketHelper::getRequestLength(const SOCKET sc)
 
 void SocketHelper::sendData(const SOCKET sc, const std::vector<unsigned char>& data)
 {
-	if (send(sc, reinterpret_cast<const char*>(data.data()), data.size(), 0) == INVALID_SOCKET)
+	int dataSize = static_cast<int>(data.size());
+	if (send(sc, reinterpret_cast<const char*>(data.data()), dataSize, 0) == INVALID_SOCKET)
 	{
 		throw std::exception("Error while sending message to client");
 	}
