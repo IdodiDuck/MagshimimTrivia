@@ -4,6 +4,11 @@ Room::Room(const RoomData& roomData) : m_metadata(roomData), m_users()
 {
 }
 
+Room::~Room()
+{
+    m_users.clear();
+}
+
 void Room::addUser(const LoggedUser& user)
 {
 	m_users.insert(user);

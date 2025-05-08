@@ -27,6 +27,7 @@ class Room
 
 public:
     Room(const RoomData& roomData);
+    ~Room();
 
     void addUser(const LoggedUser& user);
     void removeUser(const LoggedUser& user);
