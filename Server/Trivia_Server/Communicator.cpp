@@ -86,7 +86,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 
     RequestInfo info;
 
-    while (true)
+    while (m_clients[clientSocket] != nullptr)
     {
         try
         {
@@ -102,7 +102,17 @@ void Communicator::handleNewClient(SOCKET clientSocket)
                 break;
             }
 
-            if (m_clients[clientSocket]->isRequestRelevant(info))
+            std::cout << "Handling the request, getting its results..." << std::endl;
+            RequestResult res = m_clients[clientSocket]->handleRequest(info);
+
+            std::cout << "Giving the new handler to the client..." << std::endl;
+            m_clients[clientSocket] = std::move(res.newHandler);
+
+            std::cout << "Constructing response to be sent..." << std::endl;
+            std::vector<unsigned char> buffer = res.response;
+            std::string response = (buffer.size() == EMPTY ? "" : std::string(buffer.cbegin(), buffer.cend()));
+
+            if (response != EMPTY_CONTENT)
             {
                 processClientRequest(clientSocket, info);
                 break;
@@ -118,6 +128,7 @@ void Communicator::handleNewClient(SOCKET clientSocket)
         catch (const std::exception& e)
         {
             std::cerr << "Error handling client: " << e.what() << std::endl;
+
             disconnectClient(clientSocket);
             break;
         }
