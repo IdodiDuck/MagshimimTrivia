@@ -27,12 +27,12 @@ namespace TriviaClient
 
         private void JoinButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO -> (Move to the Room Waiting For Game Window)
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/GameLobby.xaml", UriKind.Relative));
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            // Return back to Menu Window
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
         }
 
         private void RoomsList_SelectionChanged(object sender, SelectionChangedEventArgs e)

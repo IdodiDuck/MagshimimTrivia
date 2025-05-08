@@ -27,12 +27,12 @@ namespace TriviaClient
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO create room
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/GamLobby.xaml", UriKind.Relative));
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            // go back to menu
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
         }
     }
 

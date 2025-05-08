@@ -27,7 +27,7 @@ namespace TriviaClient
 
         private void BackToMenu_Click(object sender, RoutedEventArgs e)
         {
-            // Return back to Menu Window
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
         }
 
     }

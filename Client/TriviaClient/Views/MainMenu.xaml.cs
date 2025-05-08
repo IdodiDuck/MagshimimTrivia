@@ -29,17 +29,17 @@ namespace TriviaClient
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            // go to CreateRoom
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/CreateRoom.xaml", UriKind.Relative));
         }
 
         private void JoinRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            // go to JoinRoom
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/JoinRoom.xaml", UriKind.Relative));
         }
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-            // go to PersonalStatistics
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/PersonalStatistics.xaml", UriKind.Relative));
         }
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
@@ -49,7 +49,7 @@ namespace TriviaClient
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
         {
-            // go to HighScores
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/HighScores.xaml", UriKind.Relative));
         }
     }
 }

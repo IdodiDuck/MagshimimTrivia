@@ -31,8 +31,8 @@ namespace TriviaClient
         }
 
         private void LeaveButton_Click(object sender, RoutedEventArgs e)
-        { 
-
+        {
+            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/JoinRoom.xaml", UriKind.Relative));
         }
     }
 }

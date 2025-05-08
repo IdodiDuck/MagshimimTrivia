@@ -57,7 +57,7 @@ namespace TriviaClient
 
                 if (response.Status == StatusCodes.SUCCESS)
                 {
-                    NavigationService?.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
+                    this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
 
                 }
                 else
