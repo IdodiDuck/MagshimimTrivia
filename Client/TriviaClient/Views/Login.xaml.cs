@@ -103,7 +103,7 @@ namespace TriviaClient
 
         private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/Signup.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new Signup());
         }
     }
 }
