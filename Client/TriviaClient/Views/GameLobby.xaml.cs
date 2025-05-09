@@ -32,7 +32,15 @@ namespace TriviaClient
 
         private void LeaveButton_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/JoinRoom.xaml", UriKind.Relative));
+            // Send to Server LeaveRoom Request!
+
+            if (NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+                return;
+            }
+
+            MessageBox.Show("Error: There's no previous page you can go back to!");
         }
     }
 }

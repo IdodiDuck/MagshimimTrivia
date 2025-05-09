@@ -27,7 +27,13 @@ namespace TriviaClient
 
         private void BackToMenu_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
+            if (NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+                return;
+            }
+
+            MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
     }

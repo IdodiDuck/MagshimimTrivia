@@ -27,12 +27,18 @@ namespace TriviaClient
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/GamLobby.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new GameLobby());
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
+            if (NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+                return;
+            }
+
+           MessageBox.Show("Error: There's no previous page you can go back to!");
         }
     }
 
