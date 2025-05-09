@@ -112,3 +112,39 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     std::string jsonString = jsonResponse.dump();
     return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
 }
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const CloseRoomResponse& closeRoomResponse)
+{
+    nlohmann::json jsonResponse = { "status", closeRoomResponse.status };
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const StartGameResponse& startGameResponse)
+{
+    nlohmann::json jsonResponse = { "status", startGameResponse.status };
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetRoomStateResponse& getRoomStateResponse)
+{
+    nlohmann::json jsonResponse = {
+        {"status", getRoomStateResponse.status},
+        {"hasGameBegun", getRoomStateResponse.hasGameBegun},
+        {"players", getRoomStateResponse.players},
+        {"questionCount", getRoomStateResponse.questionsCount},
+        {"answerTimeout", getRoomStateResponse.answerTimeout}
+    };
+
+    std::string jsonStr = jsonResponse.dump();
+    std::vector<unsigned char> buffer(jsonStr.cbegin(), jsonStr.cend());
+    return buffer;
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LeaveRoomResponse& leaveRoomResponse)
+{
+    nlohmann::json jsonResponse = { "status", leaveRoomResponse.status };
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
+}

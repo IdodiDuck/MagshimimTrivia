@@ -119,4 +119,10 @@ public:
     static std::vector<unsigned char> serializeResponse(const getHighScoreResponse& getHighScoreResponse);
     static std::vector<unsigned char> serializeResponse(const getPersonalStatsResponse& getPersonalStatsResponse);
 
+    // V3.0.0 Serializations - 
+    static std::vector<unsigned char> serializeResponse(const CloseRoomResponse& closeRoomResponse);
+    static std::vector<unsigned char> serializeResponse(const StartGameResponse& startGameResponse);
+    static std::vector<unsigned char> serializeResponse(const GetRoomStateResponse& getRoomStateResponse);
+    static std::vector<unsigned char> serializeResponse(const LeaveRoomResponse& leaveRoomResponse);
+
 };
