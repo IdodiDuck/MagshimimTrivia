@@ -18,6 +18,7 @@ using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace TriviaClient
 {
@@ -43,9 +44,7 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(loginRequest);
-
                 byte[] serverResponse = GlobalCommunicator.Communicator.SendAndReceiveFromServer(serializedRequest);
-
                 var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
 
                 if (response == null)
@@ -55,27 +54,30 @@ namespace TriviaClient
                     return;
                 }
 
-                if (response.Status == StatusCodes.SUCCESS)
+                if (response.status == StatusCodes.SUCCESS)
                 {
-                    this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/MainMenu.xaml", UriKind.Relative));
-
+                    this.NavigationService.Navigate(new MainMenu(UsernameTextBox.Text));
                 }
+
                 else
                 {
                     MessageBox.Show("Invalid username or password.", "Login Failed",
                                    MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
             catch (SocketException ex)
             {
                 MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (SerializationException ex)
             {
                 MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
