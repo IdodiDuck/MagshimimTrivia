@@ -9,12 +9,12 @@
 
 enum class SignUpStatus
 {
-	SIGNUP_ERROR = -1,
+    SIGNUP_ERROR = -1,
     SUCCESS,
     USER_ALREADY_EXISTS,
 };
 
-enum class LoginStatus 
+enum class LoginStatus
 {
     LOGIN_ERROR = -1,
     SUCCESS,
@@ -26,7 +26,7 @@ enum class LoginStatus
 class LoginManager
 {
 public:
-	
+
     LoginManager(std::weak_ptr<IDatabase> dataBase);
     ~LoginManager();
 
@@ -36,8 +36,8 @@ public:
 
 
 private:
-	std::weak_ptr<IDatabase> m_dataBase;
-	std::vector<LoggedUser> m_loggedUsers;
+    std::weak_ptr<IDatabase> m_dataBase;
+    std::vector<LoggedUser> m_loggedUsers;
     std::mutex m_loggedUsersMutex;
     bool m_isDbValid;
 

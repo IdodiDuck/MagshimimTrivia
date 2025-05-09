@@ -29,5 +29,5 @@ public:
 	virtual ~IRequestHandler() = default;
 
 	virtual bool isRequestRelevant(const RequestInfo& info) = 0;
-	virtual RequestResult handleRequest(RequestInfo& info) = 0;
+	virtual RequestResult handleRequest(const RequestInfo& info) = 0;
 };
