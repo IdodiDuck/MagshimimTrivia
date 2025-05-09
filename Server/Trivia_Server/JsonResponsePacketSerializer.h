@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include "Room.h"
 
+// V1.0.0 Responses - 
 typedef struct LoginResponse
 {
     unsigned int status;
@@ -23,7 +24,7 @@ typedef struct ErrorResponse
 
 } ErrorResponse;
 
-// v2.0.0
+// V2.0.0 Responses - 
 
 typedef struct LogoutResponse
 {
@@ -69,6 +70,30 @@ typedef struct CreateRoomResponse
     unsigned int status;
 
 } CreateRoomResponse;
+
+// V3.0.0 Responses - 
+typedef struct CloseRoomResponse
+{
+    unsigned int status;
+
+} CloseRoomResponse;
+
+typedef struct StartGameResponse
+{
+    unsigned int status;
+
+} StartGameResponse;
+
+typedef struct GetRoomStateResponse
+{
+    unsigned int status;
+    bool hasGameBegun;
+    std::vector<std::string> players;
+    unsigned int questionsCount;
+    unsigned int answerTimeout;
+
+
+} GetRoomStateResponse;
 
 class JsonResponsePacketSerializer
 {
