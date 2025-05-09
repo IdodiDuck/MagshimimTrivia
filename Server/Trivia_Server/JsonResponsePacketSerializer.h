@@ -95,14 +95,22 @@ typedef struct GetRoomStateResponse
 
 } GetRoomStateResponse;
 
+typedef struct LeaveRoomResponse
+{
+    unsigned int status;
+
+} LeaveRoomResponse;
+
 class JsonResponsePacketSerializer
 {
 
 public:
+    // V1.0.0 Serializations - 
     static std::vector<unsigned char> serializeResponse(const ErrorResponse& errorResponse);
     static std::vector<unsigned char> serializeResponse(const LoginResponse& loginResponse);
     static std::vector<unsigned char> serializeResponse(const SignupResponse& signUpResponse);
 
+    // V2.0.0 Serializations - 
     static std::vector<unsigned char> serializeResponse(const LogoutResponse& loguotResponse);
     static std::vector<unsigned char> serializeResponse(const GetRoomsResponse& getRoomsResponse);
     static std::vector<unsigned char> serializeResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse);
@@ -110,4 +118,5 @@ public:
     static std::vector<unsigned char> serializeResponse(const CreateRoomResponse& createRoomResponse);
     static std::vector<unsigned char> serializeResponse(const getHighScoreResponse& getHighScoreResponse);
     static std::vector<unsigned char> serializeResponse(const getPersonalStatsResponse& getPersonalStatsResponse);
+
 };
