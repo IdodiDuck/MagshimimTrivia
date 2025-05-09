@@ -22,34 +22,44 @@ namespace TriviaClient
     public partial class MainMenu : Page
     {
 
-        public MainMenu()
+        public MainMenu(string username)
         {
             InitializeComponent();
+            UserNameText.Text = username;
         }
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/CreateRoom.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new CreateRoom());
         }
 
         private void JoinRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/JoinRoom.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new JoinRoom());
         }
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/PersonalStatistics.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new PersonalStatistics());
         }
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/Login.xaml", UriKind.Relative));
+            this.UserNameText.Text = "User";
+
+            if (NavigationService.CanGoBack)
+            {
+                NavigationService.GoBack();
+                // Send here SignOutRequest To Server!
+                return;
+            }
+
+            MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new Uri("/TriviaClient;component/Views/HighScores.xaml", UriKind.Relative));
+            this.NavigationService.Navigate(new HighScores());
         }
     }
 }

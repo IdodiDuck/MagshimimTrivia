@@ -17,13 +17,21 @@
 
         <!-- Header with welcome message -->
         <Border Grid.Row="0" Background="#E5E5E5E5" Padding="20">
-            <TextBlock x:Name="WelcomeText" 
-                       Text="Hello User!" 
-                       Foreground="#FF333333"
-                       FontSize="24"
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock x:Name="WelcomeText" 
+                           Text="Hello, " 
+                           Foreground="#FF333333"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                
+                <TextBlock x:Name="UserNameText"
+                           Text="User"
+                           Foreground="#FF333333"
+                           FontSize="24"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
         </Border>
 
         <!-- Main content area with buttons -->
