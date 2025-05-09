@@ -13,9 +13,7 @@ namespace TriviaClient.Infrastructure
     {
         public static T? DeserializeResponse<T>(byte[] buffer)
         {
-            const int HEADERS_BYTE_SIZE = 5;
-
-            string json = System.Text.Encoding.ASCII.GetString(buffer[HEADERS_BYTE_SIZE..]);
+            string json = System.Text.Encoding.UTF8.GetString(buffer);
 
             return JsonSerializer.Deserialize<T>(json);
         }
