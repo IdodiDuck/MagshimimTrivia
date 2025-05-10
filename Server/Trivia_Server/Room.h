@@ -8,7 +8,8 @@
 enum class RoomStatus : unsigned int
 {
     OPENED = 0,
-    CLOSED
+    CLOSED,
+    GAME_STARTED
 };
 
 typedef struct RoomData 
@@ -28,10 +29,15 @@ class Room
 public:
     Room(const RoomData& roomData);
 
+    // Setters - 
     void addUser(const LoggedUser& user);
     void removeUser(const LoggedUser& user);
+    void changeRoomStatus(const RoomStatus& newStatus);
+
+    // Getters - 
     std::set<std::string> getAllUsers() const;
     RoomData getRoomData() const;
+    
 
 private:
     RoomData m_metadata;

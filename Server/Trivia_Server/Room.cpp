@@ -14,6 +14,11 @@ void Room::removeUser(const LoggedUser& user)
 	m_users.erase(user);
 }
 
+void Room::changeRoomStatus(const RoomStatus& newStatus)
+{
+    m_metadata.status = newStatus;
+}
+
 std::set<std::string> Room::getAllUsers() const
 {
     std::set<std::string> usernames;
