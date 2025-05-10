@@ -1,7 +1,5 @@
 #include "RoomManager.h"
 
-#include <stdexcept>
-
 RoomManager::~RoomManager()
 {
     this->m_rooms.clear();
@@ -9,13 +7,15 @@ RoomManager::~RoomManager()
 
 void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
-    const int MIN_VALID_ID = 1;
+    std::unique_lock lock(m_roomsMutex);
+
+    const int MIN_VALID_ID = 0; // EmptyID = 0
     if (data.id < MIN_VALID_ID)
     {
         throw std::invalid_argument("Error: Invalid room ID");
     }
 
-    if (m_rooms.find(data.id) != m_rooms.cend()) 
+    if (m_rooms.find(data.id) != m_rooms.cend())
     {
         throw std::runtime_error("Error: Room with ID " + std::to_string(data.id) + " already exists");
     }
@@ -28,6 +28,8 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 
 void RoomManager::deleteRoom(int ID)
 {
+    std::unique_lock lock(m_roomsMutex);
+
     auto roomIt = m_rooms.find(ID);
     if (roomIt == m_rooms.cend())
     {
@@ -39,6 +41,8 @@ void RoomManager::deleteRoom(int ID)
 
 RoomStatus RoomManager::getRoomState(const int ID) const
 {
+    std::shared_lock lock(m_roomsMutex);
+
     auto roomIt = m_rooms.find(ID);
     if (roomIt == m_rooms.cend())
     {
@@ -50,9 +54,10 @@ RoomStatus RoomManager::getRoomState(const int ID) const
 
 std::vector<RoomData> RoomManager::getRooms() const
 {
-    std::vector<RoomData> rooms;
+    std::shared_lock lock(m_roomsMutex);
 
-    for (const auto& [id, room] : m_rooms) 
+    std::vector<RoomData> rooms;
+    for (const auto& [id, room] : m_rooms)
     {
         rooms.push_back(room.getRoomData());
     }
@@ -62,6 +67,8 @@ std::vector<RoomData> RoomManager::getRooms() const
 
 std::optional<std::reference_wrapper<const Room>> RoomManager::getRoom(const int ID) const
 {
+    std::shared_lock lock(m_roomsMutex);
+
     auto roomIt = m_rooms.find(ID);
     if (roomIt != m_rooms.end())
     {

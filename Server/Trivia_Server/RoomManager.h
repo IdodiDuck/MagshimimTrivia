@@ -5,6 +5,7 @@
 #include <vector>
 #include <optional>
 #include <unordered_map>
+#include <shared_mutex>
 
 class RoomManager
 {
@@ -25,5 +26,6 @@ public:
 private:
 	// Attributes - 
 	std::unordered_map<unsigned int, Room> m_rooms;
+	mutable std::shared_mutex m_roomsMutex;
 
 };
