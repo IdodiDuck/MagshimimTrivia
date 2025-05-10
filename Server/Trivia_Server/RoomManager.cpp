@@ -65,7 +65,7 @@ std::optional<std::reference_wrapper<const Room>> RoomManager::getRoom(const int
     auto roomIt = m_rooms.find(ID);
     if (roomIt != m_rooms.end())
     {
-        return std::cref(roomIt->second); // Returning constant reference
+        return std::cref(roomIt->second);
     }
 
     return std::nullopt;
