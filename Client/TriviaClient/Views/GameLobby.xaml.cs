@@ -24,22 +24,27 @@ namespace TriviaClient
     public partial class GameLobby : Page
     {
         private string RoomName { get; set; } = string.Empty;
-        private int MaxPlayer { get; set; }
-        private int QuestionTime { get; set; }
-        private int TimePerQuestion { get; set; }
+        private uint MaxPlayer { get; set; }
+        private uint QuestionAmount { get; set; }
+        private uint TimePerQuestion { get; set; }
 
-        public GameLobby(string roomName, int maxPlayer, int questionTime, int timePerQuestion)
+        public GameLobby(string roomName, int maxPlayer, int questionAmount, int timePerQuestion)
         {
             InitializeComponent();
             RoomName = roomName;
-            MaxPlayer = maxPlayer;
-            QuestionTime = questionTime;
-            TimePerQuestion = timePerQuestion;
+            MaxPlayer = (uint)maxPlayer;
+            QuestionAmount = (uint)questionAmount;
+            TimePerQuestion = (uint)timePerQuestion;
+
+            RoomNameText.Text = roomName;
+            MaxPlayersText.Text = maxPlayer.ToString();
+            QuestionCountText.Text = questionAmount.ToString();
+            TimePerQuestionText.Text = timePerQuestion.ToString();
         }
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-
+            // v4.0.0
         }
 
         private void LeaveButton_Click(object sender, RoutedEventArgs e)

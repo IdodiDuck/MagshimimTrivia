@@ -43,7 +43,7 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(signupRequest);
-                byte[] serverResponse = GlobalCommunicator.Communicator.SendAndReceiveFromServer(serializedRequest);
+                byte[] serverResponse = Globals.Communicator.SendAndReceiveFromServer(serializedRequest);
                 var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
 
                 if (response == null)

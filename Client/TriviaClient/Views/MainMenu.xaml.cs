@@ -48,12 +48,10 @@ namespace TriviaClient
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.UserNameText.Text = "User";
-
             if (NavigationService.CanGoBack)
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
-                var serverResponse = GlobalCommunicator.Communicator.SendAndReceiveFromServer(request);
+                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
                 var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
 
                 if (response == null)
@@ -71,8 +69,6 @@ namespace TriviaClient
 
                 return;
             }
-
-            
             MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 

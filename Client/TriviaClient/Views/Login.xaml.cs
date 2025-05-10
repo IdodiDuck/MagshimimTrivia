@@ -44,7 +44,7 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(loginRequest);
-                byte[] serverResponse = GlobalCommunicator.Communicator.SendAndReceiveFromServer(serializedRequest);
+                byte[] serverResponse = Globals.Communicator.SendAndReceiveFromServer(serializedRequest);
                 var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
 
                 if (response == null)
@@ -64,7 +64,7 @@ namespace TriviaClient
 
                 else
                 {
-                    MessageBox.Show("Invalid username or password.", "Login Failed",
+                    MessageBox.Show("Invalid username or password / user already logged in.", "Login Failed",
                                    MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
