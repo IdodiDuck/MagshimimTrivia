@@ -59,7 +59,7 @@ namespace TriviaClient
                     UsernameTextBox.Clear();
                     PasswordBox.Clear();
 
-                    this.NavigationService.Navigate(new MainMenu(UsernameTextBox.Text));
+                    this.NavigationService.Navigate(new MainMenu(loginRequest.username));
                 }
 
                 else

@@ -125,7 +125,7 @@ RequestResult MenuRequestHandler::getHighScore(const RequestInfo& info)
 {
     getHighScoreResponse response;
     response.status = SUCCESS;
-    response.statistics = getFactorySafely()->getStatisticsManager().getUserStatistics(m_user.getUserName());
+    response.statistics = getFactorySafely()->getStatisticsManager().getHighScore();
 
     return
     {

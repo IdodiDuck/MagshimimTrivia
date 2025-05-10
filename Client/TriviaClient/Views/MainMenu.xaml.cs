@@ -24,11 +24,14 @@ namespace TriviaClient
     /// </summary>
     public partial class MainMenu : Page
     {
+        private string Username { get; set; } = string.Empty;
 
         public MainMenu(string username)
         {
             InitializeComponent();
-            UserNameText.Text = username;
+            Username = username;
+
+            UserNameText.Text = Username;
         }
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
@@ -43,7 +46,28 @@ namespace TriviaClient
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new PersonalStatistics());
+            if (NavigationService.CanGoBack)
+            {
+                var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
+                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
+
+                if (response == null)
+                {
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+
+                if (response.status == StatusCodes.SUCCESS)
+                {
+                    this.NavigationService.Navigate(new PersonalStatistics(response.statistics));
+                }
+
+                return;
+            }
+            MessageBox.Show("Error: Couldn't fetch personal statistics.");
         }
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
@@ -74,7 +98,28 @@ namespace TriviaClient
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new HighScores());
+            if (NavigationService.CanGoBack)
+            {
+                var request = Serializer.SerializeEmptyRequest(RequestCode.HighScoreRequest);
+                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                var response = Deserializer.DeserializeResponse<GetHighScoreResponse>(serverResponse);
+
+                if (response == null)
+                {
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+
+                if (response.status == StatusCodes.SUCCESS)
+                {
+                    this.NavigationService.Navigate(new HighScores(response.statistics));
+                }
+
+                return;
+            }
+            MessageBox.Show("Error: Couldn't fetch personal statistics.");
         }
     }
 }

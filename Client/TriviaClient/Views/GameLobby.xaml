@@ -74,7 +74,7 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Time per question:" Width="120"/>
-                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding QuestionAmount, StringFormat={}{0}s, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">

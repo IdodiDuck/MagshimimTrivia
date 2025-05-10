@@ -33,7 +33,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="Games Played:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock x:Name="gamesPlayed"  Text="{Binding Path=GamesPlayed, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
             <Grid Margin="0,15">
@@ -47,7 +47,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="Correct Answers:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock x:Name="correctAns" Text="{Binding Path=CorrectAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
             <Grid Margin="0,15">
@@ -61,7 +61,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="Wrong Answers:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock x:Name="wrongAns" Text="{Binding Path=WrongAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
             <Grid Margin="0,15">
@@ -75,7 +75,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Text="Average Answer Time:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock Text="0" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock x:Name="avgAnsTime" Text="{Binding Path=AverageAnswerTime, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
         </StackPanel>

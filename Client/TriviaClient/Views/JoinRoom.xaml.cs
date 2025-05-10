@@ -36,47 +36,45 @@ namespace TriviaClient
                 var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
                 var response = Deserializer.DeserializeResponse<GetRoomsResponse>(serverResponse);
 
-                if (response != null && response.status == StatusCodes.SUCCESS)
-                {
-                    if (response.rooms.Count > 0)
-                    {
-                        RoomData selectedRoom = response.rooms[0];
-
-                        var CreateRoomRequest = Serializer.SerializeEmptyRequest(RequestCode.CreateRoomRequest);
-                        var ServResponse = Globals.Communicator.SendAndReceiveFromServer(request);
-                        var dResponse = Deserializer.DeserializeResponse<GetRoomsResponse>(ServResponse);
-
-                        if (response.status == StatusCodes.SUCCESS)
-                        {
-                            this.NavigationService.Navigate(
-                                new GameLobby(
-                                    selectedRoom.name,
-                                    (int)selectedRoom.maxPlayers,
-                                    (int)selectedRoom.numOfQuestionsInGame,
-                                    (int)selectedRoom.timePerQuestion
-                                )
-                            );
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to join room, pls try again");
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("No rooms available. Please create a new room.");
-                    }
-                }
-                else
+                if (response == null || response.status != StatusCodes.SUCCESS)
                 {
                     MessageBox.Show("Failed to fetch rooms.");
+                    return;
                 }
+
+                if (response.rooms.Count == 0)
+                {
+                    MessageBox.Show("No rooms available. Please create a new room.");
+                    return;
+                }
+
+                RoomData selectedRoom = response.rooms[0];
+
+                var createRoomRequest = Serializer.SerializeEmptyRequest(RequestCode.CreateRoomRequest);
+                var servResponse = Globals.Communicator.SendAndReceiveFromServer(request); // This likely should be `createRoomRequest`
+                var dResponse = Deserializer.DeserializeResponse<GetRoomsResponse>(servResponse);
+
+                if (response.status != StatusCodes.SUCCESS)
+                {
+                    MessageBox.Show("Failed to join room, pls try again");
+                    return;
+                }
+
+                this.NavigationService.Navigate(
+                    new GameLobby(
+                        selectedRoom.name,
+                        (int)selectedRoom.maxPlayers,
+                        (int)selectedRoom.numOfQuestionsInGame,
+                        (int)selectedRoom.timePerQuestion
+                    )
+                );
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error joining room: {ex.Message}");
             }
         }
+
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
