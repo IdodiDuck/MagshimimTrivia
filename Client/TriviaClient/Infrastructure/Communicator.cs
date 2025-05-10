@@ -45,10 +45,10 @@ namespace TriviaClient.Infrastructure
                 }
 
                 stream.Write(message, 0, message.Length);
+                stream.Flush();
 
                 byte[] responseBuffer = new byte[BUFFER_SIZE];
                 int bytesRead = stream.Read(responseBuffer, 0, responseBuffer.Length);
-                stream.Flush();
 
                 byte[] response = new byte[bytesRead];
                 Array.Copy(responseBuffer, response, bytesRead);

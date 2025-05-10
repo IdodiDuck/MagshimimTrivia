@@ -18,11 +18,23 @@ namespace TriviaClient
     /// <summary>
     /// Interaction logic for GameLobby.xaml
     /// </summary>
+    /// 
+
+
     public partial class GameLobby : Page
     {
-        public GameLobby()
+        private string RoomName { get; set; } = string.Empty;
+        private int MaxPlayer { get; set; }
+        private int QuestionTime { get; set; }
+        private int TimePerQuestion { get; set; }
+
+        public GameLobby(string roomName, int maxPlayer, int questionTime, int timePerQuestion)
         {
             InitializeComponent();
+            RoomName = roomName;
+            MaxPlayer = maxPlayer;
+            QuestionTime = questionTime;
+            TimePerQuestion = timePerQuestion;
         }
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)

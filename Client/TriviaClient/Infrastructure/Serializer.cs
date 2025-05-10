@@ -51,7 +51,7 @@ namespace TriviaClient.Infrastructure
         }
 
         // Support Methods - 
-        private static byte[] BuildRequest(byte requestCode, string json)
+        public static byte[] BuildRequest(byte requestCode, string json)
         {
             const uint HEADERS_LENGTH = 5, CODE_BYTE_INDEX = 0, MESSAGE_LENGTH_INDEX = 1;
             const int JSON_SOURCE_BEGINNING = 0, JSON_DESTINATION_BEGINNING = 5;

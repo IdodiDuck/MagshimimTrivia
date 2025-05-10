@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
 using TriviaClient.Infrastructure;
+using Newtonsoft.Json;
+using TriviaClient.Constants;
+using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
@@ -49,12 +52,15 @@ namespace TriviaClient
 
             if (NavigationService.CanGoBack)
             {
-                NavigationService.GoBack();
-                // Send here SignOutRequest To Server!
-                return;
+                const byte REQUEST_CODE = (byte)RequestCode.SignoutRequest;
+                string json = JsonConvert.SerializeObject("");
+                var request = Serializer.BuildRequest(REQUEST_CODE, json);
+                var msg =GlobalCommunicator.Communicator.SendAndReceiveFromServer(request);
+                    NavigationService.GoBack();
             }
 
-            MessageBox.Show("Error: There's no previous page you can go back to!");
+            else
+                MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
