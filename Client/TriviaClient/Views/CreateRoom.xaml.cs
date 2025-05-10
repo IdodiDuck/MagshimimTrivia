@@ -66,11 +66,13 @@ namespace TriviaClient
                 {
                     this.NavigationService.Navigate(new GameLobby(request.roomName, maxUsers, questionCount, answerTimeout));
                 }
+
                 else
                 {
                     MessageBox.Show("Failed to create room", "Error");
                 }
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Error creating room: {ex.Message}", "Error");
