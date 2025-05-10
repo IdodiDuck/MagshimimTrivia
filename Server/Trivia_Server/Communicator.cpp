@@ -97,21 +97,18 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 
             catch (const std::exception& e)
             {
-                std::cerr << "[PARSER ERROR]: " << e.what() << std::endl;
-                disconnectClient(clientSocket);
-                break;
+                continue;
             }
 
             if (m_clients[clientSocket]->isRequestRelevant(info))
             {
                 processClientRequest(clientSocket, info);
-                break;
             }
 
-            if (!info.buffer.empty())
+            else if (!info.buffer.empty())
             {
+                std::cout << "Invalid Empty Request" << std::endl;
                 sendErrorResponse(clientSocket, "Error: Invalid type of request.");
-                break;
             }
         }
 
@@ -193,16 +190,18 @@ void Communicator::processClientRequest(SOCKET clientSocket, RequestInfo& info)
     RequestResult res = m_clients[clientSocket]->handleRequest(info);
 
     std::cout << "Giving the new handler to the client..." << std::endl;
+
+    std::cout << "Old handler type: " << typeid(*m_clients[clientSocket]).name() << std::endl;
+
     m_clients[clientSocket] = std::move(res.newHandler);
+
+    std::cout << "New handler type: " << typeid(*m_clients[clientSocket]).name() << std::endl;
 
     std::cout << "Constructing response to be sent..." << std::endl;
     std::vector<unsigned char> buffer = res.response;
     std::string response = (buffer.empty() ? "" : std::string(buffer.begin(), buffer.end()));
 
-    if (response != EMPTY_CONTENT)
-    {
-        sendClientResponse(clientSocket, buffer);
-    }
+    sendClientResponse(clientSocket, buffer);
 }
 
 void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage)
@@ -215,7 +214,6 @@ void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& err
     std::vector<unsigned char> error = JsonResponsePacketSerializer::serializeResponse(errResponse);
 
     SocketHelper::sendData(clientSocket, error);
-    disconnectClient(clientSocket);
 }
 
 void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<unsigned char>& response)
@@ -223,7 +221,6 @@ void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<uns
     std::cout << "Sending back the response to the client" << std::endl;
 
     SocketHelper::sendData(clientSocket, response);
-    disconnectClient(clientSocket);
     std::cout << std::endl;
 }
 
