@@ -42,4 +42,9 @@ namespace TriviaClient.Constants
 
         public uint answerTimeout { get; set; }
     }
+
+    public class  SignOutRequest 
+    {
+        
+    }
 }

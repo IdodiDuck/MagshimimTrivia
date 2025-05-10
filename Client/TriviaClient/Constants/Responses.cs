@@ -71,5 +71,9 @@ namespace TriviaClient.Constants
             public List<string> statistics { get; set; } = new List<string>();
         }
 
+        public class SignOutResponse
+        {
+            public uint status { get; set; }
+        }
     }
 }
