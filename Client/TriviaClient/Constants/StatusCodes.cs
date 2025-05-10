@@ -8,7 +8,7 @@ namespace TriviaClient.Constants
 {
     public static class StatusCodes
     {
-        public const int SUCCESS = 0;
-        public const int FAILURE = 1;
+        public const uint SUCCESS = 0;
+        public const uint FAILURE = 1;
     }
 }
