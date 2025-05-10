@@ -206,8 +206,6 @@ void Communicator::processClientRequest(SOCKET clientSocket, RequestInfo& info)
 
 void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& errorMessage)
 {
-    std::cout << "Client requested invalid type of request..." << std::endl;
-
     ErrorResponse errResponse;
     errResponse.message = errorMessage;
 
