@@ -50,6 +50,11 @@ namespace TriviaClient.Infrastructure
             return BuildRequest(REQUEST_CODE, json);
         }
 
+        public static byte[] SerializeEmptyRequest(RequestCode code)
+        {
+            return BuildRequest((byte)code, "{}");
+        }
+
         // Support Methods - 
         public static byte[] BuildRequest(byte requestCode, string json)
         {
