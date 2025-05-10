@@ -35,8 +35,6 @@ namespace TriviaClient.Infrastructure
         // Communication Methods - 
         public byte[] SendAndReceiveFromServer(byte[] message)
         {
-            const int BUFFER_SIZE = 1024;
-
             try
             {
                 if (!IsConnected)
@@ -47,7 +45,7 @@ namespace TriviaClient.Infrastructure
                 stream.Write(message, 0, message.Length);
                 stream.Flush();
 
-                byte[] responseBuffer = new byte[BUFFER_SIZE];
+                byte[] responseBuffer = new byte[NetworkConstants.BUFFER_SIZE];
                 int bytesRead = stream.Read(responseBuffer, 0, responseBuffer.Length);
 
                 byte[] response = new byte[bytesRead];
