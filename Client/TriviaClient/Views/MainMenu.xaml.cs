@@ -52,15 +52,28 @@ namespace TriviaClient
 
             if (NavigationService.CanGoBack)
             {
-                const byte REQUEST_CODE = (byte)RequestCode.SignoutRequest;
-                string json = JsonConvert.SerializeObject("");
-                var request = Serializer.BuildRequest(REQUEST_CODE, json);
-                var msg =GlobalCommunicator.Communicator.SendAndReceiveFromServer(request);
+                var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
+                var serverResponse = GlobalCommunicator.Communicator.SendAndReceiveFromServer(request);
+                var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
+
+                if (response == null)
+                {
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+
+                if (response.status == StatusCodes.SUCCESS)
+                {
                     NavigationService.GoBack();
+                }
+
+                return;
             }
 
-            else
-                MessageBox.Show("Error: There's no previous page you can go back to!");
+            
+            MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
