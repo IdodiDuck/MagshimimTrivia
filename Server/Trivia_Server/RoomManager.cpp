@@ -26,7 +26,7 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
     m_rooms.emplace(data.id, std::move(newRoom));
 }
 
-void RoomManager::deleteRoom(int ID)
+void RoomManager::deleteRoom(const int ID)
 {
     std::unique_lock lock(m_roomsMutex);
 
