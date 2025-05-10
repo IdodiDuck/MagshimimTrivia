@@ -56,6 +56,9 @@ namespace TriviaClient
 
                 if (response.status == StatusCodes.SUCCESS)
                 {
+                    UsernameTextBox.Clear();
+                    PasswordBox.Clear();
+
                     this.NavigationService.Navigate(new MainMenu(UsernameTextBox.Text));
                 }
 
