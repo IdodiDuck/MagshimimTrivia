@@ -144,21 +144,33 @@ RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr // To do - appoint to a new handler when added
+        nullptr // To do - appoint to a new handler of RoomMember when added
     };
 }
 
 RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
 {
+    const unsigned int EMPTY_ID = 0;
+
     CreateRoomRequest request = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(info.buffer).value();
     CreateRoomResponse response {};
+
+    RoomData addedRoomData = { };
+    addedRoomData.maxPlayers = request.maxUsers;
+    addedRoomData.name = request.roomName;
+    addedRoomData.numOfQuestionsInGame = request.questionCount;
+    addedRoomData.timePerQuestion = request.answerTimeout;
+    addedRoomData.status = RoomStatus::OPENED;
+    addedRoomData.id = EMPTY_ID;
+
+    this->getFactorySafely()->getRoomManager().createRoom(m_user, addedRoomData);
 
     response.status = (request.roomName != "") ? SUCCESS : FAILURE;
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr // To do - appoint to a new handler when added
+        this->getFactorySafely()->createRoomAdminRequestHandler(m_user, addedRoomData.id)
     };
 }
 
