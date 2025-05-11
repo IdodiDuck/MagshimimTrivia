@@ -15,34 +15,21 @@ using System.Windows.Navigation;
 
 namespace TriviaClient
 {
-    public class PlayerScore
-    {
-        public string Name { get; set; } = string.Empty;
-        public int Score { get; set; }
-    }
 
     /// <summary>
     /// Interaction logic for HighScores.xaml
     /// </summary>
     public partial class HighScores : Page
     {
-        public List<PlayerScore> TopPlayers { get; set; }
+        public List<string>? TopPlayers { get; set; }
 
         public HighScores(List<string> statistics)
         {
+            const int TOP_THREE = 3;
+
             InitializeComponent();
 
-            TopPlayers = new List<PlayerScore>();
-
-            foreach (var stat in statistics)
-            {
-                var parts = stat.Split(new[] { " - Score: " }, System.StringSplitOptions.None);
-                if (parts.Length == 2 && int.TryParse(parts[1], out int score))
-                {
-                    TopPlayers.Add(new PlayerScore { Name = parts[0], Score = score });
-                }
-            }
-
+            TopPlayers = statistics.Take(TOP_THREE).ToList();
             DataContext = this;
         }
 
