@@ -64,6 +64,7 @@ namespace TriviaClient
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)
                 {
+                    RoomNameTextBox.Clear();
                     PlayersNumberTextBox.Clear();
                     QuestionsNumberTextBox.Clear();
                     QuestionTimeTextBox.Clear();

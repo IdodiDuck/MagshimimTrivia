@@ -12,9 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
+
 using static TriviaClient.Constants.Responses;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
+using TriviaClient.Models;
 
 namespace TriviaClient
 {

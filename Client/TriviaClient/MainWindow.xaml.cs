@@ -47,6 +47,7 @@ namespace TriviaClient
                     System.Environment.Exit(1);
                 }
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to initialize connection: {ex.Message}",
