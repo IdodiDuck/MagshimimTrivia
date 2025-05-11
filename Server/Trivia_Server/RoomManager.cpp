@@ -9,7 +9,7 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
     std::unique_lock lock(m_roomsMutex);
 
-    const int MIN_VALID_ID = 0; // EmptyID = 0
+    const int MIN_VALID_ID = 1;
     if (data.id < MIN_VALID_ID)
     {
         throw std::invalid_argument("Error: Invalid room ID");

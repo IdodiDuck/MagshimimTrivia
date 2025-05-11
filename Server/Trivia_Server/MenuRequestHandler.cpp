@@ -6,7 +6,8 @@
 #include "JsonResponsePacketSerializer.h"
 #include "JsonRequestPacketDeserializer.h"
 
-#include <iostream>
+std::atomic<unsigned int> MenuRequestHandler::m_currentRoomId(1);
+std::mutex MenuRequestHandler::m_roomIdMutex;
 
 MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user): m_user(user), m_handlerFactory(handlerFactory)
 {
@@ -152,8 +153,6 @@ RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
 {
-    const unsigned int EMPTY_ID = 0;
-
     CreateRoomRequest request = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(info.buffer).value();
     CreateRoomResponse response {};
 
@@ -163,7 +162,7 @@ RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
     addedRoomData.numOfQuestionsInGame = request.questionCount;
     addedRoomData.timePerQuestion = request.answerTimeout;
     addedRoomData.status = RoomStatus::OPENED;
-    addedRoomData.id = EMPTY_ID;
+    addedRoomData.id = generateNewRoomId();
 
     this->getFactorySafely()->getRoomManager().createRoom(m_user, addedRoomData);
 
@@ -184,4 +183,10 @@ std::shared_ptr<RequestHandlerFactory> MenuRequestHandler::getFactorySafely()
     }
 
     throw std::runtime_error("MenuRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
+}
+
+unsigned int MenuRequestHandler::generateNewRoomId()
+{
+    std::lock_guard<std::mutex> lock(m_roomIdMutex);
+    return m_currentRoomId.fetch_add(1, std::memory_order_relaxed);
 }
