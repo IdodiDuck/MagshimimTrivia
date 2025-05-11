@@ -12,7 +12,7 @@ class RoomAdminRequestHandler : public IRequestHandler
 
 public:
 	// C'tor -
-	RoomAdminRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& loggedUser, const Room& usedRoom);
+	RoomAdminRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, RoomManager& roomManager, const LoggedUser& loggedUser, const Room& usedRoom);
 	
 	// Virtuals - 
 	bool isRequestRelevant(const RequestInfo& requestInfo) override;

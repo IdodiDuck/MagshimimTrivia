@@ -3,8 +3,8 @@
 #include "RequestHandlerFactory.h"
 #include "JsonResponsePacketSerializer.h"
 
-RoomAdminRequestHandler::RoomAdminRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& loggedUser, const Room& usedRoom):
-	m_handlerFactory(handlerFactory), m_user(loggedUser), m_roomManager(getFactorySafely()->getRoomManager()), m_room(usedRoom)
+RoomAdminRequestHandler::RoomAdminRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, RoomManager& roomManager, const LoggedUser& loggedUser, const Room& usedRoom):
+	m_handlerFactory(handlerFactory), m_user(loggedUser), m_roomManager(roomManager), m_room(usedRoom)
 {
 
 }

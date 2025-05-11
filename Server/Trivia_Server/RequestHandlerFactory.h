@@ -21,7 +21,7 @@ public:
 	// Handlers Getters - 
 	std::unique_ptr<LoginRequestHandler> createLoginRequestHandler();
 	std::unique_ptr<MenuRequestHandler> createMenuRequestHandler(const LoggedUser& user);
-	std::unique_ptr< RoomAdminRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, const int roomId);
+	std::unique_ptr<RoomAdminRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, const int roomId);
 
 	// Managers Getters - 
 	LoginManager& getLoginManager();

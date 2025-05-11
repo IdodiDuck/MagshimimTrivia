@@ -27,7 +27,7 @@ std::unique_ptr<RoomAdminRequestHandler> RequestHandlerFactory::createRoomAdminR
 
 	const Room& room = desiredRoom->get();
 
-	return std::make_unique<RoomAdminRequestHandler>(shared_from_this(), user, room);
+	return std::make_unique<RoomAdminRequestHandler>(shared_from_this(), this->m_roomManager, user, room);
 }
 
 LoginManager& RequestHandlerFactory::getLoginManager()
