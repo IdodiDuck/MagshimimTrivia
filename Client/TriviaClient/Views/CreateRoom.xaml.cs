@@ -64,6 +64,10 @@ namespace TriviaClient
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)
                 {
+                    PlayersNumberTextBox.Clear();
+                    QuestionsNumberTextBox.Clear();
+                    QuestionTimeTextBox.Clear();
+
                     this.NavigationService.Navigate(new GameLobby(request.roomName, maxUsers, questionCount, answerTimeout));
                 }
 
