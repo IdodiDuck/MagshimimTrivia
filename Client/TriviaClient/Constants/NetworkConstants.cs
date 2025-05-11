@@ -11,6 +11,6 @@ namespace TriviaClient.Constants
         public const string SERVER_IP_ADDRESS = "127.0.0.1";
         public const int SERVER_PORT = 8820;
 
-        public const int BUFFER_SIZE = 8092;
+        public const int BUFFER_SIZE = 1024;
     }
 }

@@ -15,14 +15,22 @@ using System.Windows.Navigation;
 
 namespace TriviaClient
 {
+
     /// <summary>
     /// Interaction logic for HighScores.xaml
     /// </summary>
     public partial class HighScores : Page
     {
-        public HighScores()
+        public List<string>? TopPlayers { get; set; }
+
+        public HighScores(List<string> statistics)
         {
+            const int TOP_THREE = 3;
+
             InitializeComponent();
+
+            TopPlayers = statistics.Take(TOP_THREE).ToList();
+            DataContext = this;
         }
 
         private void BackToMenu_Click(object sender, RoutedEventArgs e)

@@ -24,7 +24,7 @@
                            FontWeight="Bold"/>
 
                 <TextBlock x:Name="RoomNameText"
-                           Text="'room name'"
+                           Text="{Binding Path=RoomName, UpdateSourceTrigger=PropertyChanged}"
                            Foreground="Black"
                            FontSize="16"
                            Margin="20,0,0,0"/>
@@ -69,17 +69,17 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Questions:" Width="120"/>
-                            <TextBlock x:Name="QuestionCountText" Text="0"/>
+                            <TextBlock x:Name="QuestionCountText" Text="{Binding Path=QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Time per question:" Width="120"/>
-                            <TextBlock x:Name="TimePerQuestionText" Text="0s"/>
+                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Max players:" Width="120"/>
-                            <TextBlock x:Name="MaxPlayersText" Text="0/0"/>
+                            <TextBlock x:Name="MaxPlayersText" Text="{Binding Path=QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>

@@ -37,7 +37,8 @@
                 <TextBox x:Name="RoomNameTextBox"
                          Height="40"
                          Padding="10"
-                         FontSize="16"/>
+                         FontSize="16"
+                         TextChanged ="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Number of Players -->
@@ -48,7 +49,8 @@
                 <TextBox x:Name="PlayersNumberTextBox"
                          Height="40"
                          Padding="10"
-                         FontSize="16"/>
+                         FontSize="16"
+                         TextChanged ="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Number of Questions -->
@@ -59,7 +61,8 @@
                 <TextBox x:Name="QuestionsNumberTextBox"
                          Height="40"
                          Padding="10"
-                         FontSize="16"/>
+                         FontSize="16"
+                         TextChanged ="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Time Per Question -->
@@ -70,7 +73,8 @@
                 <TextBox x:Name="QuestionTimeTextBox"
                          Height="40"
                          Padding="10"
-                         FontSize="16"/>
+                         FontSize="16"
+                         TextChanged ="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Create Button -->

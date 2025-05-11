@@ -12,10 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TriviaClient.Infrastructure;
+using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
-    public static class GlobalCommunicator
+    public static class Globals
     {
         public static Communicator Communicator = new Communicator();
     }
@@ -37,9 +38,9 @@ namespace TriviaClient
         {
             try
             {
-                GlobalCommunicator.Communicator = new Communicator();
+                Globals.Communicator = new Communicator();
 
-                if (!GlobalCommunicator.Communicator.IsConnected)
+                if (!Globals.Communicator.IsConnected)
                 {
                     MessageBox.Show("Failed to connect to server. Please try again later.",
                                   "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -67,11 +68,6 @@ namespace TriviaClient
                               "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 System.Environment.Exit(1);
             }
-        }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            GlobalCommunicator.Communicator?.CloseConnection();
         }
     }
 }

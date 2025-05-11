@@ -6,6 +6,8 @@
 #include "JsonResponsePacketSerializer.h"
 #include "JsonRequestPacketDeserializer.h"
 
+#include <iostream>
+
 MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user): m_user(user), m_handlerFactory(handlerFactory)
 {
 
@@ -58,7 +60,7 @@ RequestResult MenuRequestHandler::handleRequest(const RequestInfo& info)
             return
             {
                 JsonResponsePacketSerializer::serializeResponse(errorResponse),
-                nullptr
+                std::make_unique<MenuRequestHandler>(*this)
             };
     }
 }
@@ -83,7 +85,7 @@ RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr // To do - appoint to a new handler when added
+        std::make_unique<MenuRequestHandler>(*this) // To do - appoint to a new handler when added
     };
 }
 
@@ -101,7 +103,7 @@ RequestResult MenuRequestHandler::getPlayersInRoom(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr
+        std::make_unique<MenuRequestHandler>(*this)
     };
 
 }
@@ -115,7 +117,7 @@ RequestResult MenuRequestHandler::getPersonalStats(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr
+        std::make_unique<MenuRequestHandler>(*this)
     };
 }
 
@@ -123,12 +125,12 @@ RequestResult MenuRequestHandler::getHighScore(const RequestInfo& info)
 {
     getHighScoreResponse response;
     response.status = SUCCESS;
-    response.statistics = getFactorySafely()->getStatisticsManager().getUserStatistics(m_user.getUserName());
+    response.statistics = getFactorySafely()->getStatisticsManager().getHighScore();
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr
+        std::make_unique<MenuRequestHandler>(*this)
     };
 }
 

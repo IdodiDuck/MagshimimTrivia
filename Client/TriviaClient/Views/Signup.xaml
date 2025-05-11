@@ -32,7 +32,8 @@
                          Foreground="Black"
                          BorderBrush="#3A3A3A3A"
                          BorderThickness="2"
-                         CaretBrush="Black"/>
+                         CaretBrush="Black"
+                         TextChanged="InputUsername_TextChanged"/>
 
                 <!-- Email field -->
                 <TextBlock Text="Email" Foreground="#EE101010" Margin="5,0"/>
@@ -43,7 +44,8 @@
                          Foreground="Black"
                          BorderBrush="#3A3A3A3A"
                          BorderThickness="2"
-                         CaretBrush="Black"/>
+                         CaretBrush="Black"
+                         TextChanged="InputEmail_TextChanged"/>
 
                 <!-- Password field -->
                 <TextBlock Text="Password" Foreground="#EE101010" Margin="5,0"/>
@@ -53,7 +55,8 @@
                              Background="#20202020"
                              Foreground="Black"
                              BorderBrush="#3A3A3A3A"
-                             BorderThickness="2"/>
+                             BorderThickness="2"
+                             PasswordChanged="PasswordBox_PasswordChanged"/>
 
                 <!-- Sign up button -->
                 <Button x:Name="SignUpButton" 
