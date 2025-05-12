@@ -83,7 +83,7 @@ namespace TriviaClient.Constants
         {
             public uint Status { get; set; }
             public bool HasGameBegun { get; set; }
-            public List<string> Players { get; set; }
+            public List<string> Players { get; set; } = new List<string>();
             public uint QuestionsCount { get; set; }
             public uint AnswerTimeout { get; set; }
         }

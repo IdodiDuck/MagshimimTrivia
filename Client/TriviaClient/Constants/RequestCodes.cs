@@ -19,6 +19,12 @@ namespace TriviaClient.Constants
         PersonalStatsRequest,
         HighScoreRequest,
         JoinRoomRequest,
-        CreateRoomRequest
+        CreateRoomRequest,
+        
+        // Room Requests - 
+        CLOSE_ROOM_REQUEST = 300,
+        START_GAME_REQUEST,
+        GET_ROOM_STATE_REQUEST,
+        LEAVE_ROOM_REQUEST
     }
 }
