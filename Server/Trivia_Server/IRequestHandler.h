@@ -26,8 +26,10 @@ class IRequestHandler
 {
 
 public:
+    // Pure Virtuals -
 	virtual ~IRequestHandler() = default;
 
 	virtual bool isRequestRelevant(const RequestInfo& info) = 0;
 	virtual RequestResult handleRequest(const RequestInfo& info) = 0;
+    virtual void handleDisconnection() = 0;
 };

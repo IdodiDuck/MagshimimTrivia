@@ -5,6 +5,8 @@
 
 #include "RequestHandlerFactory.h"
 
+#include <iostream>
+
 LoginRequestHandler::LoginRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory): m_handlerFactory(handlerFactory)
 {
 
@@ -39,6 +41,11 @@ RequestResult LoginRequestHandler::handleRequest(const RequestInfo& info)
                 nullptr
             };
     }
+}
+
+void LoginRequestHandler::handleDisconnection()
+{
+    std::cerr << "[LOGIN REQUEST HANDLER]: User decided to disconnect..." << std::endl;
 }
 
 RequestResult LoginRequestHandler::login(const RequestInfo& request)
