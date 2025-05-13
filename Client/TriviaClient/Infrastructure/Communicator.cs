@@ -32,8 +32,8 @@ namespace TriviaClient.Infrastructure
                 throw new Exception("Communicator: [ERROR]: Could not connect to server.", ex);
             }
         }
-        // Communication Methods - 
 
+        // Communication Methods - 
         public byte[] ReceiveFromServer()
         {
             try

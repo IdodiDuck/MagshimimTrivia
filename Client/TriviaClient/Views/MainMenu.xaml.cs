@@ -68,6 +68,7 @@ namespace TriviaClient
 
                 return;
             }
+
             MessageBox.Show("Error: Couldn't fetch personal statistics.");
         }
 
@@ -95,6 +96,7 @@ namespace TriviaClient
 
                 return;
             }
+
             MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
@@ -122,6 +124,7 @@ namespace TriviaClient
 
                 return;
             }
+
             MessageBox.Show("Error: Couldn't fetch personal statistics.");
         }
     }

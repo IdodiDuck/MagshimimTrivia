@@ -12,13 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TriviaClient.Infrastructure;
-using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
     public static class Globals
     {
-        public static Communicator Communicator = new Communicator();
+        public static Communicator Communicator = new();
     }
 
     /// <summary>
@@ -63,11 +62,14 @@ namespace TriviaClient
                 var loginPage = new Login();
                 MainFrame.Navigate(loginPage);
             }
+
             catch (Exception ex)
             {
+                const int FAILURE_CODE = 1;
+
                 MessageBox.Show($"Failed to load login page: {ex.Message}",
                               "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(1);
+                System.Environment.Exit(FAILURE_CODE);
             }
         }
     }
