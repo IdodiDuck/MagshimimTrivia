@@ -30,6 +30,20 @@ std::unique_ptr<RoomAdminRequestHandler> RequestHandlerFactory::createRoomAdminR
 	return std::make_unique<RoomAdminRequestHandler>(shared_from_this(), this->m_roomManager, user, room);
 }
 
+std::unique_ptr<RoomMemberRequestHandler> RequestHandlerFactory::createRoomMemberRequestHandler(const LoggedUser& user, const int roomId)
+{
+	auto desiredRoom = this->m_roomManager.getRoom(roomId);
+
+	if (!desiredRoom.has_value())
+	{
+		throw std::runtime_error("Room with given ID does not exist.");
+	}
+
+	const Room& room = desiredRoom->get();
+
+	return std::make_unique<RoomMemberRequestHandler>(shared_from_this(), this->m_roomManager, user, room);
+}
+
 LoginManager& RequestHandlerFactory::getLoginManager()
 {
 	return this->m_loginManager;

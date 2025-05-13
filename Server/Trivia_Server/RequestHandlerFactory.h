@@ -3,6 +3,7 @@
 #include "LoginRequestHandler.h"
 #include "MenuRequestHandler.h"
 #include "RoomAdminRequestHandler.h"
+#include "RoomMemberRequestHandler.h"
 
 #include "LoginManager.h"
 #include "RoomManager.h"
@@ -22,6 +23,7 @@ public:
 	std::unique_ptr<LoginRequestHandler> createLoginRequestHandler();
 	std::unique_ptr<MenuRequestHandler> createMenuRequestHandler(const LoggedUser& user);
 	std::unique_ptr<RoomAdminRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, const int roomId);
+	std::unique_ptr<RoomMemberRequestHandler> createRoomMemberRequestHandler(LoggedUser, Room);
 
 	// Managers Getters - 
 	LoginManager& getLoginManager();
