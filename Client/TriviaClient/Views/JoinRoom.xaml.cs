@@ -35,7 +35,8 @@ namespace TriviaClient
             try
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                Globals.Communicator.SendToServer(request);
+                byte[] serverResponse = Globals.Communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<GetRoomsResponse>(serverResponse);
 
                 if (response == null || response.status != StatusCodes.SUCCESS)
@@ -53,8 +54,9 @@ namespace TriviaClient
                 RoomData selectedRoom = response.rooms[0];
 
                 var createRoomRequest = Serializer.SerializeEmptyRequest(RequestCode.CreateRoomRequest);
-                var servResponse = Globals.Communicator.SendAndReceiveFromServer(request); // This likely should be `createRoomRequest`
-                var dResponse = Deserializer.DeserializeResponse<GetRoomsResponse>(servResponse);
+                Globals.Communicator.SendToServer(createRoomRequest);
+                var getRoomResponse = Globals.Communicator.ReceiveFromServer(); // This likely should be `createRoomRequest`
+                var dResponse = Deserializer.DeserializeResponse<GetRoomsResponse>(getRoomResponse);
 
                 if (response.status != StatusCodes.SUCCESS)
                 {

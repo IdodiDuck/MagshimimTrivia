@@ -49,7 +49,8 @@ namespace TriviaClient
             if (NavigationService.CanGoBack)
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                Globals.Communicator.SendToServer(request);
+                var serverResponse = Globals.Communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
 
                 if (response == null)
@@ -75,7 +76,8 @@ namespace TriviaClient
             if (NavigationService.CanGoBack)
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                Globals.Communicator.SendToServer(request);
+                var serverResponse = Globals.Communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
 
                 if (response == null)
@@ -101,7 +103,8 @@ namespace TriviaClient
             if (NavigationService.CanGoBack)
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.HighScoreRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                Globals.Communicator.SendToServer(request);
+                var serverResponse = Globals.Communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<GetHighScoreResponse>(serverResponse);
 
                 if (response == null)
