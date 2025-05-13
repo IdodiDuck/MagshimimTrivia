@@ -36,6 +36,7 @@ void RoomManager::deleteRoom(const int ID)
         throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
     }
 
+    roomIt->second.changeRoomStatus(RoomStatus::CLOSED);
     m_rooms.erase(roomIt);
 }
 
