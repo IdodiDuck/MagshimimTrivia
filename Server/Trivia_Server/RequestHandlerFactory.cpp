@@ -25,9 +25,7 @@ std::unique_ptr<RoomAdminRequestHandler> RequestHandlerFactory::createRoomAdminR
 		throw std::runtime_error("Room with given ID does not exist.");
 	}
 
-	const Room& room = desiredRoom->get();
-
-	return std::make_unique<RoomAdminRequestHandler>(shared_from_this(), this->m_roomManager, user, room);
+	return std::make_unique<RoomAdminRequestHandler>(shared_from_this(), this->m_roomManager, user, desiredRoom.value());
 }
 
 std::unique_ptr<RoomMemberRequestHandler> RequestHandlerFactory::createRoomMemberRequestHandler(const LoggedUser& user, const int roomId)
@@ -39,9 +37,7 @@ std::unique_ptr<RoomMemberRequestHandler> RequestHandlerFactory::createRoomMembe
 		throw std::runtime_error("Room with given ID does not exist.");
 	}
 
-	const Room& room = desiredRoom->get();
-
-	return std::make_unique<RoomMemberRequestHandler>(shared_from_this(), this->m_roomManager, user, room);
+	return std::make_unique<RoomMemberRequestHandler>(shared_from_this(), this->m_roomManager, user, desiredRoom.value());
 }
 
 LoginManager& RequestHandlerFactory::getLoginManager()
