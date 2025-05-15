@@ -15,71 +15,36 @@ using TriviaClient.Infrastructure;
 
 namespace TriviaClient
 {
-    public static class Globals
-    {
-        public static Communicator Communicator = new();
-    }
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        private readonly Communicator m_communicator;
         public MainWindow()
         {
             InitializeComponent();
-            InitializeCommunicator();
+            m_communicator = new Communicator();
             NavigateToLogin();
-        }
-
-        private void InitializeCommunicator()
-        {
-            const int FAILURE_CODE = 1;
-
-            try
-            {
-                Globals.Communicator = new Communicator();
-
-                if (!Globals.Communicator.IsConnected)
-                {
-                    MessageBox.Show("Failed to connect to server. Please try again later.",
-                                  "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    System.Environment.Exit(FAILURE_CODE);
-                }
-            }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to initialize connection: {ex.Message}",
-                              "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(FAILURE_CODE);
-            }
         }
 
         private void NavigateToLogin()
         {
+            MainFrame.Navigate(new Login(m_communicator));
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
             try
             {
-                var loginPage = new Login();
-                MainFrame.Navigate(loginPage);
+                m_communicator.CloseConnection();
             }
-
             catch (Exception ex)
             {
-                const int FAILURE_CODE = 1;
-
-                MessageBox.Show($"Failed to load login page: {ex.Message}",
-                              "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-
-                Globals.Communicator.CloseConnection();
-                System.Environment.Exit(FAILURE_CODE);
+                MessageBox.Show($"Error closing connection: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void Window_Closed(object sender, EventArgs e)
-        {
-            Globals.Communicator.CloseConnection();
-        }
     }
 }

@@ -16,11 +16,13 @@ namespace TriviaClient
     /// </summary>
     public partial class HighScores : Page
     {
+        private readonly Communicator m_communicator;
         public List<string>? TopPlayers { get; set; }
 
-        public HighScores()
+        public HighScores(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
             FetchHighScores();
         }
 
@@ -28,32 +30,27 @@ namespace TriviaClient
         {
             try
             {
-                // Serialize the request to get the high scores
                 var request = Serializer.SerializeEmptyRequest(RequestCode.HighScoreRequest);
-                Globals.Communicator.SendToServer(request);
+                m_communicator.SendToServer(request);
 
-                // Receive the response from the server
-                var serverResponse = Globals.Communicator.ReceiveFromServer();
+                var serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<GetHighScoreResponse>(serverResponse);
 
-                // Check if the response is valid
                 if (response == null)
                 {
                     MessageBox.Show("Invalid response from server.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                // If the response is successful, update the UI with the top players
                 if (response.status == StatusCodes.SUCCESS)
                 {
-                    TopPlayers = response.statistics.Take(3).ToList();  // Get top 3 players
-                    DataContext = this;  // Bind the TopPlayers list to the UI
+                    TopPlayers = response.statistics.Take(3).ToList();
+                    DataContext = this;
                     return;
                 }
 
                 MessageBox.Show("Error fetching high scores.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show($"Error while fetching high scores: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -71,4 +68,5 @@ namespace TriviaClient
             MessageBox.Show("Error: There's no previous page you can go back to!");
         }
     }
+
 }

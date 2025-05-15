@@ -24,14 +24,18 @@ namespace TriviaClient
     /// </summary>
     public partial class PersonalStatistics : Page
     {
+        private readonly Communicator m_communicator;
+
         private uint GamesPlayed { get; set; }
         private uint CorrectAnswers { get; set; }
         private uint WrongAnswers { get; set; }
         private int AverageAnswerTime { get; set; }
 
-        public PersonalStatistics()
+        public PersonalStatistics(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
+
             this.Loaded += PersonalStatistics_Loaded;
         }
 
@@ -40,9 +44,9 @@ namespace TriviaClient
             const int EMPTY = 0;
 
             var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
-            Globals.Communicator.SendToServer(request);
+            m_communicator.SendToServer(request);
 
-            var serverResponse = Globals.Communicator.ReceiveFromServer();
+            var serverResponse = m_communicator.ReceiveFromServer();
             var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
 
             if (response == null || response.status != StatusCodes.SUCCESS || response.statistics.Count() == EMPTY)
@@ -82,7 +86,6 @@ namespace TriviaClient
             }
 
             MessageBox.Show("Error: Couldn't fetch personal statistics.");
-
         }
     }
 }
