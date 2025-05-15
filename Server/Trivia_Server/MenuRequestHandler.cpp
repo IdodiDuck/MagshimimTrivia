@@ -91,7 +91,7 @@ RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<MenuRequestHandler>(*this) // To do - appoint to a new handler when added
+        std::make_unique<MenuRequestHandler>(*this)
     };
 }
 
@@ -152,7 +152,7 @@ RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        nullptr // To do - appoint to a new handler of RoomMember when added
+        this->getFactorySafely()->createRoomMemberRequestHandler(this->m_user, request.roomId)
     };
 }
 
