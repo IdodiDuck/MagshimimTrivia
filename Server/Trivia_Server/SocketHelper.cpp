@@ -1,17 +1,18 @@
 #include "SocketHelper.h"
 
-using std::string;
+#include <iostream>
 
 std::optional<std::vector<unsigned char>> SocketHelper::getData(const SOCKET sc, const int bytesNum)
 {
-	const int DEFAULT_FLAG = 0;
+	const int DEFAULT_FLAG = 0, CLIENT_CLOSED_SOCKET = 0;
 
 	std::vector<unsigned char> data(bytesNum);
 
 	int res = recv(sc, reinterpret_cast<char*>(data.data()), bytesNum, DEFAULT_FLAG);
 
-	if (res == SOCKET_ERROR)
+	if (res == SOCKET_ERROR || res == CLIENT_CLOSED_SOCKET)
 	{
+		std::cerr << "WSA Last Error: " << WSAGetLastError() << std::endl;
 		return std::nullopt;
 	}
 
