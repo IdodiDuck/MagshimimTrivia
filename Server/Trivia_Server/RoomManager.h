@@ -17,15 +17,19 @@ public:
 	// Setters - 
 	void createRoom(const LoggedUser& user, const RoomData& data);
 	void deleteRoom(const int ID);
+	void removeUserFromRoom(const int ID, const LoggedUser& removedUser);
 
 	// Getters - 
 	RoomStatus getRoomState(const int ID) const;
 	std::vector<RoomData> getRooms() const;
-	std::optional<std::reference_wrapper<const Room>> getRoom(const int ID) const;
+	std::optional<Room> getRoom(const int ID) const;
 
 private:
 	// Attributes - 
 	std::unordered_map<unsigned int, Room> m_rooms;
 	mutable std::shared_mutex m_roomsMutex;
+
+	// Support Methods - 
+	bool doesRoomExist(const int ID) const;
 
 };
