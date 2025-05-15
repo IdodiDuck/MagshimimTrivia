@@ -35,6 +35,8 @@ namespace TriviaClient
 
         private void InitializeCommunicator()
         {
+            const int FAILURE_CODE = 1;
+
             try
             {
                 Globals.Communicator = new Communicator();
@@ -43,7 +45,7 @@ namespace TriviaClient
                 {
                     MessageBox.Show("Failed to connect to server. Please try again later.",
                                   "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    System.Environment.Exit(1);
+                    System.Environment.Exit(FAILURE_CODE);
                 }
             }
 
@@ -51,7 +53,7 @@ namespace TriviaClient
             {
                 MessageBox.Show($"Failed to initialize connection: {ex.Message}",
                               "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(1);
+                System.Environment.Exit(FAILURE_CODE);
             }
         }
 
@@ -69,8 +71,15 @@ namespace TriviaClient
 
                 MessageBox.Show($"Failed to load login page: {ex.Message}",
                               "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                Globals.Communicator.CloseConnection();
                 System.Environment.Exit(FAILURE_CODE);
             }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Globals.Communicator.CloseConnection();
         }
     }
 }
