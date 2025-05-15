@@ -25,35 +25,37 @@ namespace TriviaClient
     public partial class MainMenu : Page
     {
         private string Username { get; set; } = string.Empty;
+        private readonly Communicator m_communicator;
 
-        public MainMenu(string username)
+        public MainMenu(Communicator clientCommunicator, string username)
         {
             InitializeComponent();
             Username = username;
+            m_communicator = clientCommunicator;
 
             UserNameText.Text = Username;
         }
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new CreateRoom());
+            this.NavigationService.Navigate(new CreateRoom(m_communicator));
         }
 
         private void JoinRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new JoinRoom());
+            this.NavigationService.Navigate(new JoinRoom(m_communicator));
         }
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-           this.NavigationService.Navigate(new PersonalStatistics());
+           this.NavigationService.Navigate(new PersonalStatistics(m_communicator));
         }
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
             var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
-            Globals.Communicator.SendToServer(request);
-            var serverResponse = Globals.Communicator.ReceiveFromServer();
+            m_communicator.SendToServer(request);
+            var serverResponse = m_communicator.ReceiveFromServer();
             var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
 
             if (response == null || response.status != StatusCodes.SUCCESS)
@@ -74,7 +76,7 @@ namespace TriviaClient
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new HighScores());
+            this.NavigationService.Navigate(new HighScores(m_communicator));
         }
     }
 }

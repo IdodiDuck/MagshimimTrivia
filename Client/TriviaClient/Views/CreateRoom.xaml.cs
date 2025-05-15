@@ -23,9 +23,12 @@ namespace TriviaClient
     /// </summary>
     public partial class CreateRoom : Page
     {
-        public CreateRoom()
+        private readonly Communicator m_communicator;
+
+        public CreateRoom(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
@@ -59,8 +62,8 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(request);
-                Globals.Communicator.SendToServer(serializedRequest);
-                byte[] response = Globals.Communicator.ReceiveFromServer();
+                m_communicator.SendToServer(serializedRequest);
+                byte[] response = m_communicator.ReceiveFromServer();
                 var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(response);
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)
@@ -70,7 +73,7 @@ namespace TriviaClient
                     QuestionsNumberTextBox.Clear();
                     QuestionTimeTextBox.Clear();
 
-                    this.NavigationService.Navigate(new GameLobby(request.roomName, maxUsers, questionCount, answerTimeout));
+                    this.NavigationService.Navigate(new GameLobby(m_communicator, request.roomName, maxUsers, questionCount, answerTimeout));
                 }
 
                 else
@@ -93,15 +96,15 @@ namespace TriviaClient
                 return;
             }
 
-           MessageBox.Show("Error: There's no previous page you can go back to!");
+            MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
             CreateButton.IsEnabled = !string.IsNullOrWhiteSpace(RoomNameTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(PlayersNumberTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(QuestionsNumberTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(QuestionTimeTextBox.Text);
+                                     !string.IsNullOrWhiteSpace(PlayersNumberTextBox.Text) &&
+                                     !string.IsNullOrWhiteSpace(QuestionsNumberTextBox.Text) &&
+                                     !string.IsNullOrWhiteSpace(QuestionTimeTextBox.Text);
         }
     }
 

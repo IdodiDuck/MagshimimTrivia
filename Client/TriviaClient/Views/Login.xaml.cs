@@ -27,10 +27,12 @@ namespace TriviaClient
     /// </summary>
     public partial class Login : Page
     {
+        private readonly Communicator m_communicator;
 
-        public Login()
+        public Login(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -44,8 +46,8 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(loginRequest);
-                Globals.Communicator.SendToServer(serializedRequest);
-                byte[] serverResponse = Globals.Communicator.ReceiveFromServer();
+                m_communicator.SendToServer(serializedRequest);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
 
                 if (response == null)
@@ -60,28 +62,24 @@ namespace TriviaClient
                     UsernameTextBox.Clear();
                     PasswordBox.Clear();
 
-                    this.NavigationService.Navigate(new MainMenu(loginRequest.username));
+                    this.NavigationService.Navigate(new MainMenu(m_communicator, loginRequest.username)); // העבר הלאה
                 }
-
                 else
                 {
                     MessageBox.Show("Invalid username or password / user already logged in.", "Login Failed",
                                    MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-
             catch (SocketException ex)
             {
                 MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
             catch (SerializationException ex)
             {
                 MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
             catch (Exception ex)
             {
                 MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
@@ -107,7 +105,7 @@ namespace TriviaClient
 
         private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            this.NavigationService.Navigate(new Signup());
+            this.NavigationService.Navigate(new Signup(m_communicator));
         }
     }
 }

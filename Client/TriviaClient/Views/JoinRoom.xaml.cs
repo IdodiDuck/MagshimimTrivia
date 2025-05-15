@@ -25,9 +25,12 @@ namespace TriviaClient
     /// </summary>
     public partial class JoinRoom : Page
     {
-        public JoinRoom()
+        private readonly Communicator m_communicator;
+
+        public JoinRoom(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void JoinButton_Click(object sender, RoutedEventArgs e)
@@ -35,8 +38,8 @@ namespace TriviaClient
             try
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
-                Globals.Communicator.SendToServer(request);
-                byte[] serverResponse = Globals.Communicator.ReceiveFromServer();
+                m_communicator.SendToServer(request);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<GetRoomsResponse>(serverResponse);
 
                 if (response == null || response.status != StatusCodes.SUCCESS)
@@ -53,32 +56,20 @@ namespace TriviaClient
 
                 RoomData selectedRoom = response.rooms[0];
 
-                var createRoomRequest = Serializer.SerializeEmptyRequest(RequestCode.CreateRoomRequest);
-                Globals.Communicator.SendToServer(createRoomRequest);
-                var getRoomResponse = Globals.Communicator.ReceiveFromServer(); // This likely should be `createRoomRequest`
-                var dResponse = Deserializer.DeserializeResponse<GetRoomsResponse>(getRoomResponse);
-
-                if (response.status != StatusCodes.SUCCESS)
-                {
-                    MessageBox.Show("Failed to join room, pls try again");
-                    return;
-                }
-
                 this.NavigationService.Navigate(
                     new GameLobby(
+                        m_communicator,
                         selectedRoom.name,
                         (int)selectedRoom.maxPlayers,
                         (int)selectedRoom.numOfQuestionsInGame,
                         (int)selectedRoom.timePerQuestion
-                    )
-                );
+                    ));
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error joining room: {ex.Message}");
             }
         }
-
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
@@ -96,4 +87,5 @@ namespace TriviaClient
             // TODO v3.0.0
         }
     }
+
 }
