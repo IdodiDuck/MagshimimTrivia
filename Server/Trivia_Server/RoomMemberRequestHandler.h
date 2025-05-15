@@ -2,7 +2,8 @@
 #include "IRequestHandler.h"
 
 #include "RoomManager.h"
-#include "RequestHandlerFactory.h"
+
+class RequestHandlerFactory;
 
 class RoomMemberRequestHandler : public IRequestHandler
 {
@@ -13,6 +14,7 @@ public:
 	// Virtuals - 
 	bool isRequestRelevant(const RequestInfo& requestInfo) override;
 	RequestResult handleRequest(const RequestInfo& requestInfo) override;
+	void handleDisconnection() override;
 
 private:
 	// Attributes - 

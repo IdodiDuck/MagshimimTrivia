@@ -1,4 +1,6 @@
 #include "RoomMemberRequestHandler.h"
+
+#include "RequestHandlerFactory.h"
 #include "Constants.h"
 #include "JsonResponsePacketSerializer.h"
 
@@ -33,6 +35,12 @@ RequestResult RoomMemberRequestHandler::handleRequest(const RequestInfo& request
 			nullptr
 		};
 	}
+}
+
+void RoomMemberRequestHandler::handleDisconnection()
+{
+	this->m_roomManager.removeUserFromRoom(this->m_room.getRoomData().id, this->m_user.getUserName());
+	this->getFactorySafely()->getLoginManager().logOut(this->m_user.getUserName());
 }
 
 RequestResult RoomMemberRequestHandler::leaveRoom(const RequestInfo& info)
