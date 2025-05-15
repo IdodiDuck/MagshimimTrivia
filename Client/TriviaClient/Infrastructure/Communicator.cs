@@ -68,7 +68,6 @@ namespace TriviaClient.Infrastructure
                 }
 
                 stream.Write(message, 0, message.Length);
-                stream.Flush();
             }
 
             catch (Exception ex)
