@@ -25,9 +25,12 @@ namespace TriviaClient
     /// </summary>
     public partial class Signup : Page
     {
-        public Signup()
+        private readonly Communicator m_communicator;
+
+        public Signup(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void SignUpButton_Click(object sender, RoutedEventArgs e)
@@ -39,12 +42,11 @@ namespace TriviaClient
                     username = UsernameTextBox.Text,
                     password = PasswordBox.Password,
                     email = EmailTextBox.Text
-
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(signupRequest);
-                Globals.Communicator.SendToServer(serializedRequest);
-                byte[] serverResponse = Globals.Communicator.ReceiveFromServer();
+                m_communicator.SendToServer(serializedRequest);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<SignupResponse>(serverResponse);
 
                 if (response == null)
@@ -56,7 +58,7 @@ namespace TriviaClient
 
                 if (response.status == StatusCodes.SUCCESS)
                 {
-                    this.NavigationService.Navigate(new MainMenu(UsernameTextBox.Text));
+                    this.NavigationService.Navigate(new MainMenu(m_communicator, UsernameTextBox.Text));
                 }
 
                 else
@@ -95,7 +97,6 @@ namespace TriviaClient
             UpdateSignupButtonState();
         }
 
-
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             UpdateSignupButtonState();
@@ -104,7 +105,7 @@ namespace TriviaClient
         private void UpdateSignupButtonState()
         {
             SignUpButton.IsEnabled = !string.IsNullOrWhiteSpace(UsernameTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(PasswordBox.Password) && 
+                                   !string.IsNullOrWhiteSpace(PasswordBox.Password) &&
                                    !string.IsNullOrWhiteSpace(EmailTextBox.Text);
         }
 

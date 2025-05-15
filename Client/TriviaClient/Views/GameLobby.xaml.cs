@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Navigation;
+using TriviaClient.Constants;
+using TriviaClient.Infrastructure;
 
 namespace TriviaClient
 {
@@ -23,14 +25,19 @@ namespace TriviaClient
 
     public partial class GameLobby : Page
     {
+        private readonly Communicator m_communicator;
+
         private string RoomName { get; set; } = string.Empty;
         private uint MaxPlayer { get; set; }
         private uint QuestionAmount { get; set; }
         private uint TimePerQuestion { get; set; }
 
-        public GameLobby(string roomName, int maxPlayer, int questionAmount, int timePerQuestion)
+        public GameLobby(Communicator communicator, string roomName, int maxPlayer, int questionAmount, int timePerQuestion)
         {
             InitializeComponent();
+
+            m_communicator = communicator;
+
             RoomName = roomName;
             MaxPlayer = (uint)maxPlayer;
             QuestionAmount = (uint)questionAmount;
@@ -44,12 +51,21 @@ namespace TriviaClient
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            // v4.0.0
+            // TODO AT V4.0.0
         }
 
         private void LeaveButton_Click(object sender, RoutedEventArgs e)
         {
-            // Send to Server LeaveRoom Request!
+            try
+            {
+                var leaveRoomRequest = Serializer.SerializeEmptyRequest(RequestCode.LEAVE_ROOM_REQUEST);
+                m_communicator.SendToServer(leaveRoomRequest);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error while leaving room: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
             if (NavigationService.CanGoBack)
             {
@@ -60,4 +76,5 @@ namespace TriviaClient
             MessageBox.Show("Error: There's no previous page you can go back to!");
         }
     }
+
 }

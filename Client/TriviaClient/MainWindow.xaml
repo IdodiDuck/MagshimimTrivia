@@ -10,7 +10,7 @@
         Width="800"
         WindowStartupLocation="CenterScreen"
         Background="White"
-        Closed="Window_Closed">
+        Closing="MainWindow_Closing">
 
     <Frame x:Name="MainFrame"
            NavigationUIVisibility="Hidden"/>
