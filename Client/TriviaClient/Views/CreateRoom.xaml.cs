@@ -59,7 +59,8 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(request);
-                byte[] response = Globals.Communicator.SendAndReceiveFromServer(serializedRequest);
+                Globals.Communicator.SendToServer(serializedRequest);
+                byte[] response = Globals.Communicator.ReceiveFromServer();
                 var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(response);
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)

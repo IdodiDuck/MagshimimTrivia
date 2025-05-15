@@ -44,6 +44,18 @@ RequestResult RoomAdminRequestHandler::handleRequest(const RequestInfo& requestI
 	}
 }
 
+void RoomAdminRequestHandler::handleDisconnection()
+{
+	try
+	{
+		this->getFactorySafely()->getRoomManager().deleteRoom(this->m_room.getRoomData().id);
+	}
+
+	catch (...) { }
+
+	this->getFactorySafely()->getLoginManager().logOut(this->m_user.getUserName());
+}
+
 RequestResult RoomAdminRequestHandler::closeRoom(const RequestInfo& info)
 {
 	this->m_roomManager.deleteRoom(m_room.getRoomData().id);

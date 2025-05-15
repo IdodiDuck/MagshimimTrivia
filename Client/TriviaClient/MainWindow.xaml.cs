@@ -12,13 +12,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TriviaClient.Infrastructure;
-using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
     public static class Globals
     {
-        public static Communicator Communicator = new Communicator();
+        public static Communicator Communicator = new();
     }
 
     /// <summary>
@@ -36,6 +35,8 @@ namespace TriviaClient
 
         private void InitializeCommunicator()
         {
+            const int FAILURE_CODE = 1;
+
             try
             {
                 Globals.Communicator = new Communicator();
@@ -44,7 +45,7 @@ namespace TriviaClient
                 {
                     MessageBox.Show("Failed to connect to server. Please try again later.",
                                   "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    System.Environment.Exit(1);
+                    System.Environment.Exit(FAILURE_CODE);
                 }
             }
 
@@ -52,7 +53,7 @@ namespace TriviaClient
             {
                 MessageBox.Show($"Failed to initialize connection: {ex.Message}",
                               "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(1);
+                System.Environment.Exit(FAILURE_CODE);
             }
         }
 
@@ -63,12 +64,22 @@ namespace TriviaClient
                 var loginPage = new Login();
                 MainFrame.Navigate(loginPage);
             }
+
             catch (Exception ex)
             {
+                const int FAILURE_CODE = 1;
+
                 MessageBox.Show($"Failed to load login page: {ex.Message}",
                               "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(1);
+
+                Globals.Communicator.CloseConnection();
+                System.Environment.Exit(FAILURE_CODE);
             }
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            Globals.Communicator.CloseConnection();
         }
     }
 }

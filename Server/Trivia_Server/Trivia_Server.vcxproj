@@ -134,6 +134,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ClientConnectionException.h" />
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="IDatabase.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="RoomAdminRequestHandler.h" />
     <ClInclude Include="RoomManager.h" />
     <ClInclude Include="Server.h" />
+    <ClInclude Include="ServerException.h" />
     <ClInclude Include="SocketHelper.h" />
     <ClInclude Include="sqlite3.h" />
     <ClInclude Include="SqliteDataBase.h" />
@@ -157,6 +159,7 @@
     <ClInclude Include="WSAInitializer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClientConnectionException.cpp" />
     <ClCompile Include="Communicator.cpp" />
     <ClCompile Include="IDatabase.cpp" />
     <ClCompile Include="IRequestHandler.cpp" />
@@ -172,6 +175,7 @@
     <ClCompile Include="RoomAdminRequestHandler.cpp" />
     <ClCompile Include="RoomManager.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="ServerException.cpp" />
     <ClCompile Include="SocketHelper.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="sqlite3.c" />

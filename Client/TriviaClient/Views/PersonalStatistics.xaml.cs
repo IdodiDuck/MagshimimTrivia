@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 using System.Windows.Navigation;
 using TriviaClient.Constants;
 using static System.Net.Mime.MediaTypeNames;
+using static TriviaClient.Constants.Responses;
+using TriviaClient.Infrastructure;
 
 namespace TriviaClient
 {
@@ -27,10 +29,29 @@ namespace TriviaClient
         private uint WrongAnswers { get; set; }
         private int AverageAnswerTime { get; set; }
 
-
-        public PersonalStatistics(List<string> statistics)
+        public PersonalStatistics()
         {
-            var correctAnswersLine = statistics[3];
+            InitializeComponent();
+            this.Loaded += PersonalStatistics_Loaded;
+        }
+
+        private void PersonalStatistics_Loaded(object sender, RoutedEventArgs e)
+        {
+            const int EMPTY = 0;
+
+            var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
+            Globals.Communicator.SendToServer(request);
+
+            var serverResponse = Globals.Communicator.ReceiveFromServer();
+            var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
+
+            if (response == null || response.status != StatusCodes.SUCCESS || response.statistics.Count() == EMPTY)
+            {
+                MessageBox.Show("Failed to fetch personal statistics.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var correctAnswersLine = response.statistics[3];
             if (correctAnswersLine != null)
             {
                 var parts = correctAnswersLine.Substring("Correct Answers: ".Length).Split('/');
@@ -43,9 +64,8 @@ namespace TriviaClient
                 }
             }
 
-            InitializeComponent();
-            GamesPlayed = uint.Parse(statistics[2].Substring(statistics[2].IndexOf(": ") + 2));
-            AverageAnswerTime = int.Parse(statistics[5].Substring(statistics[5].IndexOf(": ") + 2).Replace("s", ""));
+            GamesPlayed = uint.Parse(response.statistics[2].Substring(response.statistics[2].IndexOf(": ") + 2));
+            AverageAnswerTime = int.Parse(response.statistics[5].Substring(response.statistics[5].IndexOf(": ") + 2).Replace("s", ""));
 
             gamesPlayed.Text = GamesPlayed.ToString();
             correctAns.Text = CorrectAnswers.ToString();
@@ -61,8 +81,8 @@ namespace TriviaClient
                 return;
             }
 
-            MessageBox.Show("Error: There's no previous page you can go back to!");
-        }
+            MessageBox.Show("Error: Couldn't fetch personal statistics.");
 
+        }
     }
 }

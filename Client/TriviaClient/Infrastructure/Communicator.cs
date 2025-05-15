@@ -32,18 +32,16 @@ namespace TriviaClient.Infrastructure
                 throw new Exception("Communicator: [ERROR]: Could not connect to server.", ex);
             }
         }
+
         // Communication Methods - 
-        public byte[] SendAndReceiveFromServer(byte[] message)
+        public byte[] ReceiveFromServer()
         {
             try
             {
                 if (!IsConnected)
                 {
-                    throw new InvalidOperationException("Communicator: [ERROR]: Not connected to the server.");
+                    throw new InvalidOperationException("Communicator Receiving: [ERROR]: Not connected to the server.");
                 }
-
-                stream.Write(message, 0, message.Length);
-                stream.Flush();
 
                 byte[] responseBuffer = new byte[NetworkConstants.BUFFER_SIZE];
                 int bytesRead = stream.Read(responseBuffer, 0, responseBuffer.Length);
@@ -58,6 +56,23 @@ namespace TriviaClient.Infrastructure
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
                 return Array.Empty<byte>();
+            }
+        }
+        public void SendToServer(byte[] message)
+        {
+            try
+            {
+                if (!IsConnected)
+                {
+                    throw new InvalidOperationException("Communicator Sending: [ERROR]: Not connected to the server.");
+                }
+
+                stream.Write(message, 0, message.Length);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
             }
         }
 

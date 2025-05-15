@@ -66,6 +66,11 @@ RequestResult MenuRequestHandler::handleRequest(const RequestInfo& info)
     }
 }
 
+void MenuRequestHandler::handleDisconnection()
+{
+    this->getFactorySafely()->getLoginManager().logOut(this->m_user.getUserName());
+}
+
 RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 {
     LogoutResponse response { SUCCESS };

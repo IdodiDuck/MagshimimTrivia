@@ -19,6 +19,7 @@ public:
 	// Virtuals - 
 	bool isRequestRelevant(const RequestInfo& info) override;
 	RequestResult handleRequest(const RequestInfo& info) override;
+	void handleDisconnection() override;
 
 private:
 	// Attributes - 
