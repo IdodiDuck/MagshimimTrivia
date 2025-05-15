@@ -48,7 +48,7 @@ void RoomAdminRequestHandler::handleDisconnection()
 {
 	try
 	{
-		this->getFactorySafely()->getRoomManager().deleteRoom(this->m_room.getRoomData().id);
+		this->m_roomManager.deleteRoom(this->m_room.getRoomData().id);
 	}
 
 	catch (...) { }
