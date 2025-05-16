@@ -111,46 +111,20 @@ namespace TriviaClient
 
         private void refreshPage()
         {
-            const int HALF_SECOND = 500, EMPTY = 0, ADMIN_INDEX = 0;
+            const int HALF_SECOND = 500;
 
             while (m_refreshPage)
             {
-                List<RoomInfo> roomsList = new();
-
                 try
                 {
-                    var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
-                    m_communicator.SendToServer(request);
-                    byte[] responseBytes = m_communicator.ReceiveFromServer();
-                    var response = Deserializer.DeserializeResponse<GetRoomsResponse>(responseBytes);
-
-                    if ((response != null) && (response.status == StatusCodes.SUCCESS))
-                    {
-                        foreach (var currentRoom in response.rooms)
-                        {
-                            var getPlayersRequest = new GetPlayersInRoomRequest { roomId = currentRoom.id };
-                            m_communicator.SendToServer(Serializer.SerializeRequest(getPlayersRequest));
-                            var getPlayersInRoomResponse = Deserializer.DeserializeResponse<GetPlayersInRoomResponse>(m_communicator.ReceiveFromServer());
-
-                            if ((getPlayersInRoomResponse == null) || (getPlayersInRoomResponse.players.Count == EMPTY))
-                            {
-                                continue;
-                            }
-
-                            roomsList.Add(new RoomInfo(currentRoom.name, getPlayersInRoomResponse.players[ADMIN_INDEX], (uint)getPlayersInRoomResponse.players.Count, currentRoom.id, currentRoom.status));
-                        }
-                    }
+                    List<RoomInfo> roomsList = GetAvailableRooms();
 
                     if (this.Dispatcher.HasShutdownStarted || this.Dispatcher.HasShutdownFinished)
                     {
                         break;
                     }
 
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        RoomsList.ItemsSource = roomsList;
-                        NoRoomsText.Visibility = (roomsList.Count == EMPTY) ? Visibility.Visible : Visibility.Collapsed;
-                    });
+                    UpdateRoomsListUI(roomsList);
                 }
 
                 catch
@@ -162,6 +136,55 @@ namespace TriviaClient
             }
 
         }
+
+        // Support Methods - 
+        private List<RoomInfo> GetAvailableRooms()
+        {
+            const int EMPTY = 0, ADMIN_INDEX = 0;
+            List<RoomInfo> roomsList = new();
+
+            var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
+            m_communicator.SendToServer(request);
+            byte[] responseBytes = m_communicator.ReceiveFromServer();
+            var response = Deserializer.DeserializeResponse<GetRoomsResponse>(responseBytes);
+
+            if (response != null && response.status == StatusCodes.SUCCESS)
+            {
+                foreach (var currentRoom in response.rooms)
+                {
+                    var getPlayersRequest = new GetPlayersInRoomRequest { roomId = currentRoom.id };
+                    m_communicator.SendToServer(Serializer.SerializeRequest(getPlayersRequest));
+                    var getPlayersResponse = Deserializer.DeserializeResponse<GetPlayersInRoomResponse>(m_communicator.ReceiveFromServer());
+
+                    if (getPlayersResponse == null || getPlayersResponse.players.Count == EMPTY)
+                    {
+                        continue;
+                    }
+
+                    roomsList.Add(new RoomInfo(
+                        currentRoom.name,
+                        getPlayersResponse.players[ADMIN_INDEX],
+                        (uint)getPlayersResponse.players.Count,
+                        currentRoom.id,
+                        currentRoom.status));
+                }
+            }
+
+            return roomsList;
+        }
+
+        private void UpdateRoomsListUI(List<RoomInfo> roomsList)
+        {
+            const int EMPTY = 0;
+
+            this.Dispatcher.Invoke(() =>
+            {
+                RoomsList.ItemsSource = null; // reset binding
+                RoomsList.ItemsSource = roomsList;
+                NoRoomsText.Visibility = (roomsList.Count == EMPTY) ? Visibility.Visible : Visibility.Collapsed;
+            });
+        }
+
     }
 
 }
