@@ -86,7 +86,7 @@ RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
 {
-    GetRoomsResponse response { SUCCESS };
+    GetRoomsResponse response { SUCCESS, getFactorySafely()->getRoomManager().getRooms() };
     
     return
     {
