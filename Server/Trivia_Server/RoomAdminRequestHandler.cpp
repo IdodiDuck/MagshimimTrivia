@@ -58,6 +58,7 @@ void RoomAdminRequestHandler::handleDisconnection()
 
 RequestResult RoomAdminRequestHandler::closeRoom(const RequestInfo& info)
 {
+	this->m_room.changeRoomStatus(RoomStatus::CLOSED);
 	this->m_roomManager.deleteRoom(m_room.getRoomData().id);
 
 	CloseRoomResponse closeRoomResponse = { };
