@@ -56,7 +56,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
             });
     }
     // Creating the JSON Object
-    nlohmann::json jsonResponse = {{"status", getRoomsResponse.status}, jsonRooms};
+    nlohmann::json jsonResponse = {{"status", getRoomsResponse.status}, {"rooms", jsonRooms}};
 
     // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
