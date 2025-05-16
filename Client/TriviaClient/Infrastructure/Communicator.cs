@@ -10,8 +10,8 @@ namespace TriviaClient.Infrastructure
     public class Communicator
     {
         // Attributes -
-        private readonly TcpClient m_socket;
-        private readonly NetworkStream stream;
+        private readonly TcpClient? m_socket;
+        private readonly NetworkStream? stream;
         public bool IsConnected { get; private set; }
 
         // Constructor - 
@@ -43,6 +43,12 @@ namespace TriviaClient.Infrastructure
                 }
 
                 byte[] responseBuffer = new byte[NetworkConstants.BUFFER_SIZE];
+
+                if (stream == null)
+                {
+                    throw new InvalidOperationException("Communicator Receiving: [ERROR]: Stream is not initialized.");
+                }
+
                 int bytesRead = stream.Read(responseBuffer, 0, responseBuffer.Length);
 
                 byte[] response = new byte[bytesRead];
@@ -67,7 +73,7 @@ namespace TriviaClient.Infrastructure
                     throw new InvalidOperationException("Communicator Sending: [ERROR]: Not connected to the server.");
                 }
 
-                stream.Write(message, 0, message.Length);
+                stream?.Write(message, 0, message.Length);
             }
 
             catch (Exception ex)
