@@ -7,7 +7,7 @@ RoomManager::~RoomManager()
 
 void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
-    std::unique_lock lock(m_roomsMutex);
+    std::shared_lock readingLock(m_roomsMutex);
 
     const int MIN_VALID_ID = 1;
 
@@ -21,15 +21,18 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
         throw std::runtime_error("Error: Room with ID " + std::to_string(data.id) + " already exists");
     }
 
+    readingLock.unlock();
+
     Room newRoom(data);
     newRoom.addUser(user);
 
+    std::unique_lock writingLock(m_roomsMutex);
     m_rooms.emplace(data.id, std::move(newRoom));
 }
 
 void RoomManager::deleteRoom(const int ID)
 {
-    std::unique_lock lock(m_roomsMutex);
+    std::shared_lock readingLock(m_roomsMutex);
 
     auto roomIt = m_rooms.find(ID);
     if (!doesRoomExist(ID))
@@ -37,7 +40,9 @@ void RoomManager::deleteRoom(const int ID)
         throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
     }
 
-    roomIt->second.changeRoomStatus(RoomStatus::CLOSED);
+    readingLock.unlock();
+
+    std::unique_lock writeLock(m_roomsMutex);
     m_rooms.erase(roomIt);
 }
 
