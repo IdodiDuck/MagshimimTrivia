@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TriviaClient.Constants;
+
 namespace TriviaClient.Models
 {
     public class RoomData
@@ -13,6 +15,6 @@ namespace TriviaClient.Models
         public uint maxPlayers { get; set; }
         public uint numOfQuestionsInGame { get; set; }
         public uint timePerQuestion { get; set; }
-        public uint status { get; set; }
+        public RoomStatus status { get; set; }
     }
 }
