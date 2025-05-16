@@ -16,7 +16,7 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
         throw std::invalid_argument("Error: Invalid room ID");
     }
 
-    if (doesRoomExist(data.id))
+    if (m_rooms.find(data.id) != m_rooms.cend())
     {
         throw std::runtime_error("Error: Room with ID " + std::to_string(data.id) + " already exists");
     }
