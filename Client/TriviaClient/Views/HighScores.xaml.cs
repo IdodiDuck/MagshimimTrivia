@@ -28,6 +28,7 @@ namespace TriviaClient
 
         private void FetchHighScores()
         {
+            const int BEST_THREE_PLAYERS = 3;
             try
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.HighScoreRequest);
@@ -44,13 +45,14 @@ namespace TriviaClient
 
                 if (response.status == StatusCodes.SUCCESS)
                 {
-                    TopPlayers = response.statistics.Take(3).ToList();
+                    TopPlayers = response.statistics.Take(BEST_THREE_PLAYERS).ToList();
                     DataContext = this;
                     return;
                 }
 
                 MessageBox.Show("Error fetching high scores.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Error while fetching high scores: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);

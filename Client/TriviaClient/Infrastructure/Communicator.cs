@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows;
 using TriviaClient.Constants;
 
 namespace TriviaClient.Infrastructure
@@ -28,8 +28,7 @@ namespace TriviaClient.Infrastructure
             {
                 Console.WriteLine("Communicator: [ERROR]: " + ex.Message);
                 IsConnected = false;
-
-                throw new Exception("Communicator: [ERROR]: Could not connect to server.", ex);
+                Application.Current.Shutdown();
             }
         }
 
@@ -54,7 +53,8 @@ namespace TriviaClient.Infrastructure
 
             catch (Exception ex)
             {
-                Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
+                Console.WriteLine("Communicator: [ERROR]: Error with receiving the request: " + ex.Message);
+                Application.Current.Shutdown();
                 return Array.Empty<byte>();
             }
         }
@@ -73,11 +73,14 @@ namespace TriviaClient.Infrastructure
             catch (Exception ex)
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
+                Application.Current.Shutdown();
             }
         }
 
         public void CloseConnection()
         {
+            Console.WriteLine("Closing Client Communicator Active Connection...\n");
+
             try
             {
                 stream?.Close();
@@ -88,6 +91,7 @@ namespace TriviaClient.Infrastructure
             catch (Exception ex)
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with closing connection: " + ex.Message);
+                Application.Current.Shutdown();
             }
         }
     }

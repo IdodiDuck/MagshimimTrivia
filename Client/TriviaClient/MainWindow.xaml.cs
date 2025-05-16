@@ -40,6 +40,7 @@ namespace TriviaClient
             {
                 m_communicator.CloseConnection();
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Error closing connection: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
