@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -42,13 +43,12 @@ namespace TriviaClient.Infrastructure
                     throw new InvalidOperationException("Communicator Receiving: [ERROR]: Not connected to the server.");
                 }
 
-                byte[] responseBuffer = new byte[NetworkConstants.BUFFER_SIZE];
-
                 if (stream == null)
                 {
                     throw new InvalidOperationException("Communicator Receiving: [ERROR]: Stream is not initialized.");
                 }
 
+                byte[] responseBuffer = new byte[NetworkConstants.BUFFER_SIZE];
                 int bytesRead = stream.Read(responseBuffer, 0, responseBuffer.Length);
 
                 byte[] response = new byte[bytesRead];
