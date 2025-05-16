@@ -12,16 +12,6 @@
 
 Communicator::Communicator(std::weak_ptr<RequestHandlerFactory> handlerFactory): m_handlerFactory(handlerFactory), m_isRunning(true)
 {
-    const int SUCCESS = 0;
-
-    WSADATA wsaData;
-    int wsaInitResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-    if (wsaInitResult != SUCCESS)
-    {
-        throw std::runtime_error("Error: WSAStartup failed.");
-    }
-
     this->m_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 
     if (m_serverSocket == INVALID_SOCKET)
