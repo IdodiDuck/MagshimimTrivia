@@ -180,10 +180,8 @@ namespace TriviaClient
             const int EMPTY = 0, ADMIN_INDEX = 0;
             List<RoomData> roomsList = new List<RoomData>();
 
-            var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
-            m_communicator.SendToServer(request);
-            byte[] responseBytes = m_communicator.ReceiveFromServer();
-            var response = Deserializer.DeserializeResponse<GetRoomsResponse>(responseBytes);
+            m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest));
+            var response = Deserializer.DeserializeResponse<GetRoomsResponse>(m_communicator.ReceiveFromServer());
 
             if (response != null && response.status == StatusCodes.SUCCESS)
             {

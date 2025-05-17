@@ -33,7 +33,6 @@ namespace TriviaClient
         private uint MaxPlayer { get; set; }
         private uint QuestionAmount { get; set; }
         private uint TimePerQuestion { get; set; }
-        private bool isAdmin { get; set; }
 
         public GameLobby(Communicator communicator, string roomName, uint maxPlayer, uint questionAmount, uint timePerQuestion, bool isAdmin)
         {
@@ -45,13 +44,11 @@ namespace TriviaClient
             this.MaxPlayer = maxPlayer;
             this.QuestionAmount = questionAmount;
             this.TimePerQuestion = timePerQuestion;
-            this.isAdmin = isAdmin;
 
             RoomNameText.Text = roomName;
             MaxPlayersText.Text = maxPlayer.ToString();
             QuestionCountText.Text = questionAmount.ToString();
             TimePerQuestionText.Text = timePerQuestion.ToString();
-            this.isAdmin = isAdmin;
 
             if (isAdmin)
             {
@@ -86,6 +83,7 @@ namespace TriviaClient
                 {
                     if (NavigationService.CanGoBack)
                     {
+                        NavigationService.GoBack();
                         NavigationService.GoBack();
                         return;
                     }

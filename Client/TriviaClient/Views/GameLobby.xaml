@@ -74,12 +74,12 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Time per question:" Width="120"/>
-                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding Path=TimePerQuestion, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Max players:" Width="120"/>
-                            <TextBlock x:Name="MaxPlayersText" Text="{Binding Path=QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock x:Name="MaxPlayersText" Text="{Binding Path=MaxPlayers, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
