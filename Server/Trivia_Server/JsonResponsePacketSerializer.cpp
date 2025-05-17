@@ -115,14 +115,14 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const CloseRoomResponse& closeRoomResponse)
 {
-    nlohmann::json jsonResponse = { "status", closeRoomResponse.status };
+    nlohmann::json jsonResponse = { { "status", closeRoomResponse.status } };
     std::string jsonString = jsonResponse.dump();
     return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const StartGameResponse& startGameResponse)
 {
-    nlohmann::json jsonResponse = { "status", startGameResponse.status };
+    nlohmann::json jsonResponse = { { "status", startGameResponse.status } };
     std::string jsonString = jsonResponse.dump();
     return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
 }
@@ -144,7 +144,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LeaveRoomResponse& leaveRoomResponse)
 {
-    nlohmann::json jsonResponse = { "status", leaveRoomResponse.status };
+    nlohmann::json jsonResponse = { { "status", leaveRoomResponse.status } };
     std::string jsonString = jsonResponse.dump();
     return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
 }
