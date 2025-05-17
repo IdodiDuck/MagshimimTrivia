@@ -45,7 +45,7 @@ void RoomMemberRequestHandler::handleDisconnection()
 
 RequestResult RoomMemberRequestHandler::leaveRoom(const RequestInfo& info)
 {
-	m_room.removeUser(m_user);
+	this->m_roomManager.removeUserFromRoom(this->m_room.getRoomData().id, this->m_user);
 
 	LeaveRoomResponse leaveRoomResponse;
 	leaveRoomResponse.status = SUCCESS;
