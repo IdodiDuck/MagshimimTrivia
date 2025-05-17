@@ -14,11 +14,6 @@ MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> hand
 
 }
 
-MenuRequestHandler::~MenuRequestHandler()
-{
-
-}
-
 bool MenuRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
     return (info.requestID == static_cast<unsigned int>(RequestCode::SIGNOUT_REQUEST)) ||
@@ -142,19 +137,36 @@ RequestResult MenuRequestHandler::getHighScore(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
 {
-    const unsigned int INVALID_ROOM_ID = 0;
-
     JoinRoomRequest request = JsonRequestPacketDeserializer::deserializeJoinRoomRequest(info.buffer).value();
-    JoinRoomResponse response {};
+    JoinRoomResponse response{};
 
-    response.status = (request.roomId != INVALID_ROOM_ID) ? SUCCESS : FAILURE;
+    auto roomOpt = getFactorySafely()->getRoomManager().getRoomReference(request.roomId);
+
+    if (!roomOpt.has_value())
+    {
+        response.status = FAILURE;
+        return { JsonResponsePacketSerializer::serializeResponse(response), std::make_unique<MenuRequestHandler>(*this) };
+    }
+
+    Room& room = roomOpt.value();
+
+
+    if (room.isRoomFull())
+    {
+        response.status = FAILURE;
+        return { JsonResponsePacketSerializer::serializeResponse(response), std::make_unique<MenuRequestHandler>(*this) };
+    }
+
+    room.addUser(this->m_user);
+    response.status = SUCCESS;
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        this->getFactorySafely()->createRoomMemberRequestHandler(this->m_user, request.roomId)
+        getFactorySafely()->createRoomMemberRequestHandler(this->m_user, request.roomId)
     };
 }
+
 
 RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
 {

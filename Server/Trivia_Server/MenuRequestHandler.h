@@ -14,7 +14,6 @@ class MenuRequestHandler : public IRequestHandler
 public:
 	// C'tor & D'tor - 
 	MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user);
-	virtual ~MenuRequestHandler();
 
 	// Virtuals - 
 	bool isRequestRelevant(const RequestInfo& info) override;
