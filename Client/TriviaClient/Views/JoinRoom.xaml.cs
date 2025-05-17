@@ -47,44 +47,38 @@ namespace TriviaClient
 
         private void JoinButton_Click(object sender, RoutedEventArgs e)
         {
-            const int EMPTY = 0;
+            const bool IS_NOT_ADMIN = false;
 
-            //TODO FIX METHOD THIS IF WE HAVE SELECTED A ROOM ALREADY
             try
             {
-                var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
-                m_communicator.SendToServer(request);
-                byte[] serverResponse = m_communicator.ReceiveFromServer();
-                var response = Deserializer.DeserializeResponse<GetRoomsResponse>(serverResponse);
-
-                if (response == null || response.status != StatusCodes.SUCCESS)
+                if (RoomsList.SelectedItem is not RoomData selectedRoomInfo)
                 {
-                    MessageBox.Show("Failed to fetch rooms.");
+                    MessageBox.Show("Please select a room to join.");
                     return;
                 }
 
-                if (response.rooms.Count == EMPTY)
+                var joinRequest = new JoinRoomRequest { roomId = selectedRoomInfo.id };
+                m_communicator.SendToServer(Serializer.SerializeRequest(joinRequest));
+
+                byte[] responseBytes = m_communicator.ReceiveFromServer();
+                var joinResponse = Deserializer.DeserializeResponse<JoinRoomResponse>(responseBytes);
+
+                if (joinResponse == null || joinResponse.status != StatusCodes.SUCCESS)
                 {
-                    MessageBox.Show("No rooms available. Please create a new room.");
+                    MessageBox.Show("Failed to join the selected room.");
                     return;
                 }
 
-                RoomData selectedRoom = response.rooms[0];
-
-                this.NavigationService.Navigate(
-                    new GameLobby(
-                        m_communicator,
-                        selectedRoom.name,
-                        (int)selectedRoom.maxPlayers,
-                        (int)selectedRoom.numOfQuestionsInGame,
-                        (int)selectedRoom.timePerQuestion
-                    ));
+                this.NavigationService.Navigate(new GameLobby(m_communicator, selectedRoomInfo.name, selectedRoomInfo.maxPlayers,
+                    selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Error joining room: {ex.Message}");
             }
         }
+
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
@@ -111,13 +105,13 @@ namespace TriviaClient
 
         private void refreshPage()
         {
-            const int HALF_SECOND = 500;
+            const int THREE_SECONDS = 3000;
 
             while (m_refreshPage)
             {
                 try
                 {
-                    List<RoomInfo> roomsList = GetAvailableRooms();
+                    List<RoomData> roomsList = GetAvailableRooms();
 
                     if (this.Dispatcher.HasShutdownStarted || this.Dispatcher.HasShutdownFinished)
                     {
@@ -132,16 +126,16 @@ namespace TriviaClient
                     break;
                 }
 
-                Thread.Sleep(HALF_SECOND);
+                Thread.Sleep(THREE_SECONDS);
             }
 
         }
 
         // Support Methods - 
-        private List<RoomInfo> GetAvailableRooms()
+        private List<RoomData> GetAvailableRooms()
         {
             const int EMPTY = 0, ADMIN_INDEX = 0;
-            List<RoomInfo> roomsList = new();
+            List<RoomData> roomsList = [];
 
             var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
             m_communicator.SendToServer(request);
@@ -161,29 +155,41 @@ namespace TriviaClient
                         continue;
                     }
 
-                    roomsList.Add(new RoomInfo(
-                        currentRoom.name,
-                        getPlayersResponse.players[ADMIN_INDEX],
-                        (uint)getPlayersResponse.players.Count,
-                        currentRoom.id,
-                        currentRoom.status));
+                    roomsList.Add(new RoomData(currentRoom.id, currentRoom.name, currentRoom.maxPlayers, currentRoom.numOfQuestionsInGame,
+                        currentRoom.timePerQuestion, currentRoom.status, getPlayersResponse.players[ADMIN_INDEX], (uint)getPlayersResponse.players.Count()));
                 }
             }
 
             return roomsList;
         }
 
-        private void UpdateRoomsListUI(List<RoomInfo> roomsList)
+        private void UpdateRoomsListUI(List<RoomData> roomsList)
         {
             const int EMPTY = 0;
 
             this.Dispatcher.Invoke(() =>
             {
-                RoomsList.ItemsSource = null; // reset binding
+                var selectedRoom = RoomsList.SelectedItem as RoomData;
+                uint? selectedRoomId = selectedRoom?.id;
+
+                RoomsList.ItemsSource = null;
                 RoomsList.ItemsSource = roomsList;
+
+                // Restore selection if still exists
+                if (selectedRoomId.HasValue)
+                {
+                    var itemToSelect = roomsList.FirstOrDefault(r => r.id == selectedRoomId.Value);
+                    if (itemToSelect != null)
+                    {
+                        RoomsList.SelectedItem = itemToSelect;
+                    }
+                }
+
                 NoRoomsText.Visibility = (roomsList.Count == EMPTY) ? Visibility.Visible : Visibility.Collapsed;
+                JoinRoomBtn.IsEnabled = RoomsList.SelectedItem != null;
             });
         }
+
 
     }
 

@@ -33,21 +33,24 @@ namespace TriviaClient
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
+            const bool IS_ADMIN = true;
+            const int EMPTY = 0;
+
             try
             {
-                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers <= 0)
+                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers <= EMPTY)
                 {
                     MessageBox.Show("Please enter a valid number of players", "Invalid Input");
                     return;
                 }
 
-                if (!int.TryParse(QuestionsNumberTextBox.Text, out int questionCount) || questionCount <= 0)
+                if (!int.TryParse(QuestionsNumberTextBox.Text, out int questionCount) || questionCount <= EMPTY)
                 {
                     MessageBox.Show("Please enter a valid number of questions", "Invalid Input");
                     return;
                 }
 
-                if (!int.TryParse(QuestionTimeTextBox.Text, out int answerTimeout) || answerTimeout <= 0)
+                if (!int.TryParse(QuestionTimeTextBox.Text, out int answerTimeout) || answerTimeout <= EMPTY)
                 {
                     MessageBox.Show("Please enter a valid time per question", "Invalid Input");
                     return;
@@ -73,7 +76,7 @@ namespace TriviaClient
                     QuestionsNumberTextBox.Clear();
                     QuestionTimeTextBox.Clear();
 
-                    this.NavigationService.Navigate(new GameLobby(m_communicator, request.roomName, maxUsers, questionCount, answerTimeout));
+                    this.NavigationService.Navigate(new GameLobby(m_communicator, request.roomName, (uint)maxUsers, (uint)questionCount, (uint)answerTimeout, IS_ADMIN));
                 }
 
                 else

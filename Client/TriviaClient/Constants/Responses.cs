@@ -26,6 +26,7 @@ namespace TriviaClient.Constants
             public uint status { get; set; }
         }
 
+        // V2.0.0 Responses - 
         public class LogoutResponse
         {
             public uint status { get; set; }
@@ -69,6 +70,7 @@ namespace TriviaClient.Constants
             public uint status { get; set; }
         }
 
+        // V3.0.0 Responses - 
         public class CloseRoomResponse
         {
             public uint Status { get; set; }

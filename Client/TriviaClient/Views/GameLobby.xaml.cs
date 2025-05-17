@@ -31,22 +31,25 @@ namespace TriviaClient
         private uint MaxPlayer { get; set; }
         private uint QuestionAmount { get; set; }
         private uint TimePerQuestion { get; set; }
+        private bool isAdmin { get; set; }
 
-        public GameLobby(Communicator communicator, string roomName, int maxPlayer, int questionAmount, int timePerQuestion)
+        public GameLobby(Communicator communicator, string roomName, uint maxPlayer, uint questionAmount, uint timePerQuestion, bool isAdmin)
         {
             InitializeComponent();
 
-            m_communicator = communicator;
+            this.m_communicator = communicator;
 
-            RoomName = roomName;
-            MaxPlayer = (uint)maxPlayer;
-            QuestionAmount = (uint)questionAmount;
-            TimePerQuestion = (uint)timePerQuestion;
+            this.RoomName = roomName;
+            this.MaxPlayer = maxPlayer;
+            this.QuestionAmount = questionAmount;
+            this.TimePerQuestion = timePerQuestion;
+            this.isAdmin = isAdmin;
 
             RoomNameText.Text = roomName;
             MaxPlayersText.Text = maxPlayer.ToString();
             QuestionCountText.Text = questionAmount.ToString();
             TimePerQuestionText.Text = timePerQuestion.ToString();
+            this.isAdmin = isAdmin;
         }
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
