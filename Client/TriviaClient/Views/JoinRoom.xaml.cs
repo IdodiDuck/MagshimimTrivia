@@ -102,6 +102,14 @@ namespace TriviaClient
         private void RoomsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             JoinRoomBtn.IsEnabled = RoomsList.SelectedItem != null;
+
+            if (RoomsList.SelectedItem is RoomData selectedRoom)
+            {
+                LoadPlayersForRoom(selectedRoom.id);
+                return;
+            }
+
+            UsersList.ItemsSource = null;
         }
 
         private void refreshPage()
@@ -191,7 +199,32 @@ namespace TriviaClient
             });
         }
 
+        private void LoadPlayersForRoom(uint roomId)
+        {
+            try
+            {
+                var request = new GetPlayersInRoomRequest { roomId = roomId };
+                m_communicator.SendToServer(Serializer.SerializeRequest(request));
 
+                var response = Deserializer.DeserializeResponse<GetPlayersInRoomResponse>(m_communicator.ReceiveFromServer());
+
+                if (response?.players != null)
+                {
+                    UsersList.ItemsSource = response.players;
+                    return;
+                }
+
+                UsersList.ItemsSource = null;
+
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error retrieving players list: {ex.Message}");
+                UsersList.ItemsSource = null;
+
+            }
+        }
     }
 
 }

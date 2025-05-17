@@ -90,8 +90,32 @@
 
 
         <ListBox x:Name="UsersList"
-                 Grid.Column="1" Grid.Row="1"
-                 Margin="10"/>
+         Grid.Column="1" Grid.Row="1"
+         Margin="10"
+         SelectionMode="Single"
+         HorizontalContentAlignment="Stretch"
+         Focusable="False">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" Padding="8" Margin="5"
+                    Background="White" HorizontalAlignment="Stretch">
+                        <TextBlock Text="{Binding}" FontSize="14" Foreground="Black" />
+                    </Border>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Margin" Value="5"/>
+                    <Setter Property="Padding" Value="0"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="IsHitTestVisible" Value="False"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
 
         <!-- Buttons -->
         <StackPanel Orientation="Horizontal"
