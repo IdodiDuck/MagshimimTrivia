@@ -20,20 +20,20 @@ RequestResult RoomMemberRequestHandler::handleRequest(const RequestInfo& request
 {
 	switch (static_cast<RequestCode>(requestInfo.requestID))
 	{
-	case RequestCode::GET_ROOM_STATE_REQUEST:
-		return getRoomState(requestInfo);
+		case RequestCode::GET_ROOM_STATE_REQUEST:
+			return getRoomState(requestInfo);
 
-	case RequestCode::LEAVE_ROOM_REQUEST:
-		return leaveRoom(requestInfo);
+		case RequestCode::LEAVE_ROOM_REQUEST:
+			return leaveRoom(requestInfo);
 
-	default:
-		ErrorResponse errorResponse;
-		errorResponse.message = "Unknown request type.";
-		return
-		{
-			JsonResponsePacketSerializer::serializeResponse(errorResponse),
-			nullptr
-		};
+		default:
+			ErrorResponse errorResponse;
+			errorResponse.message = "Unknown request type.";
+			return
+			{
+				JsonResponsePacketSerializer::serializeResponse(errorResponse),
+				nullptr
+			};
 	}
 }
 
