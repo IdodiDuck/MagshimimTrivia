@@ -35,7 +35,7 @@ namespace TriviaClient.Constants
         public class GetRoomsResponse
         {
             public uint status { get; set; }
-            public List<RoomData> rooms { get; set; } = new List<RoomData>();
+            public List<Room> rooms { get; set; } = new List<Room>();
         }
 
         public class GetPlayersInRoomResponse
