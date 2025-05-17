@@ -51,6 +51,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
             {"id", room.id},
             {"name", room.name},
             {"maxPlayers", room.maxPlayers},
+            {"numOfQuestionsInGame", room.numOfQuestionsInGame},
             {"timePerQuestion", room.timePerQuestion},
             {"status", room.status}
             });
