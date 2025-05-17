@@ -18,10 +18,10 @@ const std::string EXIT_SERVER = "EXIT";
 
 enum class RequestCode : unsigned int 
 {
-    SIGNUP_REQUEST = 100,
+    SIGNUP_REQUEST = 10,
     LOGIN_REQUEST,
 
-    SIGNOUT_REQUEST = 200,
+    SIGNOUT_REQUEST = 20,
     ROOMS_REQUEST,
     PLAYERS_IN_ROOM_REQUEST,
     PERSONAL_STATS_REQUEST,
@@ -29,7 +29,7 @@ enum class RequestCode : unsigned int
     JOIN_ROOM_REQUEST,
     CREATE_ROOM_REQUEST,
 
-    CLOSE_ROOM_REQUEST = 300,
+    CLOSE_ROOM_REQUEST = 30,
     START_GAME_REQUEST,
     GET_ROOM_STATE_REQUEST,
     LEAVE_ROOM_REQUEST
