@@ -29,5 +29,6 @@ private:
 
 	// Support Methods -
 	std::shared_ptr<RequestHandlerFactory> getFactorySafely();
+	Room& getRoomSafely();
 };
 

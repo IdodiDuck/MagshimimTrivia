@@ -61,13 +61,14 @@ RequestResult RoomMemberRequestHandler::getRoomState(const RequestInfo& info)
 {
 	GetRoomStateResponse getRoomStateResponse;
 
-	RoomData usedRoomData = m_room.getRoomData();
+	Room& room = getRoomSafely();
+	RoomData usedRoomData = room.getRoomData();
 
 	getRoomStateResponse.status = SUCCESS;
 	getRoomStateResponse.hasGameBegun = (usedRoomData.status == RoomStatus::GAME_STARTED);
 	getRoomStateResponse.questionsCount = usedRoomData.numOfQuestionsInGame;
 	getRoomStateResponse.answerTimeout = usedRoomData.timePerQuestion;
-	getRoomStateResponse.players = std::vector<std::string>(m_room.getAllUsers().cbegin(), m_room.getAllUsers().cend());
+	getRoomStateResponse.players = std::vector<std::string>(room.getAllUsers().cbegin(), room.getAllUsers().cend());
 
 	RequestResult response;
 
@@ -94,4 +95,17 @@ std::shared_ptr<RequestHandlerFactory> RoomMemberRequestHandler::getFactorySafel
 	}
 
 	throw std::runtime_error("RoomMemberRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
+}
+
+Room& RoomMemberRequestHandler::getRoomSafely()
+{
+	auto roomOptional = this->m_roomManager.getRoomReference(m_room.getRoomData().id);
+
+	if (!roomOptional.has_value())
+	{
+		throw std::runtime_error("RoomMemberRequestHandler: [ERROR]: Room not found in RoomManager");
+	}
+
+	auto roomRef = roomOptional.value();
+	return roomRef.get();
 }

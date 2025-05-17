@@ -58,7 +58,7 @@ void RoomAdminRequestHandler::handleDisconnection()
 
 RequestResult RoomAdminRequestHandler::closeRoom(const RequestInfo& info)
 {
-	this->m_room.changeRoomStatus(RoomStatus::CLOSED);
+	getRoomSafely().changeRoomStatus(RoomStatus::CLOSED);
 	this->m_roomManager.deleteRoom(m_room.getRoomData().id);
 
 	CloseRoomResponse closeRoomResponse = { };
@@ -73,7 +73,7 @@ RequestResult RoomAdminRequestHandler::closeRoom(const RequestInfo& info)
 
 RequestResult RoomAdminRequestHandler::startGame(const RequestInfo& info)
 {
-	this->m_room.changeRoomStatus(RoomStatus::GAME_STARTED);
+	getRoomSafely().changeRoomStatus(RoomStatus::GAME_STARTED);
 
 	StartGameResponse startGameResponse = { };
 	startGameResponse.status = SUCCESS;
@@ -91,25 +91,25 @@ RequestResult RoomAdminRequestHandler::getRoomState(const RequestInfo& info)
 {
 	GetRoomStateResponse getRoomStateResponse;
 
-	RoomData usedRoomData = m_room.getRoomData();
+	Room& room = getRoomSafely();
+	RoomData usedRoomData = room.getRoomData();
 
 	getRoomStateResponse.status = SUCCESS;
 	getRoomStateResponse.hasGameBegun = (usedRoomData.status == RoomStatus::GAME_STARTED);
 	getRoomStateResponse.questionsCount = usedRoomData.numOfQuestionsInGame;
 	getRoomStateResponse.answerTimeout = usedRoomData.timePerQuestion;
-	getRoomStateResponse.players = std::vector<std::string>(m_room.getAllUsers().cbegin(), m_room.getAllUsers().cend());
+	getRoomStateResponse.players = std::vector<std::string>(room.getAllUsers().cbegin(), room.getAllUsers().cend());
 
 	RequestResult response;
 
 	if (getRoomStateResponse.hasGameBegun)
 	{
 		// Create here GameRequestHandler instead!!! -> Temporary Handler and initialize a new game!!!
-		response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, m_room.getRoomData().id);
+		response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id);
 	}
-
 	else
 	{
-		response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, m_room.getRoomData().id);
+		response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id);
 	}
 
 	response.response = JsonResponsePacketSerializer::serializeResponse(getRoomStateResponse);
@@ -124,4 +124,17 @@ std::shared_ptr<RequestHandlerFactory> RoomAdminRequestHandler::getFactorySafely
 	}
 
 	throw std::runtime_error("RoomAdminRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
+}
+
+Room& RoomAdminRequestHandler::getRoomSafely()
+{
+	auto roomOptional = this->m_roomManager.getRoomReference(m_room.getRoomData().id);
+
+	if (!roomOptional.has_value())
+	{
+		throw std::runtime_error("RoomAdminRequestHandler: [ERROR]: Room not found in RoomManager");
+	}
+
+	auto roomRef = roomOptional.value();
+	return roomRef.get();
 }
