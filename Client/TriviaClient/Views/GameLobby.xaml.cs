@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+
+using static TriviaClient.Constants.Responses;
 using System.Windows.Navigation;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
@@ -50,6 +52,16 @@ namespace TriviaClient
             QuestionCountText.Text = questionAmount.ToString();
             TimePerQuestionText.Text = timePerQuestion.ToString();
             this.isAdmin = isAdmin;
+
+            if (isAdmin)
+            {
+                AdminButtonsPanel.Visibility = Visibility.Visible;
+            }
+            
+            else
+            {
+                LeaveButton.Visibility = Visibility.Visible;
+            }
         }
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
@@ -63,20 +75,56 @@ namespace TriviaClient
             {
                 var leaveRoomRequest = Serializer.SerializeEmptyRequest(RequestCode.LEAVE_ROOM_REQUEST);
                 m_communicator.SendToServer(leaveRoomRequest);
+                var serverResponse = Deserializer.DeserializeResponse<LeaveRoomResponse>(m_communicator.ReceiveFromServer());
+
+                if (serverResponse == null)
+                {
+                    return;
+                }
+
+                if (serverResponse.Status == StatusCodes.SUCCESS)
+                {
+                    if (NavigationService.CanGoBack)
+                    {
+                        NavigationService.GoBack();
+                        return;
+                    }
+
+                    MessageBox.Show("Error: There's no previous page you can go back to!", "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                MessageBox.Show("Failed to leave room. Server returned an error.", "Leave Room", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             catch (Exception ex)
             {
                 MessageBox.Show($"Error while leaving room: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
 
-            if (NavigationService.CanGoBack)
+        private void CloseRoomButton_Click(object sender, RoutedEventArgs e)
+        {
+            m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.CLOSE_ROOM_REQUEST));
+            var serverResponse = Deserializer.DeserializeResponse<CloseRoomResponse>(m_communicator.ReceiveFromServer());
+
+            if (serverResponse == null)
             {
-                NavigationService.GoBack();
                 return;
             }
 
-            MessageBox.Show("Error: There's no previous page you can go back to!");
+            if (serverResponse.Status == StatusCodes.SUCCESS)
+            {
+                // Stop Thread which is checking Room State!!
+                if (NavigationService.CanGoBack)
+                {
+                    NavigationService.GoBack();
+                    NavigationService.GoBack();
+                    return;
+                }
+            }
+
+            MessageBox.Show("Failed to Close room", "Close room", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

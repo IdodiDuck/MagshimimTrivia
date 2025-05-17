@@ -83,27 +83,32 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
-
-                <Button x:Name="StartGameButton"
-                         Content="START GAME"
-                         Height="50"
-                         FontSize="16"
-                         FontWeight="Bold"
-                         Background="#FF007ACC"
-                         Foreground="White"
-                         BorderThickness="0"
-                         Visibility="Collapsed"
-                         Click="StartGameButton_Click"/>
             </StackPanel>
         </Grid>
 
         <!-- Footer -->
         <Border Grid.Row="2" Background="#FFEEEEEE" Padding="10">
-            <Button x:Name="LeaveButton"
-                    Content="LEAVE ROOM"
-                    HorizontalAlignment="Right"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                <!-- Admin Panel -->
+                <StackPanel x:Name="AdminButtonsPanel" Orientation="Horizontal" Visibility="Collapsed" >
+                    <Button x:Name="StartGameButton"
+                    Content="START GAME"
+                    Margin="0,0,10,0"
                     Width="120"
-                    Click="LeaveButton_Click"/>
+                    Click="StartGameButton_Click"/>
+                    <Button x:Name="CloseRoomButton"
+                    Content="CLOSE ROOM"
+                    Width="120"
+                    Click="CloseRoomButton_Click"/>
+                </StackPanel>
+
+                <!-- Regular Member Panel -->
+                <Button x:Name="LeaveButton"
+                Content="LEAVE ROOM"
+                Width="120"
+                Visibility="Collapsed"
+                Click="LeaveButton_Click"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Page>
