@@ -20,10 +20,10 @@ public:
 	RequestHandlerFactory(std::weak_ptr<IDatabase> database);
 
 	// Handlers Getters - 
-	std::unique_ptr<LoginRequestHandler> createLoginRequestHandler();
-	std::unique_ptr<MenuRequestHandler> createMenuRequestHandler(const LoggedUser& user);
-	std::unique_ptr<RoomAdminRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, const int roomId);
-	std::unique_ptr<RoomMemberRequestHandler> createRoomMemberRequestHandler(const LoggedUser& user, const int roomId);
+	std::unique_ptr<IRequestHandler> createLoginRequestHandler();
+	std::unique_ptr<IRequestHandler> createMenuRequestHandler(const LoggedUser& user);
+	std::unique_ptr<IRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, int roomId);
+	std::unique_ptr<IRequestHandler> createRoomMemberRequestHandler(const LoggedUser& user, int roomId);
 
 	// Managers Getters - 
 	LoginManager& getLoginManager();
