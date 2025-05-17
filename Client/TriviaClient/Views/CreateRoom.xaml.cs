@@ -38,7 +38,7 @@ namespace TriviaClient
 
             try
             {
-                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers <= MIN_PLAYERS)
+                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers < MIN_PLAYERS)
                 {
                     MessageBox.Show("Please enter a valid number of players", "Invalid Input");
                     return;
