@@ -69,6 +69,7 @@ namespace TriviaClient
                     return;
                 }
 
+                m_refreshPage = false;
                 this.NavigationService.Navigate(new GameLobby(m_communicator, selectedRoomInfo.name, selectedRoomInfo.maxPlayers,
                     selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
             }
@@ -113,7 +114,7 @@ namespace TriviaClient
                 {
                     List<RoomData> roomsList = GetAvailableRooms();
 
-                    if (this.Dispatcher.HasShutdownStarted || this.Dispatcher.HasShutdownFinished)
+                    if ((this.Dispatcher.HasShutdownStarted) || (this.Dispatcher.HasShutdownFinished))
                     {
                         break;
                     }
@@ -178,7 +179,7 @@ namespace TriviaClient
                 // Restore selection if still exists
                 if (selectedRoomId.HasValue)
                 {
-                    var itemToSelect = roomsList.FirstOrDefault(r => r.id == selectedRoomId.Value);
+                    var itemToSelect = roomsList.FirstOrDefault(desiredRoom => desiredRoom.id == selectedRoomId.Value);
                     if (itemToSelect != null)
                     {
                         RoomsList.SelectedItem = itemToSelect;
