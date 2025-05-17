@@ -34,11 +34,11 @@ namespace TriviaClient
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
             const bool IS_ADMIN = true;
-            const int EMPTY = 0;
+            const int EMPTY = 0, MIN_PLAYERS = 2;
 
             try
             {
-                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers <= EMPTY)
+                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers <= MIN_PLAYERS)
                 {
                     MessageBox.Show("Please enter a valid number of players", "Invalid Input");
                     return;
