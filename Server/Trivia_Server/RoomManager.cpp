@@ -48,11 +48,21 @@ void RoomManager::deleteRoom(const int ID)
 
 void RoomManager::removeUserFromRoom(const int ID, const LoggedUser& removedUser)
 {
-    auto desiredRoom = this->getRoom(ID);
+    auto desiredRoom = this->getRoomReference(ID);
 
     if (desiredRoom.has_value())
     {
-        desiredRoom.value().removeUser(removedUser);
+        desiredRoom.value().get().removeUser(removedUser);
+    }
+}
+
+void RoomManager::addUserToRoom(const int ID, const LoggedUser& addedUser)
+{
+    auto desiredRoom = this->getRoomReference(ID);
+
+    if (desiredRoom.has_value())
+    {
+        desiredRoom.value().get().addUser(addedUser);
     }
 }
 
@@ -86,6 +96,20 @@ std::optional<Room> RoomManager::getRoom(const int ID) const
     if (doesRoomExist(ID))
     {
         return m_rooms.at(ID);
+    }
+
+    return std::nullopt;
+}
+
+std::optional<std::reference_wrapper<Room>> RoomManager::getRoomReference(const int ID)
+{
+    std::unique_lock lock(m_roomsMutex);
+
+    auto desiredRoomIt = m_rooms.find(ID);
+
+    if (desiredRoomIt != m_rooms.end())
+    {
+        return std::optional<std::reference_wrapper<Room>>(desiredRoomIt->second);
     }
 
     return std::nullopt;

@@ -18,11 +18,13 @@ public:
 	void createRoom(const LoggedUser& user, const RoomData& data);
 	void deleteRoom(const int ID);
 	void removeUserFromRoom(const int ID, const LoggedUser& removedUser);
+	void addUserToRoom(const int ID, const LoggedUser& addedUser);
 
 	// Getters - 
 	RoomStatus getRoomState(const int ID) const;
 	std::vector<RoomData> getRooms() const;
 	std::optional<Room> getRoom(const int ID) const;
+	std::optional<std::reference_wrapper<Room>> getRoomReference(const int ID);
 
 private:
 	// Attributes - 
