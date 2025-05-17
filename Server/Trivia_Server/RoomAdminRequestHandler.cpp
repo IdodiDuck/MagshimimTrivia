@@ -4,7 +4,7 @@
 #include "JsonResponsePacketSerializer.h"
 
 RoomAdminRequestHandler::RoomAdminRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, RoomManager& roomManager, const LoggedUser& loggedUser, const Room& usedRoom):
-	m_handlerFactory(handlerFactory), m_user(loggedUser), m_roomManager(roomManager), m_room(usedRoom)
+	RoomRequestHandler(handlerFactory, roomManager, loggedUser, usedRoom, true)
 {
 
 }
@@ -85,56 +85,4 @@ RequestResult RoomAdminRequestHandler::startGame(const RequestInfo& info)
 	response.response = JsonResponsePacketSerializer::serializeResponse(startGameResponse);
 
 	return response;
-}
-
-RequestResult RoomAdminRequestHandler::getRoomState(const RequestInfo& info)
-{
-	GetRoomStateResponse getRoomStateResponse;
-
-	Room& room = getRoomSafely();
-	RoomData usedRoomData = room.getRoomData();
-
-	getRoomStateResponse.status = SUCCESS;
-	getRoomStateResponse.hasGameBegun = (usedRoomData.status == RoomStatus::GAME_STARTED);
-	getRoomStateResponse.questionsCount = usedRoomData.numOfQuestionsInGame;
-	getRoomStateResponse.answerTimeout = usedRoomData.timePerQuestion;
-	getRoomStateResponse.players = std::vector<std::string>(room.getAllUsers().cbegin(), room.getAllUsers().cend());
-
-	RequestResult response;
-
-	if (getRoomStateResponse.hasGameBegun)
-	{
-		// Create here GameRequestHandler instead!!! -> Temporary Handler and initialize a new game!!!
-		response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id);
-	}
-	else
-	{
-		response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id);
-	}
-
-	response.response = JsonResponsePacketSerializer::serializeResponse(getRoomStateResponse);
-	return response;
-}
-
-std::shared_ptr<RequestHandlerFactory> RoomAdminRequestHandler::getFactorySafely()
-{
-	if (auto factory = m_handlerFactory.lock())
-	{
-		return factory;
-	}
-
-	throw std::runtime_error("RoomAdminRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
-}
-
-Room& RoomAdminRequestHandler::getRoomSafely()
-{
-	auto roomOptional = this->m_roomManager.getRoomReference(m_room.getRoomData().id);
-
-	if (!roomOptional.has_value())
-	{
-		throw std::runtime_error("RoomAdminRequestHandler: [ERROR]: Room not found in RoomManager");
-	}
-
-	auto roomRef = roomOptional.value();
-	return roomRef.get();
 }

@@ -1,12 +1,12 @@
 #pragma once
-#include "IRequestHandler.h"
 
-#include "RoomManager.h"
+#include "RoomRequestHandler.h"
 
 class RequestHandlerFactory;
 
-class RoomMemberRequestHandler : public IRequestHandler
+class RoomMemberRequestHandler : public RoomRequestHandler
 {
+
 public:
 	// C'tor -
 	RoomMemberRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, RoomManager& roomManager, const LoggedUser& loggedUser, const Room& usedRoom);
@@ -17,18 +17,7 @@ public:
 	void handleDisconnection() override;
 
 private:
-	// Attributes - 
-	Room m_room;
-	LoggedUser m_user;
-	RoomManager& m_roomManager;
-	std::weak_ptr<RequestHandlerFactory> m_handlerFactory;
-
 	// Private Methods - 
 	RequestResult leaveRoom(const RequestInfo& info);
-	RequestResult getRoomState(const RequestInfo& info);
-
-	// Support Methods -
-	std::shared_ptr<RequestHandlerFactory> getFactorySafely();
-	Room& getRoomSafely();
 };
 
