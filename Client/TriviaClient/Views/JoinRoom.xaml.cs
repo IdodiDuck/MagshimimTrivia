@@ -36,6 +36,12 @@ namespace TriviaClient
             m_refreshPage = true;
 
             this.Loaded += Room_Loaded;
+            this.Unloaded += JoinRoom_Unloaded;
+
+            if (this.NavigationService != null)
+            {
+                this.NavigationService.Navigating += NavigationService_Navigating;
+            }
         }
 
         private void Room_Loaded(object sender, RoutedEventArgs e)
@@ -43,6 +49,34 @@ namespace TriviaClient
             m_refreshPage = true;
             m_refreshRoomsThread = new Thread(refreshPage);
             m_refreshRoomsThread.Start();
+        }
+
+        private void JoinRoom_Unloaded(object sender, RoutedEventArgs e)
+        {
+            m_refreshPage = false;
+            if (m_refreshRoomsThread != null && m_refreshRoomsThread.IsAlive)
+            {
+                m_refreshRoomsThread.Join();
+            }
+        }
+
+        private void NavigationService_Navigating(object sender, NavigatingCancelEventArgs e)
+        {
+            if (e.Content == this)
+            {
+                StartRefreshingRooms();
+            }
+        }
+
+        private void StartRefreshingRooms()
+        {
+            m_refreshPage = true;
+
+            if (m_refreshRoomsThread == null || !m_refreshRoomsThread.IsAlive)
+            {
+                m_refreshRoomsThread = new Thread(refreshPage);
+                m_refreshRoomsThread.Start();
+            }
         }
 
         private void JoinButton_Click(object sender, RoutedEventArgs e)
@@ -144,7 +178,7 @@ namespace TriviaClient
         private List<RoomData> GetAvailableRooms()
         {
             const int EMPTY = 0, ADMIN_INDEX = 0;
-            List<RoomData> roomsList = [];
+            List<RoomData> roomsList = new List<RoomData>();
 
             var request = Serializer.SerializeEmptyRequest(RequestCode.RoomsRequest);
             m_communicator.SendToServer(request);
