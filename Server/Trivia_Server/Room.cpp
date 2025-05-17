@@ -35,3 +35,8 @@ RoomData Room::getRoomData() const
 {
     return m_metadata;
 }
+
+bool Room::isRoomFull() const
+{
+    return (m_users.size() >= m_metadata.maxPlayers);
+}

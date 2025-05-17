@@ -37,9 +37,11 @@ public:
     // Getters - 
     std::set<std::string> getAllUsers() const;
     RoomData getRoomData() const;
+    bool isRoomFull() const;
     
 
 private:
+    // Attributes - 
     RoomData m_metadata;
     std::set<LoggedUser> m_users;
 
