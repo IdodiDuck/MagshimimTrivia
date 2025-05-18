@@ -29,7 +29,6 @@ namespace TriviaClient.Infrastructure
             {
                 Console.WriteLine("Communicator: [ERROR]: " + ex.Message);
                 IsConnected = false;
-                Application.Current.Shutdown();
             }
         }
 
@@ -60,7 +59,6 @@ namespace TriviaClient.Infrastructure
             catch (Exception ex)
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with receiving the request: " + ex.Message);
-                Application.Current.Shutdown();
                 return Array.Empty<byte>();
             }
         }
@@ -79,7 +77,6 @@ namespace TriviaClient.Infrastructure
             catch (Exception ex)
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
-                Application.Current.Shutdown();
             }
         }
 

@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 using System.Text.Json;
+using System.IO;
+using System.Net.Sockets;
 
 namespace TriviaClient.Infrastructure
 {
@@ -13,6 +15,13 @@ namespace TriviaClient.Infrastructure
     {
         public static T? DeserializeResponse<T>(byte[] buffer)
         {
+            const int EMPTY = 0, WSAEHOSTDOWN_CODE = 10064;
+
+            if (buffer == null || buffer.Length == EMPTY)
+            {
+                throw new IOException("Received empty buffer. The server may have disconnected.");
+            }
+
             string json = System.Text.Encoding.UTF8.GetString(buffer);
 
             return JsonSerializer.Deserialize<T>(json);

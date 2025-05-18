@@ -8,6 +8,8 @@ using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
 using Newtonsoft.Json;
 using static TriviaClient.Constants.Responses;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -53,9 +55,19 @@ namespace TriviaClient
                 MessageBox.Show("Error fetching high scores.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"Error while fetching high scores: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -17,6 +17,8 @@ using static TriviaClient.Constants.Responses;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
 using TriviaClient.Models;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -108,9 +110,19 @@ namespace TriviaClient
                     selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
             }
 
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"Error joining room: {ex.Message}");
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

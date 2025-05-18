@@ -16,6 +16,8 @@ using TriviaClient.Constants;
 using static System.Net.Mime.MediaTypeNames;
 using static TriviaClient.Constants.Responses;
 using TriviaClient.Infrastructure;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -43,38 +45,56 @@ namespace TriviaClient
         {
             const int EMPTY = 0;
 
-            var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
-            m_communicator.SendToServer(request);
-
-            var serverResponse = m_communicator.ReceiveFromServer();
-            var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
-
-            if (response == null || response.status != StatusCodes.SUCCESS || response.statistics.Count() == EMPTY)
+            try
             {
-                MessageBox.Show("Failed to fetch personal statistics.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
+                var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
+                m_communicator.SendToServer(request);
 
-            var correctAnswersLine = response.statistics[3];
-            if (correctAnswersLine != null)
-            {
-                var parts = correctAnswersLine.Substring("Correct Answers: ".Length).Split('/');
-                if (parts.Length == 2 &&
-                    uint.TryParse(parts[0], out uint correct) &&
-                    uint.TryParse(parts[1], out uint total))
+                var serverResponse = m_communicator.ReceiveFromServer();
+                var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
+
+                if (response == null || response.status != StatusCodes.SUCCESS || response.statistics.Count() == EMPTY)
                 {
-                    CorrectAnswers = correct;
-                    WrongAnswers = total - correct;
+                    MessageBox.Show("Failed to fetch personal statistics.", "Server Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
                 }
+
+                var correctAnswersLine = response.statistics[3];
+                if (correctAnswersLine != null)
+                {
+                    var parts = correctAnswersLine.Substring("Correct Answers: ".Length).Split('/');
+                    if (parts.Length == 2 &&
+                        uint.TryParse(parts[0], out uint correct) &&
+                        uint.TryParse(parts[1], out uint total))
+                    {
+                        CorrectAnswers = correct;
+                        WrongAnswers = total - correct;
+                    }
+                }
+
+                GamesPlayed = uint.Parse(response.statistics[2].Substring(response.statistics[2].IndexOf(": ") + 2));
+                AverageAnswerTime = int.Parse(response.statistics[5].Substring(response.statistics[5].IndexOf(": ") + 2).Replace("s", ""));
+
+                gamesPlayed.Text = GamesPlayed.ToString();
+                correctAns.Text = CorrectAnswers.ToString();
+                wrongAns.Text = WrongAnswers.ToString();
+                avgAnsTime.Text = AverageAnswerTime.ToString() + "s";
             }
 
-            GamesPlayed = uint.Parse(response.statistics[2].Substring(response.statistics[2].IndexOf(": ") + 2));
-            AverageAnswerTime = int.Parse(response.statistics[5].Substring(response.statistics[5].IndexOf(": ") + 2).Replace("s", ""));
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
 
-            gamesPlayed.Text = GamesPlayed.ToString();
-            correctAns.Text = CorrectAnswers.ToString();
-            wrongAns.Text = WrongAnswers.ToString();
-            avgAnsTime.Text = AverageAnswerTime.ToString() + "s";
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void BackToMenu_Click(object sender, RoutedEventArgs e)

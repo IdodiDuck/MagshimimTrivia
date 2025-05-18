@@ -17,6 +17,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
+using System.IO;
 
 namespace TriviaClient
 {
@@ -68,22 +69,19 @@ namespace TriviaClient
                 }
             }
 
-            catch (SocketException ex)
+            catch (IOException ex)
             {
-                MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Connection error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

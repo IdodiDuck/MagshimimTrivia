@@ -15,6 +15,8 @@ using System.Windows.Navigation;
 using TriviaClient.Constants;
 using static TriviaClient.Constants.Responses;
 using TriviaClient.Infrastructure;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -85,9 +87,19 @@ namespace TriviaClient
                 }
             }
 
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"Error creating room: {ex.Message}", "Error");
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -16,6 +16,8 @@ using TriviaClient.Infrastructure;
 using Newtonsoft.Json;
 using TriviaClient.Constants;
 using static TriviaClient.Constants.Responses;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -53,22 +55,40 @@ namespace TriviaClient
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
-            m_communicator.SendToServer(request);
-            var serverResponse = m_communicator.ReceiveFromServer();
-            var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
-
-            if (response == null || response.status != StatusCodes.SUCCESS)
+            try
             {
-                MessageBox.Show("Invalid response from server or sign out failed.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
+                m_communicator.SendToServer(request);
+                var serverResponse = m_communicator.ReceiveFromServer();
+                var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
+
+                if (response == null || response.status != StatusCodes.SUCCESS)
+                {
+                    MessageBox.Show("Invalid response from server or sign out failed.", "Server Error",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (NavigationService.CanGoBack)
+                {
+                    NavigationService.GoBack();
+                    return;
+                }
             }
 
-            if (NavigationService.CanGoBack)
+            catch (IOException ex)
             {
-                NavigationService.GoBack();
-                return;
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             MessageBox.Show("Error: There's No previous page to navigate back to.");

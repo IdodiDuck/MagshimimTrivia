@@ -19,6 +19,7 @@ using TriviaClient.Infrastructure;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.IO;
 
 namespace TriviaClient
 {
@@ -62,28 +63,28 @@ namespace TriviaClient
                     UsernameTextBox.Clear();
                     PasswordBox.Clear();
 
-                    this.NavigationService.Navigate(new MainMenu(m_communicator, loginRequest.username)); // העבר הלאה
+                    this.NavigationService.Navigate(new MainMenu(m_communicator, loginRequest.username));
                 }
+
                 else
                 {
-                    MessageBox.Show("Invalid username or password / user already logged in.", "Login Failed",
-                                   MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Invalid username or password / user already logged in.", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            catch (SocketException ex)
+
+            catch (IOException ex)
             {
-                MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
