@@ -34,35 +34,51 @@ Room& RoomRequestHandler::getRoomSafely()
 
 RequestResult RoomRequestHandler::getRoomState(const RequestInfo& info)
 {
+    const int EMPTY = 0;
+
     GetRoomStateResponse getRoomStateResponse;
-
-    Room& room = getRoomSafely();
-    RoomData usedRoomData = room.getRoomData();
-
-    getRoomStateResponse.status = SUCCESS;
-    getRoomStateResponse.hasGameBegun = (usedRoomData.status == RoomStatus::GAME_STARTED);
-    getRoomStateResponse.questionsCount = usedRoomData.numOfQuestionsInGame;
-    getRoomStateResponse.answerTimeout = usedRoomData.timePerQuestion;
-    auto users = room.getAllUsers();
-    getRoomStateResponse.players = std::vector<std::string>(users.cbegin(), users.cend());
-
+    RoomData usedRoomData = {};
     RequestResult response;
 
-    if (usedRoomData.status == RoomStatus::GAME_STARTED)
+    try
     {
-        // TODO AT V4.0.0 -> CREATE GAME HANDLER IF THE GAME HAS STARTED!!!
-        response.newHandler = this->_isAdmin ? getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id) : getFactorySafely()->createRoomMemberRequestHandler(m_user, usedRoomData.id);
-    }
+        Room& room = getRoomSafely();
+        usedRoomData = room.getRoomData();
 
-    else if (usedRoomData.status == RoomStatus::CLOSED)
+        getRoomStateResponse.status = SUCCESS;
+        getRoomStateResponse.hasGameBegun = (usedRoomData.status == RoomStatus::GAME_STARTED);
+        getRoomStateResponse.questionsCount = usedRoomData.numOfQuestionsInGame;
+        getRoomStateResponse.answerTimeout = usedRoomData.timePerQuestion;
+
+        auto users = room.getAllUsers();
+        getRoomStateResponse.players = std::vector<std::string>(users.cbegin(), users.cend());
+
+        switch (usedRoomData.status)
+        {
+            case RoomStatus::GAME_STARTED:
+                // CREATE HERE GAME REQUEST HANDLER INSTEAD
+                response.newHandler = this->_isAdmin ? getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id) : getFactorySafely()->createRoomMemberRequestHandler(m_user, usedRoomData.id);
+                break;
+
+            case RoomStatus::CLOSED:
+                getRoomStateResponse.status = FAILURE;
+                response.newHandler = getFactorySafely()->createMenuRequestHandler(m_user);
+                break;
+
+            default:
+                response.newHandler = this->_isAdmin ? getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id) : getFactorySafely()->createRoomMemberRequestHandler(m_user, usedRoomData.id);
+            }
+    }
+    
+    catch (const std::exception& e)
     {
         getRoomStateResponse.status = FAILURE;
-        response.newHandler = getFactorySafely()->createMenuRequestHandler(m_user);
-    }
+        getRoomStateResponse.players = {};
+        getRoomStateResponse.hasGameBegun = false;
+        getRoomStateResponse.questionsCount = EMPTY;
+        getRoomStateResponse.answerTimeout = EMPTY;
 
-    else
-    {
-        response.newHandler = this->_isAdmin ? getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id) : getFactorySafely()->createRoomMemberRequestHandler(m_user, usedRoomData.id);
+        response.newHandler = getFactorySafely()->createMenuRequestHandler(m_user);
     }
 
     response.response = JsonResponsePacketSerializer::serializeResponse(getRoomStateResponse);
