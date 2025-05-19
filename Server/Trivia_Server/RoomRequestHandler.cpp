@@ -67,7 +67,7 @@ RequestResult RoomRequestHandler::getRoomState(const RequestInfo& info)
 
             default:
                 response.newHandler = this->_isAdmin ? getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id) : getFactorySafely()->createRoomMemberRequestHandler(m_user, usedRoomData.id);
-            }
+        }
     }
     
     catch (const std::exception& e)
