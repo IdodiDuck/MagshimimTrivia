@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,10 +42,10 @@ namespace TriviaClient
 
             m_communicator = communicator;
 
-            RoomName = roomName;
-            MaxPlayer = maxPlayer;
-            QuestionAmount = questionAmount;
-            TimePerQuestion = timePerQuestion;
+            this.RoomName = roomName;
+            this.MaxPlayer = maxPlayer;
+            this.QuestionAmount = questionAmount;
+            this.TimePerQuestion = timePerQuestion;
 
             RoomNameText.Text = roomName;
             MaxPlayersText.Text = maxPlayer.ToString();
