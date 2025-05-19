@@ -43,7 +43,8 @@ RequestResult RoomRequestHandler::getRoomState(const RequestInfo& info)
     getRoomStateResponse.hasGameBegun = (usedRoomData.status == RoomStatus::GAME_STARTED);
     getRoomStateResponse.questionsCount = usedRoomData.numOfQuestionsInGame;
     getRoomStateResponse.answerTimeout = usedRoomData.timePerQuestion;
-    getRoomStateResponse.players = std::vector<std::string>(room.getAllUsers().cbegin(), room.getAllUsers().cend());
+    auto users = room.getAllUsers();
+    getRoomStateResponse.players = std::vector<std::string>(users.cbegin(), users.cend());
 
     RequestResult response;
 
@@ -55,6 +56,7 @@ RequestResult RoomRequestHandler::getRoomState(const RequestInfo& info)
 
     else if (usedRoomData.status == RoomStatus::CLOSED)
     {
+        getRoomStateResponse.status = FAILURE;
         response.newHandler = getFactorySafely()->createMenuRequestHandler(m_user);
     }
 
