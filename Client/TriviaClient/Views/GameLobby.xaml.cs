@@ -40,57 +40,42 @@ namespace TriviaClient
         {
             InitializeComponent();
 
-            this.m_communicator = communicator;
-            this.m_isAdmin = isAdmin;
+            m_communicator = communicator;
 
-            this.RoomName = roomName;
-            this.MaxPlayer = maxPlayer;
-            this.QuestionAmount = questionAmount;
-            this.TimePerQuestion = timePerQuestion;
+            RoomName = roomName;
+            MaxPlayer = maxPlayer;
+            QuestionAmount = questionAmount;
+            TimePerQuestion = timePerQuestion;
 
             RoomNameText.Text = roomName;
             MaxPlayersText.Text = maxPlayer.ToString();
             QuestionCountText.Text = questionAmount.ToString();
             TimePerQuestionText.Text = timePerQuestion.ToString();
 
-            if (isAdmin)
-            {
-                AdminButtonsPanel.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                LeaveButton.Visibility = Visibility.Visible;
-            }
+            AdminButtonsPanel.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            LeaveButton.Visibility = isAdmin ? Visibility.Collapsed : Visibility.Visible;
 
-            this.Loaded += CheckStatus_Loaded;
-            this.Unloaded += CheckStatus_Unloaded;
+            Loaded += GameLobby_Loaded;
+            Unloaded += GameLobby_Unloaded;
 
-            if (this.NavigationService != null)
+            if (NavigationService != null)
             {
-                this.NavigationService.Navigating += NavigationService_Navigating;
+                NavigationService.Navigating += NavigationService_Navigating;
             }
         }
 
-        private void CheckStatus_Loaded(object sender, RoutedEventArgs e)
+        private void GameLobby_Loaded(object sender, RoutedEventArgs e)
         {
             m_checkRoomStatus = true;
             m_roomStatusThread = new Thread(CheckRoomStatus);
             m_roomStatusThread.Start();
         }
 
-        private void StartRoomStatusThread()
-        {
-            if (m_roomStatusThread == null || !m_roomStatusThread.IsAlive)
-            {
-                m_roomStatusThread = new Thread(CheckRoomStatus);
-                m_roomStatusThread.Start();
-            }
-        }
-
-        private void CheckStatus_Unloaded(object sender, RoutedEventArgs e)
+        private void GameLobby_Unloaded(object sender, RoutedEventArgs e)
         {
             m_checkRoomStatus = false;
-            if (m_roomStatusThread?.IsAlive == false)
+
+            if (m_roomStatusThread != null && m_roomStatusThread.IsAlive)
             {
                 m_roomStatusThread.Join();
             }
@@ -104,44 +89,50 @@ namespace TriviaClient
             {
                 try
                 {
-                    var getRoomStateRequest = Serializer.SerializeEmptyRequest(RequestCode.GET_ROOM_STATE_REQUEST);
-                    m_communicator.SendToServer(getRoomStateRequest);
-                    var serverResponse = Deserializer.DeserializeResponse<GetRoomStateResponse>(m_communicator.ReceiveFromServer());
+                    var request = Serializer.SerializeEmptyRequest(RequestCode.GET_ROOM_STATE_REQUEST);
+                    m_communicator.SendToServer(request);
+                    var response = Deserializer.DeserializeResponse<GetRoomStateResponse>(m_communicator.ReceiveFromServer());
 
-                    if (serverResponse == null || serverResponse.Status != StatusCodes.SUCCESS)
+                    if (response == null)
                     {
-                        MessageBox.Show("Failed to check room status.");
+                        Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show("Invalid room state response.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            NavigationService?.GoBack();
+                        });
                         return;
                     }
 
                     Dispatcher.Invoke(() =>
                     {
-                        if (serverResponse.HasGameBegun)
+                        if (response.HasGameBegun)
                         {
                             m_checkRoomStatus = false;
                             MessageBox.Show("The game has started!", "Game Started", MessageBoxButton.OK, MessageBoxImage.Information);
                             // NavigationService.Navigate(new GamePage(m_communicator));
                         }
 
-                        if (serverResponse.Status != StatusCodes.SUCCESS)
+                        else if (response.Status != StatusCodes.SUCCESS)
                         {
                             m_checkRoomStatus = false;
                             MessageBox.Show("The room has been closed by the admin.", "Room Closed", MessageBoxButton.OK, MessageBoxImage.Information);
-                            NavigationService.GoBack();
+                            NavigationService?.GoBack();
                         }
                     });
 
                     Thread.Sleep(THREE_SECONDS);
                 }
+
                 catch (IOException ex)
                 {
                     Dispatcher.Invoke(() =>
                     {
                         m_checkRoomStatus = false;
                         MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                        NavigationService.GoBack();
+                        NavigationService?.GoBack();
                     });
                 }
+
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error in room status thread: {ex.Message}");
@@ -154,7 +145,9 @@ namespace TriviaClient
         {
             if (e.Content == this)
             {
-                StartRoomStatusThread();
+                m_checkRoomStatus = true;
+                m_roomStatusThread = new Thread(CheckRoomStatus);
+                m_roomStatusThread.Start();
             }
         }
 
@@ -171,11 +164,13 @@ namespace TriviaClient
                     MessageBox.Show("Game started successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     // NavigationService.Navigate(new GamePage(m_communicator));
                 }
+
                 else
                 {
                     MessageBox.Show("Failed to start the game.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Error starting game: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -190,33 +185,34 @@ namespace TriviaClient
                 m_communicator.SendToServer(leaveRoomRequest);
                 var serverResponse = Deserializer.DeserializeResponse<LeaveRoomResponse>(m_communicator.ReceiveFromServer());
 
-                if (serverResponse == null)
-                {
-                    return;
-                }
-
-                if (serverResponse.Status == StatusCodes.SUCCESS)
+                if (serverResponse?.Status == StatusCodes.SUCCESS)
                 {
                     if (NavigationService.CanGoBack)
                     {
                         NavigationService.GoBack();
                         NavigationService.GoBack();
-                        return;
                     }
 
-                    MessageBox.Show("Error: There's no previous page you can go back to!", "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    else
+                    {
+                        MessageBox.Show("There's no previous page to return to.", "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
 
-                MessageBox.Show("Failed to leave room. Server returned an error.", "Leave Room", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else
+                {
+                    MessageBox.Show("Failed to leave room.", "Leave Room", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
+
             catch (IOException ex)
             {
                 MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -227,23 +223,21 @@ namespace TriviaClient
                 m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.CLOSE_ROOM_REQUEST));
                 var serverResponse = Deserializer.DeserializeResponse<CloseRoomResponse>(m_communicator.ReceiveFromServer());
 
-                if (serverResponse == null)
-                {
-                    return;
-                }
-
-                if (serverResponse.Status == StatusCodes.SUCCESS)
+                if (serverResponse?.Status == StatusCodes.SUCCESS)
                 {
                     if (NavigationService.CanGoBack)
                     {
                         NavigationService.GoBack();
                         NavigationService.GoBack();
-                        return;
                     }
                 }
 
-                MessageBox.Show("Failed to Close room", "Close room", MessageBoxButton.OK, MessageBoxImage.Information);
+                else
+                {
+                    MessageBox.Show("Failed to close the room.", "Close Room", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show($"Error closing room: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
