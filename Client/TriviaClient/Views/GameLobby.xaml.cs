@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,12 +24,12 @@ namespace TriviaClient
     /// <summary>
     /// Interaction logic for GameLobby.xaml
     /// </summary>
-    /// 
-
-
     public partial class GameLobby : Page
     {
         private readonly Communicator m_communicator;
+        private Thread? m_roomStatusThread;
+        private bool m_checkRoomStatus;
+        private bool m_isAdmin;
 
         private string RoomName { get; set; } = string.Empty;
         private uint MaxPlayer { get; set; }
@@ -40,7 +40,7 @@ namespace TriviaClient
         {
             InitializeComponent();
 
-            this.m_communicator = communicator;
+            m_communicator = communicator;
 
             this.RoomName = roomName;
             this.MaxPlayer = maxPlayer;
@@ -52,20 +52,129 @@ namespace TriviaClient
             QuestionCountText.Text = questionAmount.ToString();
             TimePerQuestionText.Text = timePerQuestion.ToString();
 
-            if (isAdmin)
+            AdminButtonsPanel.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
+            LeaveButton.Visibility = isAdmin ? Visibility.Collapsed : Visibility.Visible;
+
+            Loaded += GameLobby_Loaded;
+            Unloaded += GameLobby_Unloaded;
+
+            if (NavigationService != null)
             {
-                AdminButtonsPanel.Visibility = Visibility.Visible;
+                NavigationService.Navigating += NavigationService_Navigating;
             }
-            
-            else
+        }
+
+        private void GameLobby_Loaded(object sender, RoutedEventArgs e)
+        {
+            m_checkRoomStatus = true;
+            m_roomStatusThread = new Thread(CheckRoomStatus);
+            m_roomStatusThread.Start();
+        }
+
+        private void GameLobby_Unloaded(object sender, RoutedEventArgs e)
+        {
+            m_checkRoomStatus = false;
+
+            if (m_roomStatusThread != null && m_roomStatusThread.IsAlive)
             {
-                LeaveButton.Visibility = Visibility.Visible;
+                m_roomStatusThread.Join();
+            }
+        }
+
+        private void CheckRoomStatus()
+        {
+            const int THREE_SECONDS = 3000;
+
+            while (m_checkRoomStatus)
+            {
+                try
+                {
+                    var request = Serializer.SerializeEmptyRequest(RequestCode.GET_ROOM_STATE_REQUEST);
+                    m_communicator.SendToServer(request);
+                    var response = Deserializer.DeserializeResponse<GetRoomStateResponse>(m_communicator.ReceiveFromServer());
+
+                    if (response == null)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            MessageBox.Show("Invalid room state response.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            NavigationService?.GoBack();
+                        });
+                        return;
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (response.HasGameBegun)
+                        {
+                            m_checkRoomStatus = false;
+                            MessageBox.Show("The game has started!", "Game Started", MessageBoxButton.OK, MessageBoxImage.Information);
+                            // NavigationService.Navigate(new GamePage(m_communicator));
+                        }
+
+                        else if (response.Status != StatusCodes.SUCCESS)
+                        {
+                            m_checkRoomStatus = false;
+                            MessageBox.Show("The room has been closed by the admin.", "Room Closed", MessageBoxButton.OK, MessageBoxImage.Information);
+                            NavigationService?.GoBack();
+                        }
+                    });
+
+                    Thread.Sleep(THREE_SECONDS);
+                }
+
+                catch (IOException ex)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        m_checkRoomStatus = false;
+                        MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        NavigationService?.GoBack();
+                    });
+                }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in room status thread: {ex.Message}");
+                    Thread.Sleep(THREE_SECONDS);
+                }
+            }
+        }
+
+        private void NavigationService_Navigating(object sender, NavigatingCancelEventArgs e)
+        {
+            if (e.Content == this)
+            {
+                m_checkRoomStatus = true;
+                m_roomStatusThread = new Thread(CheckRoomStatus);
+                m_roomStatusThread.Start();
             }
         }
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO AT V4.0.0
+            try
+            {
+                var startGameRequest = Serializer.SerializeEmptyRequest(RequestCode.START_GAME_REQUEST);
+                m_communicator.SendToServer(startGameRequest);
+                var serverResponse = Deserializer.DeserializeResponse<StartGameResponse>(m_communicator.ReceiveFromServer());
+
+                if (serverResponse?.Status == StatusCodes.SUCCESS)
+                {
+                    MessageBox.Show("Game started successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // NavigationService.Navigate(new GamePage(m_communicator));
+                }
+
+                else
+                {
+                    MessageBox.Show("Failed to start the game.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error starting game: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LeaveButton_Click(object sender, RoutedEventArgs e)
@@ -76,25 +185,24 @@ namespace TriviaClient
                 m_communicator.SendToServer(leaveRoomRequest);
                 var serverResponse = Deserializer.DeserializeResponse<LeaveRoomResponse>(m_communicator.ReceiveFromServer());
 
-                if (serverResponse == null)
-                {
-                    return;
-                }
-
-                if (serverResponse.Status == StatusCodes.SUCCESS)
+                if (serverResponse?.Status == StatusCodes.SUCCESS)
                 {
                     if (NavigationService.CanGoBack)
                     {
                         NavigationService.GoBack();
                         NavigationService.GoBack();
-                        return;
                     }
 
-                    MessageBox.Show("Error: There's no previous page you can go back to!", "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
+                    else
+                    {
+                        MessageBox.Show("There's no previous page to return to.", "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
 
-                MessageBox.Show("Failed to leave room. Server returned an error.", "Leave Room", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else
+                {
+                    MessageBox.Show("Failed to leave room.", "Leave Room", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
 
             catch (IOException ex)
@@ -102,39 +210,38 @@ namespace TriviaClient
                 MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
-            catch (SerializationException ex)
-            {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Unexpected error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void CloseRoomButton_Click(object sender, RoutedEventArgs e)
         {
-            m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.CLOSE_ROOM_REQUEST));
-            var serverResponse = Deserializer.DeserializeResponse<CloseRoomResponse>(m_communicator.ReceiveFromServer());
-
-            if (serverResponse == null)
+            try
             {
-                return;
-            }
+                m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.CLOSE_ROOM_REQUEST));
+                var serverResponse = Deserializer.DeserializeResponse<CloseRoomResponse>(m_communicator.ReceiveFromServer());
 
-            if (serverResponse.Status == StatusCodes.SUCCESS)
-            {
-                // Stop Thread which is checking Room State!!
-                if (NavigationService.CanGoBack)
+                if (serverResponse?.Status == StatusCodes.SUCCESS)
                 {
-                    NavigationService.GoBack();
-                    NavigationService.GoBack();
-                    return;
+                    if (NavigationService.CanGoBack)
+                    {
+                        NavigationService.GoBack();
+                        NavigationService.GoBack();
+                    }
+                }
+
+                else
+                {
+                    MessageBox.Show("Failed to close the room.", "Close Room", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
 
-            MessageBox.Show("Failed to Close room", "Close room", MessageBoxButton.OK, MessageBoxImage.Information);
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error closing room: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 
