@@ -73,26 +73,26 @@ namespace TriviaClient.Constants
         // V3.0.0 Responses - 
         public class CloseRoomResponse
         {
-            public uint Status { get; set; }
+            public uint status { get; set; }
         }
 
         public class StartGameResponse
         {
-            public uint Status { get; set; }
+            public uint status { get; set; }
         }
 
         public class GetRoomStateResponse
         {
-            public uint Status { get; set; }
-            public bool HasGameBegun { get; set; }
-            public List<string> Players { get; set; } = new List<string>();
-            public uint QuestionsCount { get; set; }
-            public uint AnswerTimeout { get; set; }
+            public uint status { get; set; }
+            public bool hasGameBegun { get; set; }
+            public List<string> players { get; set; } = new List<string>();
+            public uint questionsCount { get; set; }
+            public uint answerTimeout { get; set; }
         }
 
         public class LeaveRoomResponse
         {
-            public uint Status { get; set; }
+            public uint status { get; set; }
         }
     }
 
