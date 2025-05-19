@@ -27,8 +27,8 @@ namespace TriviaClient
     public partial class GameLobby : Page
     {
         private readonly Communicator m_communicator;
-        private Thread? m_roomStatusThread;
-        private bool m_checkRoomStatus;
+        private Thread? m_roomStatesThread;
+        private bool m_refreshPage;
         private bool m_isAdmin;
 
         private string RoomName { get; set; } = string.Empty;
@@ -66,26 +66,26 @@ namespace TriviaClient
 
         private void GameLobby_Loaded(object sender, RoutedEventArgs e)
         {
-            m_checkRoomStatus = true;
-            m_roomStatusThread = new Thread(CheckRoomStatus);
-            m_roomStatusThread.Start();
+            m_refreshPage = true;
+            m_roomStatesThread = new Thread(refreshRoomStates);
+            m_roomStatesThread.Start();
         }
 
         private void GameLobby_Unloaded(object sender, RoutedEventArgs e)
         {
-            m_checkRoomStatus = false;
+            m_refreshPage = false;
 
-            if (m_roomStatusThread != null && m_roomStatusThread.IsAlive)
+            if (m_roomStatesThread != null && m_roomStatesThread.IsAlive)
             {
-                m_roomStatusThread.Join();
+                m_roomStatesThread.Join();
             }
         }
 
-        private void CheckRoomStatus()
+        private void refreshRoomStates()
         {
             const int THREE_SECONDS = 3000;
 
-            while (m_checkRoomStatus)
+            while (m_refreshPage)
             {
                 try
                 {
@@ -105,16 +105,19 @@ namespace TriviaClient
 
                     Dispatcher.Invoke(() =>
                     {
-                        if (response.HasGameBegun)
+                        PlayersListView.ItemsSource = null;
+                        PlayersListView.ItemsSource = response.players;
+
+                        if (response.hasGameBegun)
                         {
-                            m_checkRoomStatus = false;
+                            m_refreshPage = false;
                             MessageBox.Show("The game has started!", "Game Started", MessageBoxButton.OK, MessageBoxImage.Information);
                             // NavigationService.Navigate(new GamePage(m_communicator));
                         }
 
-                        else if (response.Status != StatusCodes.SUCCESS)
+                        else if (response.status != StatusCodes.SUCCESS)
                         {
-                            m_checkRoomStatus = false;
+                            m_refreshPage = false;
                             MessageBox.Show("The room has been closed by the admin.", "Room Closed", MessageBoxButton.OK, MessageBoxImage.Information);
                             NavigationService?.GoBack();
                         }
@@ -127,7 +130,7 @@ namespace TriviaClient
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        m_checkRoomStatus = false;
+                        m_refreshPage = false;
                         MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         NavigationService?.GoBack();
                     });
@@ -145,9 +148,9 @@ namespace TriviaClient
         {
             if (e.Content == this)
             {
-                m_checkRoomStatus = true;
-                m_roomStatusThread = new Thread(CheckRoomStatus);
-                m_roomStatusThread.Start();
+                m_refreshPage = true;
+                m_roomStatesThread = new Thread(refreshRoomStates);
+                m_roomStatesThread.Start();
             }
         }
 
@@ -159,7 +162,7 @@ namespace TriviaClient
                 m_communicator.SendToServer(startGameRequest);
                 var serverResponse = Deserializer.DeserializeResponse<StartGameResponse>(m_communicator.ReceiveFromServer());
 
-                if (serverResponse?.Status == StatusCodes.SUCCESS)
+                if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
                     MessageBox.Show("Game started successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                     // NavigationService.Navigate(new GamePage(m_communicator));
@@ -185,7 +188,7 @@ namespace TriviaClient
                 m_communicator.SendToServer(leaveRoomRequest);
                 var serverResponse = Deserializer.DeserializeResponse<LeaveRoomResponse>(m_communicator.ReceiveFromServer());
 
-                if (serverResponse?.Status == StatusCodes.SUCCESS)
+                if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
                     if (NavigationService.CanGoBack)
                     {
@@ -223,8 +226,15 @@ namespace TriviaClient
                 m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.CLOSE_ROOM_REQUEST));
                 var serverResponse = Deserializer.DeserializeResponse<CloseRoomResponse>(m_communicator.ReceiveFromServer());
 
-                if (serverResponse?.Status == StatusCodes.SUCCESS)
+                if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
+                    m_refreshPage = false;
+
+                    if ((m_roomStatesThread != null) && (m_roomStatesThread.IsAlive))
+                    {
+                        m_roomStatesThread.Join();
+                    }
+
                     if (NavigationService.CanGoBack)
                     {
                         NavigationService.GoBack();
