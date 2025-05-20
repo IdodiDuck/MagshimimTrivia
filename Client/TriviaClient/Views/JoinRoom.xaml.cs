@@ -110,6 +110,11 @@ namespace TriviaClient
                     selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
             }
 
+            catch (TaskCanceledException)
+            {
+
+            }
+
             catch (IOException ex)
             {
                 MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -162,7 +167,7 @@ namespace TriviaClient
         {
             const int THREE_SECONDS = 3000;
 
-            while (m_refreshPage)
+            while (m_refreshPage && m_communicator.IsConnected)
             {
                 try
                 {
@@ -220,7 +225,7 @@ namespace TriviaClient
         {
             const int EMPTY = 0;
 
-            this.Dispatcher.Invoke(() =>
+            this.SafeInvoke(() =>
             {
                 var selectedRoom = RoomsList.SelectedItem as RoomData;
                 uint? selectedRoomId = selectedRoom?.id;
@@ -267,6 +272,27 @@ namespace TriviaClient
                 MessageBox.Show($"Error retrieving players list: {ex.Message}");
                 UsersList.ItemsSource = null;
 
+            }
+        }
+
+        private void SafeInvoke(Action action)
+        {
+            try
+            {
+                if (Dispatcher != null && !Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
+                {
+                    Dispatcher.Invoke(action);
+                }
+            }
+
+            catch (TaskCanceledException)
+            {
+
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Dispatcher.Invoke error: {ex.Message}");
             }
         }
     }
