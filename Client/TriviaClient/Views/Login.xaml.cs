@@ -58,6 +58,13 @@ namespace TriviaClient
                     return;
                 }
 
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
                 if (response.status == StatusCodes.SUCCESS)
                 {
                     UsernameTextBox.Clear();
@@ -68,7 +75,7 @@ namespace TriviaClient
 
                 else
                 {
-                    MessageBox.Show("Invalid username or password / user already logged in.", "Login Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Login Failed", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
 

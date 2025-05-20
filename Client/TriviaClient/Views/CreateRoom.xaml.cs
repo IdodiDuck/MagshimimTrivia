@@ -68,8 +68,22 @@ namespace TriviaClient
 
                 byte[] serializedRequest = Serializer.SerializeRequest(request);
                 m_communicator.SendToServer(serializedRequest);
-                byte[] response = m_communicator.ReceiveFromServer();
-                var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(response);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
+                var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(serverResponse);
+
+                if (createRoomResponse == null)
+                {
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)
                 {

@@ -99,15 +99,31 @@ namespace TriviaClient
                 byte[] responseBytes = m_communicator.ReceiveFromServer();
                 var joinResponse = Deserializer.DeserializeResponse<JoinRoomResponse>(responseBytes);
 
-                if (joinResponse == null || joinResponse.status != StatusCodes.SUCCESS)
+                if (joinResponse == null)
                 {
-                    MessageBox.Show("Failed to join the selected room.");
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
-                m_refreshPage = false;
-                this.NavigationService.Navigate(new GameLobby(m_communicator, selectedRoomInfo.name, selectedRoomInfo.maxPlayers,
-                    selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
+                if (responseBytes[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(responseBytes);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                if (joinResponse.status == StatusCodes.SUCCESS)
+                {
+                    m_refreshPage = false;
+                    this.NavigationService.Navigate(new GameLobby(m_communicator, selectedRoomInfo.name, selectedRoomInfo.maxPlayers,
+                        selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
+                    return;
+                    
+                }
+
+                MessageBox.Show("Failed to join the selected room.");
+                return;
             }
 
             catch (TaskCanceledException)

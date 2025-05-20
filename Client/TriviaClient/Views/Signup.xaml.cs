@@ -57,6 +57,13 @@ namespace TriviaClient
                     return;
                 }
 
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
                 if (response.status == StatusCodes.SUCCESS)
                 {
                     this.NavigationService.Navigate(new MainMenu(m_communicator, UsernameTextBox.Text));
@@ -64,8 +71,7 @@ namespace TriviaClient
 
                 else
                 {
-                    MessageBox.Show("Invalid username or password.", "Signup Failed",
-                                   MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Signup Failed", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
 
