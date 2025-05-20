@@ -149,3 +149,47 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     std::string jsonString = jsonResponse.dump();
     return std::vector<unsigned char>(jsonString.cbegin(), jsonString.cend());
 }
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetGameResultsResponse& getGameResultsResponse)
+{
+    nlohmann::json jsonResponse = {{"status", getGameResultsResponse.status}, {"results", nlohmann::json::array()} };
+
+    for (const auto& playerResult : getGameResultsResponse.results) 
+    {
+        jsonResponse["results"].push_back({
+            {"username", playerResult.username},
+            {"correctAnswerCount", playerResult.correctAnswerCount},
+            {"wrongAnswerCount", playerResult.wrongAnswerCount},
+            {"averageAnswerTime", playerResult.averageAnswerTime}
+            });
+    }
+
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const SubmitAnswerResponse& submitAnswerResponse)
+{
+    nlohmann::json jsonResponse = { {"status", submitAnswerResponse.status}, {"correctAnswerId", submitAnswerResponse.correctAnswerId}};
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetQuestionResponse& getQuestionResponse)
+{
+    nlohmann::json jsonResponse = {
+        {"status", getQuestionResponse.status},
+        {"question", getQuestionResponse.question},
+        {"answers", getQuestionResponse.answers}
+    };
+
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LeaveGameResponse& leaveGameResponse)
+{
+    nlohmann::json jsonResponse = { {"status", leaveGameResponse.status} };
+    std::string jsonString = jsonResponse.dump();
+    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
+}
