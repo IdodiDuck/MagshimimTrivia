@@ -125,4 +125,8 @@ public:
     static std::vector<unsigned char> serializeResponse(const GetRoomStateResponse& getRoomStateResponse);
     static std::vector<unsigned char> serializeResponse(const LeaveRoomResponse& leaveRoomResponse);
 
+private:
+    // Support Methods - 
+    static void insertLengthAsBytes(std::vector<unsigned char>& buffer, const int dataLength);
+    static std::vector<unsigned char> buildResponse(const ResponseCode code, const std::string& jsonString);
 };
