@@ -40,7 +40,7 @@ RequestResult LoginRequestHandler::login(const RequestInfo& request)
 {
     LoginRequest loginRequest = JsonRequestPacketDeserializer::deserializeLoginRequest(request.buffer).value();
     LoginStatus status = getFactorySafely()->getLoginManager().login(loginRequest.username, loginRequest.password);
-    LoginResponse response;
+    LoginResponse response {};
 
     if (status == LoginStatus::SUCCESS)
     {
@@ -67,7 +67,7 @@ RequestResult LoginRequestHandler::signup(const RequestInfo& request)
     SignupRequest signupRequest = JsonRequestPacketDeserializer::deserializeSignupRequest(request.buffer).value();
     SignUpStatus status = getFactorySafely()->getLoginManager().signUp(signupRequest.username, signupRequest.password, signupRequest.email);
 
-    SignupResponse response;
+    SignupResponse response {};
 
     if (status == SignUpStatus::SUCCESS)
     {
