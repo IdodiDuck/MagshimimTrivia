@@ -98,28 +98,28 @@ namespace TriviaClient.Constants
         // V4.0.0 Responses
         public class LeaveGameResponse
         {
-            public uint Status { get; set; }
+            public uint status { get; set; }
         }
 
         public class GetQuestionResponse
         {
-            public uint Status { get; set; }
-            public string Question { get; set; } = string.Empty;
-            public Dictionary<uint, string> Answers { get; set; } = new Dictionary<uint, string>(); 
+            public uint status { get; set; }
+            public string question { get; set; } = string.Empty;
+            public Dictionary<uint, string> answers { get; set; } = new Dictionary<uint, string>(); 
         }
 
         public class SubmitAnswerResponse
         {
-            public uint Status { get; set; }
-            public uint CorrectAnswerId { get; set; }
+            public uint status { get; set; }
+            public uint correctAnswerId { get; set; }
         }
 
         public class PlayerResults
         {
-            public string Username { get; set; } = string.Empty;
-            public uint CorrectAnswerCount { get; set; }
-            public uint WrongAnswerCount { get; set; }
-            public uint AverageAnswerTime { get; set; }
+            public string username { get; set; } = string.Empty;
+            public uint correctAnswerCount { get; set; }
+            public uint wrongAnswerCount { get; set; }
+            public uint averageAnswerTime { get; set; }
         }
     }
 
