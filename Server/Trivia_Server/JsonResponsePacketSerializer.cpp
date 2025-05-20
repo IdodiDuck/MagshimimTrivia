@@ -3,47 +3,38 @@
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const ErrorResponse& errorResponse)
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"message", errorResponse.message}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::ERROR_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LoginResponse& loginResponse)
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", loginResponse.status}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::LOGIN_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const SignupResponse& signUpResponse)
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", signUpResponse.status}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::SIGNUP_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LogoutResponse& loguotResponse)
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", loguotResponse.status}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::SIGNOUT_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetRoomsResponse& getRoomsResponse) 
 {
-    // Convert each RoomData object to JSON format manually
     nlohmann::json jsonRooms = nlohmann::json::array();
     for (const auto& room : getRoomsResponse.rooms) 
     {
@@ -56,60 +47,48 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
             {"status", room.status}
             });
     }
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", getRoomsResponse.status}, {"rooms", jsonRooms}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::GET_ROOMS_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse) 
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"players", getPlayersInRoomResponse.players}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::GET_ROOMS_PLAYERS_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const JoinRoomResponse& joinRoomResponse) 
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", joinRoomResponse.status}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::JOIN_ROOM_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const CreateRoomResponse& createRoomResponse) 
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", createRoomResponse.status}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::CREATE_ROOM_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const getHighScoreResponse& getHighScoreResponse) 
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", getHighScoreResponse.status}, {"statistics", getHighScoreResponse.statistics}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::GET_HIGH_SCORE_RESPONSE, jsonString);
 }
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const getPersonalStatsResponse& getPersonalStatsResponse) 
 {
-    // Creating the JSON Object
     nlohmann::json jsonResponse = {{"status", getPersonalStatsResponse.status}, {"statistics", getPersonalStatsResponse.statistics}};
 
-    // Converting the JSON to a string and returning vector of bytes by it's iterators
     std::string jsonString = jsonResponse.dump();
     return buildResponse(ResponseCode::GET_PERSONAL_STATISTICS_RESPONSE, jsonString);
 }
@@ -149,6 +128,50 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     return buildResponse(ResponseCode::LEAVE_ROOM_RESPONSE, jsonString);
 }
 
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetGameResultsResponse& getGameResultsResponse)
+{
+    nlohmann::json jsonResponse = { {"status", getGameResultsResponse.status}, {"results", nlohmann::json::array()} };
+
+    for (const auto& playerResult : getGameResultsResponse.results)
+    {
+        jsonResponse["results"].push_back({
+            {"username", playerResult.username},
+            {"correctAnswerCount", playerResult.correctAnswerCount},
+            {"wrongAnswerCount", playerResult.wrongAnswerCount},
+            {"averageAnswerTime", playerResult.averageAnswerTime}
+            });
+    }
+
+    std::string jsonString = jsonResponse.dump();
+    return buildResponse(ResponseCode::GET_GAME_RESULTS_RESPONSE, jsonString);
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const SubmitAnswerResponse& submitAnswerResponse)
+{
+    nlohmann::json jsonResponse = { {"status", submitAnswerResponse.status}, {"correctAnswerId", submitAnswerResponse.correctAnswerId} };
+    std::string jsonString = jsonResponse.dump();
+    return buildResponse(ResponseCode::SUBMIT_ANSWER_RESPONSE, jsonString);
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetQuestionResponse& getQuestionResponse)
+{
+    nlohmann::json jsonResponse = {
+        {"status", getQuestionResponse.status},
+        {"question", getQuestionResponse.question},
+        {"answers", getQuestionResponse.answers}
+    };
+
+    std::string jsonString = jsonResponse.dump();
+    return buildResponse(ResponseCode::GET_QUESTION_RESPONSE, jsonString);
+}
+
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LeaveGameResponse& leaveGameResponse)
+{
+    nlohmann::json jsonResponse = { {"status", leaveGameResponse.status} };
+    std::string jsonString = jsonResponse.dump();
+    return buildResponse(ResponseCode::LEAVE_GAME_RESPONSE, jsonString);
+}
+
 void JsonResponsePacketSerializer::insertLengthAsBytes(std::vector<unsigned char>& buffer, const int dataLength)
 {
     const int SHIFT_BYTE_3 = 24;
@@ -174,48 +197,4 @@ std::vector<unsigned char> JsonResponsePacketSerializer::buildResponse(const Res
     buffer.insert(buffer.end(), jsonString.begin(), jsonString.end());
 
     return buffer;
-}
-
-std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetGameResultsResponse& getGameResultsResponse)
-{
-    nlohmann::json jsonResponse = {{"status", getGameResultsResponse.status}, {"results", nlohmann::json::array()} };
-
-    for (const auto& playerResult : getGameResultsResponse.results) 
-    {
-        jsonResponse["results"].push_back({
-            {"username", playerResult.username},
-            {"correctAnswerCount", playerResult.correctAnswerCount},
-            {"wrongAnswerCount", playerResult.wrongAnswerCount},
-            {"averageAnswerTime", playerResult.averageAnswerTime}
-            });
-    }
-
-    std::string jsonString = jsonResponse.dump();
-    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
-}
-
-std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const SubmitAnswerResponse& submitAnswerResponse)
-{
-    nlohmann::json jsonResponse = { {"status", submitAnswerResponse.status}, {"correctAnswerId", submitAnswerResponse.correctAnswerId}};
-    std::string jsonString = jsonResponse.dump();
-    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
-}
-
-std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetQuestionResponse& getQuestionResponse)
-{
-    nlohmann::json jsonResponse = {
-        {"status", getQuestionResponse.status},
-        {"question", getQuestionResponse.question},
-        {"answers", getQuestionResponse.answers}
-    };
-
-    std::string jsonString = jsonResponse.dump();
-    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
-}
-
-std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const LeaveGameResponse& leaveGameResponse)
-{
-    nlohmann::json jsonResponse = { {"status", leaveGameResponse.status} };
-    std::string jsonString = jsonResponse.dump();
-    return std::vector<unsigned char>(jsonString.begin(), jsonString.end());
 }
