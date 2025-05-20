@@ -1,5 +1,7 @@
 #include "RoomManager.h"
 
+#include "ManagerException.h"
+
 RoomManager::~RoomManager()
 {
     this->m_rooms.clear();
@@ -13,12 +15,12 @@ void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 
     if (data.id < MIN_VALID_ID)
     {
-        throw std::invalid_argument("Error: Invalid room ID");
+        throw ManagerException("Error: Invalid room ID!");
     }
 
     if (m_rooms.find(data.id) != m_rooms.cend())
     {
-        throw std::runtime_error("Error: Room with ID " + std::to_string(data.id) + " already exists");
+        throw ManagerException("Error: Room with ID " + std::to_string(data.id) + " already exists!");
     }
 
     readingLock.unlock();
@@ -37,7 +39,7 @@ void RoomManager::deleteRoom(const int ID)
     auto roomIt = m_rooms.find(ID);
     if (!doesRoomExist(ID))
     {
-        throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
+        throw ManagerException("Error: Room with ID " + std::to_string(ID) + " not found!");
     }
 
     readingLock.unlock();
@@ -70,7 +72,7 @@ RoomStatus RoomManager::getRoomState(const int ID) const
 {
     if (!doesRoomExist(ID))
     {
-        throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
+        throw ManagerException("Error: Room with ID " + std::to_string(ID) + " not found!");
     }
 
     return this->m_rooms.at(ID).getRoomData().status;

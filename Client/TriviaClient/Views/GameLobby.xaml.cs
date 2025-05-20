@@ -85,7 +85,7 @@ namespace TriviaClient
         {
             const int THREE_SECONDS = 3000;
 
-            while (m_refreshPage)
+            while (m_refreshPage && m_communicator.IsConnected)
             {
                 try
                 {
@@ -95,7 +95,7 @@ namespace TriviaClient
 
                     if (response == null)
                     {
-                        Dispatcher.Invoke(() =>
+                        SafeInvoke(() =>
                         {
                             MessageBox.Show("Invalid room state response.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                             NavigationService?.GoBack();
@@ -103,7 +103,7 @@ namespace TriviaClient
                         return;
                     }
 
-                    Dispatcher.Invoke(() =>
+                    SafeInvoke(() =>
                     {
                         PlayersListView.ItemsSource = null;
                         PlayersListView.ItemsSource = response.players;
@@ -134,6 +134,11 @@ namespace TriviaClient
                         MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         NavigationService?.GoBack();
                     });
+                }
+
+                catch (TaskCanceledException)
+                {
+                    m_refreshPage = false;
                 }
 
                 catch (Exception ex)
@@ -253,6 +258,28 @@ namespace TriviaClient
                 MessageBox.Show($"Error closing room: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void SafeInvoke(Action action)
+        {
+            try
+            {
+                if (Dispatcher != null && !Dispatcher.HasShutdownStarted && !Dispatcher.HasShutdownFinished)
+                {
+                    Dispatcher.Invoke(action);
+                }
+            }
+
+            catch (TaskCanceledException)
+            {
+
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Dispatcher.Invoke error: {ex.Message}");
+            }
+        }
     }
+
 
 }

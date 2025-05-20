@@ -59,13 +59,20 @@ namespace TriviaClient
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
                 m_communicator.SendToServer(request);
-                var serverResponse = m_communicator.ReceiveFromServer();
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
 
-                if (response == null || response.status != StatusCodes.SUCCESS)
+                if (response == null)
                 {
                     MessageBox.Show("Invalid response from server or sign out failed.", "Server Error",
                                       MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }    
+                
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 

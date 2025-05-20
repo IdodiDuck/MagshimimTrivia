@@ -3,6 +3,8 @@
 #include "RequestHandlerFactory.h"
 #include "JsonResponsePacketSerializer.h"
 
+#include "ManagerException.h"
+
 RoomRequestHandler::RoomRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, RoomManager& roomManager, const LoggedUser& loggedUser, const Room& usedRoom, const bool isAdmin):
 	m_handlerFactory(handlerFactory), m_user(loggedUser), m_roomManager(roomManager), m_room(usedRoom), _isAdmin(isAdmin)
 {
@@ -25,7 +27,7 @@ Room& RoomRequestHandler::getRoomSafely()
 
 	if (!roomOptional.has_value())
 	{
-		throw std::runtime_error("RoomRequestHandler: [ERROR]: Room not found in RoomManager");
+		throw ManagerException("RoomRequestHandler: [ERROR]: Room not found in RoomManager");
 	}
 
 	auto roomRef = roomOptional.value();
@@ -70,7 +72,7 @@ RequestResult RoomRequestHandler::getRoomState(const RequestInfo& info)
         }
     }
     
-    catch (const std::exception& e)
+    catch (const ManagerException& e)
     {
         getRoomStateResponse.status = FAILURE;
         getRoomStateResponse.players = {};

@@ -45,6 +45,13 @@ namespace TriviaClient
                     return;
                 }
 
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
                 if (response.status == StatusCodes.SUCCESS)
                 {
                     TopPlayers = response.statistics.Take(BEST_THREE_PLAYERS).ToList();

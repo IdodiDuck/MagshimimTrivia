@@ -1,7 +1,10 @@
 #include "LoginManager.h"
 #include "SqliteDataBase.h"
+
 #include <algorithm>
 #include <iostream>
+
+#include "ServerException.h"
 
 LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase)
     : m_dataBase(dataBase), m_isDbValid(false)
@@ -12,13 +15,13 @@ LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase)
 
         if (!m_isDbValid)
         {
-            std::cerr << "LoginManager: [ERROR] Failed to open database in constructor.\n";
+            throw ServerException("[ERROR] Failed to open database in constructor.");
         }
     }
 
     else
     {
-        std::cerr << "LoginManager: [ERROR] Database pointer expired.\n";
+        throw ServerException("LoginManager: [ERROR] Database pointer expired.");
     }
 }
 

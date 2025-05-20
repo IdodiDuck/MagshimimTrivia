@@ -171,4 +171,8 @@ public:
     static std::vector<unsigned char> serializeResponse(const GetQuestionResponse& getQuestionResponse);
     static std::vector<unsigned char> serializeResponse(const LeaveGameResponse& leaveGameResponse);
 
+private:
+    // Support Methods - 
+    static void insertLengthAsBytes(std::vector<unsigned char>& buffer, const int dataLength);
+    static std::vector<unsigned char> buildResponse(const ResponseCode code, const std::string& jsonString);
 };

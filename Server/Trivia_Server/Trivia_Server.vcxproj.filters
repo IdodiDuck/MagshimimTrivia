@@ -90,6 +90,9 @@
     <ClInclude Include="RoomRequestHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ManagerException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -165,6 +168,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RoomRequestHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagerException.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
