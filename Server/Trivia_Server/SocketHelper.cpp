@@ -10,9 +10,15 @@ std::optional<std::vector<unsigned char>> SocketHelper::getData(const SOCKET sc,
 
 	int res = recv(sc, reinterpret_cast<char*>(data.data()), bytesNum, DEFAULT_FLAG);
 
-	if (res == SOCKET_ERROR || res == CLIENT_CLOSED_SOCKET)
+	if (res == SOCKET_ERROR)
 	{
-		std::cerr << "WSA Last Error: " << WSAGetLastError() << std::endl;
+		std::cerr << "[ERROR]: Unexpected Error with Client's Socket: WSA Last Error: " << WSAGetLastError() << std::endl;
+		return std::nullopt;
+	}
+
+	else if (res == CLIENT_CLOSED_SOCKET)
+	{
+		std::cerr << "[ERROR]: Client has closed his socket!" << std::endl;
 		return std::nullopt;
 	}
 
