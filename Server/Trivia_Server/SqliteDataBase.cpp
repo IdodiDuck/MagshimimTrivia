@@ -8,6 +8,13 @@
 
 #include <curl/curl.h> // Used for processing HTTP Responses
 
+typedef struct scoresEntity
+{
+    SqliteDataBase* db;
+    std::vector<std::pair<std::string, int>>* scores;
+
+} scoresEntity;
+
 SqliteDataBase::SqliteDataBase() : _dataBaseName("trivia.db"), _dataBase(nullptr)
 {
 
@@ -417,44 +424,45 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
 
 std::vector<std::string> SqliteDataBase::getHighScores()
 {
-    std::vector<std::pair<std::string, int>> playersScores; // vector of pairs of username and his score
+    std::vector<std::pair<std::string, int>> playersScores;
 
     if (!isDataBaseOpen())
     {
         std::cerr << "DataBase: [ERROR]: Database is not open!" << std::endl;
-        return std::vector<std::string>();
+        return {};
     }
 
     const std::string GET_SCORES_QUERY = "SELECT USERNAME FROM STATISTICS;";
-
     char* errMsg = nullptr;
 
-    // Passing this pointer as data to the callback
-    if (sqlite3_exec(_dataBase, GET_SCORES_QUERY.c_str(), processScoresCallback, this, &errMsg) != SQLITE_OK)
+    scoresEntity scoresSavingEntity = { this, &playersScores };
+
+    if (sqlite3_exec(_dataBase, GET_SCORES_QUERY.c_str(), processScoresCallback, &scoresSavingEntity, &errMsg) != SQLITE_OK)
     {
         std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
         sqlite3_free(errMsg);
-        return std::vector<std::string>(); // Return empty vector if an error occurred with database
+        return {};
     }
 
     if (playersScores.empty())
     {
         std::cerr << "DataBase: [ERROR]: No players found in the database." << std::endl;
-        return std::vector<std::string>(); // Return empty vector if there're no players
+        return {};
     }
-    
+
     sortHighestScores(playersScores);
 
     const int TOP_PLAYERS_AMOUNT = 5;
-
     std::vector<std::string> highScores;
-    for (int currentPlayer = 0; currentPlayer < min(TOP_PLAYERS_AMOUNT, static_cast<int>(playersScores.size())); currentPlayer++)
+
+    for (int i = 0; i < min(TOP_PLAYERS_AMOUNT, static_cast<int>(playersScores.size())); i++)
     {
-        highScores.push_back(playersScores[currentPlayer].first); // Pushing top 5 usernames (Or less if we don't have 5 yet)
+        highScores.push_back(playersScores[i].first);
     }
 
     return highScores;
 }
+
 
 int SqliteDataBase::executeQuery(const std::string& executedSQLQuery)
 {
@@ -581,17 +589,20 @@ int SqliteDataBase::processScoresCallback(void* data, int argc, char** argv, cha
 {
     const int SUCCESS = 0;
 
-    SqliteDataBase* dbInstance = static_cast<SqliteDataBase*>(data);
+    // Calling callback with both this* and vector of scores so we can use GetPlayerScore() method in callback
+    auto* scoresCallbackContentPtr = static_cast<scoresEntity*>(data);
+    SqliteDataBase* db = scoresCallbackContentPtr->db;
+    auto* scores = scoresCallbackContentPtr->scores;
 
-    if (argv[0] != nullptr) 
+    if (argv[0] != nullptr)
     {
-        std::vector<std::pair<std::string, int>>* scores = static_cast<std::vector<std::pair<std::string, int>>*>(data);
         std::string username = argv[0];
+        int score = db->getPlayerScore(username);
 
-        int score = dbInstance->getPlayerScore(username);
         scores->push_back({ username, score });
     }
-    return SUCCESS; // Success code
+
+    return SUCCESS;
 }
 
 int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, char** colNames)
