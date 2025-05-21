@@ -46,6 +46,13 @@ typedef struct CreateRoomRequest
 
 } CreateRoomRequest;
 
+// Game Structs (V4) - 
+typedef struct SubmitAnswerRequest
+{
+	unsigned int answerId;
+
+} SubmitAnswerRequest;
+
 
 class JsonRequestPacketDeserializer
 {
