@@ -43,4 +43,8 @@ namespace TriviaClient.Constants
         public uint answerTimeout { get; set; }
     }
 
+    public class SubmitAnswerRequest
+    {
+        public uint answerId { get; set; }
+    }
 }

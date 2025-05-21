@@ -50,6 +50,14 @@ namespace TriviaClient.Infrastructure
             return BuildRequest(REQUEST_CODE, json);
         }
 
+        // V4 Serializations - 
+        public static byte[] SerializeRequest(SubmitAnswerRequest submitAnswerRequest)
+        {
+            const byte REQUEST_CODE = (byte)RequestCode.SUBMIT_ANSWER_REQUEST;
+            string json = JsonConvert.SerializeObject(submitAnswerRequest);
+            return BuildRequest(REQUEST_CODE, json);
+        }
+
         public static byte[] SerializeEmptyRequest(RequestCode code)
         {
             return BuildRequest((byte)code, "{}");

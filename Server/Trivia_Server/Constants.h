@@ -32,7 +32,12 @@ enum class RequestCode : unsigned int
     CLOSE_ROOM_REQUEST = 30,
     START_GAME_REQUEST,
     GET_ROOM_STATE_REQUEST,
-    LEAVE_ROOM_REQUEST
+    LEAVE_ROOM_REQUEST,
+
+    LEAVE_GAME_REQUEST = 40,
+    GET_QUESTION_REQUEST,
+    SUBMIT_ANSWER_REQUEST,
+    GET_GAME_RESULTS_REQUEST
 
 };
 
@@ -43,6 +48,7 @@ enum class RequestCode : unsigned int
 enum class ResponseCode : unsigned int
 {
     ERROR_RESPONSE = 99,
+
     SIGNUP_RESPONSE = 10,
     LOGIN_RESPONSE,
 
