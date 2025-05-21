@@ -173,3 +173,36 @@ std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreat
         return CreateRoomRequest{"", 0, 0, 0};
     }
 }
+
+std::optional<SubmitAnswerRequest> JsonRequestPacketDeserializer::deserializeSubmitAnswerRequest(const std::vector<unsigned char>& buffer)
+{
+    const std::string ANSWER_ID = "answerId";
+
+    // Convert the buffer to a string
+    std::string jsonStr(buffer.begin(), buffer.end());
+
+    // Parse the JSON safely (returns null if failed)
+    auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
+
+    // Validate that parsing was successful
+    if (jsonData.is_discarded())
+    {
+        std::cerr << "Error: Failed to parse JSON data for SubmitAnswerRequest." << std::endl;
+        return { };
+    }
+
+    try
+    {
+        // Extract answerId from the parsed JSON and return the struct
+        unsigned int answerId = jsonData.at(ANSWER_ID).get<unsigned int>();
+
+        return SubmitAnswerRequest { answerId };
+    }
+
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error extracting SubmitAnswerRequest data: " << e.what() << std::endl;
+        return {};
+    }
+
+}

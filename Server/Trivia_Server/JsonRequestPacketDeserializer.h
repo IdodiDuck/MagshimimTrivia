@@ -65,5 +65,8 @@ public:
 	static std::optional<GetPlayersInRoomRequest> deserializeGetPlayersRequest(const std::vector<unsigned char>& buffer);
 	static std::optional<JoinRoomRequest> deserializeJoinRoomRequest(const std::vector<unsigned char>& buffer);
 	static std::optional<CreateRoomRequest> deserializeCreateRoomRequest(const std::vector<unsigned char>& buffer);
+
+	// V4 Deserializations - 
+	static std::optional<SubmitAnswerRequest> deserializeSubmitAnswerRequest(const std::vector<unsigned char>& buffer);
 };
 
