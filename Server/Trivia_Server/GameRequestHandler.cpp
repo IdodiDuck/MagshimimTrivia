@@ -21,7 +21,46 @@ bool GameRequestHandler::isRequestRelevant(const RequestInfo& requestInfo)
 
 RequestResult GameRequestHandler::handleRequest(const RequestInfo& requestInfo)
 {
-	return RequestResult();
+	try
+	{
+		switch (static_cast<RequestCode>(requestInfo.requestID))
+		{
+			case RequestCode::GET_QUESTION_REQUEST:
+				return getQuestion(requestInfo);
+
+			case RequestCode::SUBMIT_ANSWER_REQUEST:
+				return submitAnswer(requestInfo);
+
+			case RequestCode::GET_GAME_RESULTS_REQUEST:
+				return getGameResults(requestInfo);
+
+			case RequestCode::LEAVE_GAME_REQUEST:
+				return leaveGame(requestInfo);
+
+			default:
+				throw ManagerException("Error: Unknown Type of Request was sent!");
+		}
+	}
+
+	catch (const ManagerException& e)
+	{
+		ErrorResponse errorResponse = { };
+		errorResponse.message = e.what();
+		RequestResult requestResult;
+		requestResult.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
+		// Stay in the same Handler, keep waiting for relevant request
+		return requestResult;
+	}
+
+	catch (const ServerException& e)
+	{
+		ErrorResponse errorResponse = { };
+		errorResponse.message = "Server Error: " + std::string(e.what());
+		RequestResult requestResult;
+		requestResult.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
+		// Stay in the same Handler (For now)
+		return requestResult;
+	}
 }
 
 void GameRequestHandler::handleDisconnection()

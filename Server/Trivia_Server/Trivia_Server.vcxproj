@@ -137,6 +137,7 @@
     <ClInclude Include="ClientConnectionException.h" />
     <ClInclude Include="Communicator.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="GameRequestHandler.h" />
     <ClInclude Include="IDatabase.h" />
     <ClInclude Include="IRequestHandler.h" />
     <ClInclude Include="JsonRequestPacketDeserializer.h" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClCompile Include="ClientConnectionException.cpp" />
     <ClCompile Include="Communicator.cpp" />
+    <ClCompile Include="GameRequestHandler.cpp" />
     <ClCompile Include="IDatabase.cpp" />
     <ClCompile Include="IRequestHandler.cpp" />
     <ClCompile Include="JsonRequestPacketDeserializer.cpp" />
