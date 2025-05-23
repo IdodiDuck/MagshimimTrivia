@@ -58,5 +58,5 @@ std::shared_ptr<RequestHandlerFactory> GameRequestHandler::getFactorySafely()
 		return factory;
 	}
 
-	throw ServerException("MenuRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
+	throw ServerException("GameRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
 }
