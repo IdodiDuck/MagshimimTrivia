@@ -15,6 +15,7 @@ public:
 	std::string getQuestion() const;
 	std::vector<std::string> getPossibleAnswers() const;
 	int getCorrectAnswerId() const;
+	std::string getCorrectAnswer() const;
 
 	// Operators - 
 	bool operator==(const Question& other) const;
