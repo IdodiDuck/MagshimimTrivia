@@ -27,7 +27,7 @@ class Game
 {
 
 public:
-	Game(int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users);
+	Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users);
 
 	Question getQuestionForUser(const std::string& user);
 	void submitAnswer(const std::string& user, const std::string& answer);
