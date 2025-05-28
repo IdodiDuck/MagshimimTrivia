@@ -44,6 +44,7 @@ public:
 	int getNumOfTotalAnswers(const std::string& username) override;
 	int getNumOfPlayerGames(const std::string& username) override;
 	int getPlayerScore(const std::string& username) override;
+	int submitGameStatistics(const std::string& username, const GameData& data) override;
 
 	// Global Stats - 
 	std::vector<std::string> getHighScores() override;

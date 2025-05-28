@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Question.h"
+#include "Game.h"
 
 class IDatabase
 {
@@ -29,6 +30,7 @@ public:
     virtual int getNumOfTotalAnswers(const std::string& username) = 0;
     virtual int getNumOfPlayerGames(const std::string& username) = 0;
     virtual int getPlayerScore(const std::string& username) = 0;
+    virtual int submitGameStatistics(std::string username, const GameData& data) = 0;
 
     // Global stats - 
     virtual std::vector<std::string> getHighScores() = 0;
