@@ -41,6 +41,7 @@ Game& GameManager::createGame(const Room& room)
 
     this->m_games.try_emplace(gameId, gameId, std::move(questions), std::move(players));
 
+    lock.unlock();
     return this->getGameSafely(gameId);
 }
 
@@ -63,7 +64,7 @@ Game& GameManager::getGameSafely(const unsigned int gameId)
         throw ServerException("[ERROR] Failed to open database in constructor.");
     }
 
-    std::shared_lock readLock(m_mutex);
+    std::shared_lock<std::shared_mutex> readLock(this->m_mutex);
 
     if (this->m_games.find(gameId) == this->m_games.cend()) 
     {
