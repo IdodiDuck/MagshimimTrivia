@@ -3,6 +3,8 @@
 #include "IRequestHandler.h"
 
 #include "LoggedUser.h"
+#include "Game.h"
+#include "GameManager.h"
 
 class RequestHandlerFactory;
 
@@ -11,7 +13,7 @@ class GameRequestHandler : public IRequestHandler
 
 public:
 	// C'tor 
-	GameRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user); // TODO: Add Game& and GameManager&
+	GameRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user, GameManager& gameManager, Game& game);
 	
 	// Virtuals -
 	bool isRequestRelevant(const RequestInfo& requestInfo) override;
@@ -20,12 +22,10 @@ public:
 
 private:
 	// Attributes - 
-	
 	std::weak_ptr<RequestHandlerFactory> m_handlerFactory;
 	LoggedUser m_user;
-	// Game& Attribute
-	// GameManager& Attribute
-
+	Game& m_game;
+	GameManager& m_gameManager;
 
 	// Private Methods - 
 	RequestResult getQuestion(const RequestInfo& info);
