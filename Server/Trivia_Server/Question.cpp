@@ -32,6 +32,7 @@ std::string Question::getCorrectAnswer() const
 	{
 		return m_possibleAnswers[m_correctAnswerId];
 	}
+
 	return "";
 }
 

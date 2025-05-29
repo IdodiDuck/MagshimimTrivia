@@ -2,18 +2,18 @@
 
 #include "ManagerException.h"
 
-Game::Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users)
-    : m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING)
+Game::Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users):
+    m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING_TO_START)
 {
     if (!users.empty()) 
     {
-        m_state = GameState::IN_PROGRESS;
+        this->m_state = GameState::STARTED;
     }
 }
 
 Question Game::getQuestionForUser(const std::string& user)
 {
-    std::shared_lock lock(m_userMutex);
+    std::shared_lock lock(m_updateMutex);
 
     if (m_players.find(user) == m_players.cend())
     {
@@ -23,12 +23,14 @@ Question Game::getQuestionForUser(const std::string& user)
     GameData& data = m_players.at(user);
     unsigned int currentIndex = data.correctAnswerCount + data.wrongAnswerCount;
 
-    if (currentIndex >= m_questions.size()) 
+    if (currentIndex >= m_questions.size())
     {
         throw ManagerException("No more questions available for this user");
     }
 
     data.currentQuestion = m_questions[currentIndex];
+    m_answerTimes[user] = std::chrono::steady_clock::now();
+
     return data.currentQuestion;
 }
 
@@ -91,4 +93,41 @@ void Game::removePlayer(const std::string& user)
 {
     std::unique_lock lock(m_userMutex);
     m_players.erase(user);
+}
+
+unsigned int Game::getGameId() const
+{
+    return this->m_gameId;
+}
+
+bool Game::isGameEmpty() const
+{
+    const int EMPTY = 0;
+
+    return (this->m_players.size() == EMPTY);
+}
+
+GameData Game::getPlayerGameData(const std::string& username) const
+{
+    std::shared_lock readLock(m_userMutex);
+
+    if (this->m_players.find(username) == this->m_players.cend()) 
+    {
+        throw ManagerException("User not found in game");
+    }
+
+    return this->m_players.at(username);
+}
+
+std::vector<std::string> Game::getAllPlayersUsernames() const
+{
+    std::shared_lock lock(m_userMutex);
+    std::vector<std::string> usernames;
+
+    for (const auto& [name, data] : m_players)
+    {
+        usernames.push_back(name);
+    }
+
+    return usernames;
 }

@@ -23,9 +23,11 @@ typedef struct GameData
 
 enum class GameState
 {
-    WAITING,
-    IN_PROGRESS, 
-    FINISHED     
+    WAITING_TO_START,
+    STARTED,
+    WAITING_FOR_NEXT_QUESTION,
+    WAITING_FOR_ANSWER,
+    FINISHED
 };
 
 class Game 
@@ -39,6 +41,12 @@ public:
 	void submitAnswer(const std::string& user, const std::string& answer);
 	void removePlayer(const std::string& user);
 
+    // Getters - 
+    unsigned int getGameId() const;
+    bool isGameEmpty() const;
+    GameData getPlayerGameData(const std::string& username) const;
+    std::vector<std::string> getAllPlayersUsernames() const;
+
 private:
     // Attributes - 
     std::vector<Question> m_questions;
@@ -46,8 +54,8 @@ private:
     unsigned int m_gameId;
     unsigned int m_totalQuestions;
     GameState m_state;
-    std::shared_mutex m_updateMutex;
-    std::shared_mutex m_userMutex;
+    mutable std::shared_mutex m_updateMutex;
+    mutable std::shared_mutex m_userMutex;
     std::unordered_map<std::string, std::chrono::steady_clock::time_point> m_answerTimes;
 
 };
