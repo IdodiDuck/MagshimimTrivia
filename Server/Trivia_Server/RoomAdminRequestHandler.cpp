@@ -99,8 +99,8 @@ RequestResult RoomAdminRequestHandler::startGame(const RequestInfo& info)
 
 	RequestResult response = { };
 
-	// Create here GameRequestHandler instead!!! -> Temporary Handler
-	response.newHandler = getFactorySafely()->createRoomAdminRequestHandler(m_user, m_room.getRoomData().id);
+	Room& desiredRoom = this->getFactorySafely()->getRoomManager().getRoomReference(this->m_room.getRoomData().id).value();
+	response.newHandler = getFactorySafely()->createGameRequestHandler(this->m_user, this->getFactorySafely()->getGameManager().createGame(desiredRoom));
 	response.response = JsonResponsePacketSerializer::serializeResponse(startGameResponse);
 
 	return response;

@@ -58,8 +58,7 @@ RequestResult RoomRequestHandler::getRoomState(const RequestInfo& info)
         switch (usedRoomData.status)
         {
             case RoomStatus::GAME_STARTED:
-                // CREATE HERE GAME REQUEST HANDLER INSTEAD
-                response.newHandler = this->_isAdmin ? getFactorySafely()->createRoomAdminRequestHandler(m_user, usedRoomData.id) : getFactorySafely()->createRoomMemberRequestHandler(m_user, usedRoomData.id);
+                response.newHandler = getFactorySafely()->createGameRequestHandler(this->m_user, this->getFactorySafely()->getGameManager().createGame(this->getFactorySafely()->getRoomManager().getRoomReference(this->m_room.getRoomData().id).value()));
                 break;
 
             case RoomStatus::CLOSED:
