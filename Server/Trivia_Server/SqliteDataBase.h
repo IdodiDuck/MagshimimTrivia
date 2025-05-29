@@ -60,6 +60,8 @@ private:
 	bool isDataBaseOpen();
 	void sortHighestScores(std::vector<std::pair<std::string, int>>& playersScores);
 	int getAmountOfQuestions();
+	std::string buildInsertStatsQuery(const std::string& username, const GameData& data);
+	std::string buildUpdateStatsQuery(const std::string& username, const GameData& data);
 
 	// Static Callbacks - 
 	static int processScoresCallback(void* data, int argc, char** argv, char** colNames);

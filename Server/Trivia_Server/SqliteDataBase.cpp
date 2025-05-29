@@ -432,70 +432,29 @@ int SqliteDataBase::submitGameStatistics(const std::string& username, const Game
 
     if (sqlite3_exec(_dataBase, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr) != SQLITE_OK)
     {
-        std::cerr << "DataBase: [ERROR]: Failed to begin transaction" << std::endl;
+        std::cerr << "DataBase: [ERROR]: Failed to begin transaction\n";
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
     char* errMsg = nullptr;
-    int result = static_cast<int>(DatabaseResult::DATABASE_ERROR);
-    bool userExists = false;
+    bool userExists = doesUserExist(username);
 
-    std::string checkSql = "SELECT USERNAME FROM STATISTICS WHERE USERNAME = '" + username + "';";
+    const std::string desiredQuery = userExists ? buildUpdateStatsQuery(username, data) : buildInsertStatsQuery(username, data);
 
-    auto existsCallback = [](void* data, int argc, char** argv, char** colNames) -> int 
-        {
-        *static_cast<bool*>(data) = true;
-        return 0;
-        };
-
-    if (sqlite3_exec(_dataBase, checkSql.c_str(), existsCallback, &userExists, &errMsg) != SQLITE_OK)
+    if ((sqlite3_exec(_dataBase, desiredQuery.c_str(), nullptr, nullptr, &errMsg) == SQLITE_OK) &&
+        (sqlite3_exec(_dataBase, "COMMIT;", nullptr, nullptr, &errMsg) == SQLITE_OK))
     {
-        std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
+        return static_cast<int>(DatabaseResult::DATABASE_SUCCESS);
+    }
+
+    std::cerr << "DataBase: [ERROR]: " << (errMsg ? errMsg : "Unknown error") << std::endl;
+    if (errMsg)
+    {
         sqlite3_free(errMsg);
-        sqlite3_exec(_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
-        return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    std::string sql;
-    if (userExists)
-    {
-        sql = "UPDATE STATISTICS SET "
-              "CORRECT_ANSWERS = CORRECT_ANSWERS + " + std::to_string(data.correctAnswerCount) + ", "
-              "TOTAL_ANSWERS = TOTAL_ANSWERS + " + std::to_string(data.correctAnswerCount + data.wrongAnswerCount) + ", "
-              "AVG_ANSWER_TIME = ((AVG_ANSWER_TIME * GAMES_PLAYED) + " + std::to_string(data.averageAnswerTime) + ") / (GAMES_PLAYED + 1), "
-              "GAMES_PLAYED = GAMES_PLAYED + 1 "
-              "WHERE USERNAME = '" + username + "';";
-    }
-    else
-    {
-        sql = "INSERT INTO STATISTICS (USERNAME, CORRECT_ANSWERS, TOTAL_ANSWERS, AVG_ANSWER_TIME, GAMES_PLAYED) "
-              "VALUES ('" + username + "', " +
-              std::to_string(data.correctAnswerCount) + ", " +
-              std::to_string(data.correctAnswerCount + data.wrongAnswerCount) + ", " +
-              std::to_string(data.averageAnswerTime) + ", 1);";
-    }
-
-    if (sqlite3_exec(_dataBase, sql.c_str(), nullptr, nullptr, &errMsg) == SQLITE_OK)
-    {
-        if (sqlite3_exec(_dataBase, "COMMIT;", nullptr, nullptr, &errMsg) == SQLITE_OK)
-        {
-            result = static_cast<int>(DatabaseResult::DATABASE_SUCCESS);
-        }
-        else
-        {
-            std::cerr << "DataBase: [ERROR]: Failed to commit transaction: " << errMsg << std::endl;
-            sqlite3_free(errMsg);
-            sqlite3_exec(_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
-        }
-    }
-    else
-    {
-        std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
-        sqlite3_free(errMsg);
-        sqlite3_exec(_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
-    }
-
-    return result;
+    sqlite3_exec(_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
+    return static_cast<int>(DatabaseResult::DATABASE_ERROR);
 }
 
 std::vector<std::string> SqliteDataBase::getHighScores()
@@ -661,6 +620,24 @@ int SqliteDataBase::getAmountOfQuestions()
     return totalQuestions;  // Return the number of questions
 }
 
+std::string SqliteDataBase::buildUpdateStatsQuery(const std::string& username, const GameData& data)
+{
+    return "UPDATE STATISTICS SET "
+        "CORRECT_ANSWERS = CORRECT_ANSWERS + " + std::to_string(data.correctAnswerCount) + ", "
+        "TOTAL_ANSWERS = TOTAL_ANSWERS + " + std::to_string(data.correctAnswerCount + data.wrongAnswerCount) + ", "
+        "AVG_ANSWER_TIME = ((AVG_ANSWER_TIME * GAMES_PLAYED) + " + std::to_string(data.averageAnswerTime) + ") / (GAMES_PLAYED + 1), "
+        "GAMES_PLAYED = GAMES_PLAYED + 1 "
+        "WHERE USERNAME = '" + username + "';";
+}
+
+std::string SqliteDataBase::buildInsertStatsQuery(const std::string& username, const GameData& data)
+{
+    return "INSERT INTO STATISTICS (USERNAME, CORRECT_ANSWERS, TOTAL_ANSWERS, AVG_ANSWER_TIME, GAMES_PLAYED) VALUES ('" +
+        username + "', " + std::to_string(data.correctAnswerCount) + ", " +
+        std::to_string(data.correctAnswerCount + data.wrongAnswerCount) + ", " +
+        std::to_string(data.averageAnswerTime) + ", 1);";
+}
+
 int SqliteDataBase::processScoresCallback(void* data, int argc, char** argv, char** colNames)
 {
     const int SUCCESS = 0;
@@ -707,7 +684,7 @@ int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, 
         // If the correct answer is found, calculate its index
         if (correctAnswerIdIt != possibleAnswers.end())
         {
-            int correctAnswerId = std::distance(possibleAnswers.cbegin(), correctAnswerIdIt);
+            int correctAnswerId = static_cast<int>(std::distance(possibleAnswers.cbegin(), correctAnswerIdIt));
 
             // Creating the question based on the extracted data and adding it to the lists of questions
             Question question(questionText, possibleAnswers, correctAnswerId);
