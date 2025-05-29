@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+
 using TriviaClient.Infrastructure;
 
 namespace TriviaClient.Views
@@ -22,11 +23,15 @@ namespace TriviaClient.Views
     public partial class Game : Page
     {
         private readonly Communicator m_communicator;
-        public Game(Communicator communicator)
+        private uint QuestionAmount { get; set; }
+        private uint TimePerQuestion { get; set; }
+        public Game(Communicator communicator, uint questionsAmount, uint timePerQuestions)
         {
             InitializeComponent();
 
             m_communicator = communicator;
+            QuestionAmount = questionsAmount;
+            TimePerQuestion = timePerQuestions;
         }
     }
 }

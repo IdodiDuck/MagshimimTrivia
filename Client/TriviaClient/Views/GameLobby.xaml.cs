@@ -112,7 +112,7 @@ namespace TriviaClient
                         if (response.hasGameBegun)
                         {
                             m_refreshPage = false;
-                            NavigationService.Navigate(new Game(m_communicator));
+                            NavigationService.Navigate(new Game(m_communicator, QuestionAmount, TimePerQuestion));
                         }
 
                         else if (response.status != StatusCodes.SUCCESS)
@@ -169,7 +169,7 @@ namespace TriviaClient
 
                 if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
-                    NavigationService.Navigate(new Game(m_communicator));
+                    NavigationService.Navigate(new Game(m_communicator, QuestionAmount, TimePerQuestion));
                 }
 
                 else
