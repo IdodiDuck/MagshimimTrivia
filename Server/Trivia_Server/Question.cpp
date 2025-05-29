@@ -26,6 +26,15 @@ int Question::getCorrectAnswerId() const
 	return this->m_correctAnswerId;
 }
 
+std::string Question::getCorrectAnswer() const
+{
+	if (m_correctAnswerId >= 0 && m_correctAnswerId < m_possibleAnswers.size()) 
+	{
+		return m_possibleAnswers[m_correctAnswerId];
+	}
+	return "";
+}
+
 bool Question::operator==(const Question& other) const
 {
 	return (this->m_question == other.getQuestion());
