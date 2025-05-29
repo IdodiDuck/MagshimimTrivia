@@ -1,6 +1,6 @@
 #include "Game.h"
 
-#include <chrono>
+#include "ManagerException.h"
 
 Game::Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users)
     : m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING)
@@ -15,9 +15,9 @@ Question Game::getQuestionForUser(const std::string& user)
 {
     std::shared_lock lock(m_userMutex);
 
-    if (m_players.find(user) == m_players.end())
+    if (m_players.find(user) == m_players.cend())
     {
-        throw std::runtime_error("User not found in game");
+        throw ManagerException("User not found in game");
     }
 
     GameData& data = m_players.at(user);
@@ -25,7 +25,7 @@ Question Game::getQuestionForUser(const std::string& user)
 
     if (currentIndex >= m_questions.size()) 
     {
-        throw std::runtime_error("No more questions available for this user");
+        throw ManagerException("No more questions available for this user");
     }
 
     data.currentQuestion = m_questions[currentIndex];
@@ -38,7 +38,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
 
     if (m_players.find(user) == m_players.end()) 
     {
-        throw std::runtime_error("User not found in game");
+        throw ManagerException("User not found in game");
     }
 
     GameData& data = m_players.at(user);
@@ -71,6 +71,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
     data.averageAnswerTime = ((data.averageAnswerTime * (totalAnswered - 1)) + answerTime) / totalAnswered;
 
     bool allFinished = true;
+
     for (const auto& [username, gameData] : m_players) 
     {
         if ((gameData.correctAnswerCount + gameData.wrongAnswerCount) < m_totalQuestions)
