@@ -6,19 +6,24 @@
 #include <vector>
 #include <unordered_map>
 #include <shared_mutex>
+#include <chrono>
 
 typedef struct GameData
 {
+    // Attributes - 
     Question currentQuestion;
     unsigned int correctAnswerCount;
     unsigned int wrongAnswerCount;
     unsigned int averageAnswerTime;
 
+    // Default C'tor - 
+    GameData() = default;
+
 } GameData;
 
 enum class GameState
 {
-    WAITING,    
+    WAITING,
     IN_PROGRESS, 
     FINISHED     
 };
@@ -27,6 +32,7 @@ class Game
 {
 
 public:
+    // C'tor - 
 	Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users);
 
 	Question getQuestionForUser(const std::string& user);
@@ -34,6 +40,7 @@ public:
 	void removePlayer(const std::string& user);
 
 private:
+    // Attributes - 
     std::vector<Question> m_questions;
     std::unordered_map<std::string, GameData> m_players;
     unsigned int m_gameId;

@@ -8,6 +8,7 @@ class Question
 public:
 
 	// C'tor & D'tor - 
+	Question() = default;
 	Question(const std::string& question, const std::vector<std::string>& possibleAnswers, const int correctAnswerId);
 	~Question();
 
