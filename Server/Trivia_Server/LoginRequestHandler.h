@@ -10,7 +10,6 @@ class LoginRequestHandler: public IRequestHandler
 public:
 	// C'tor & D'tor - 
 	LoginRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory);
-	virtual ~LoginRequestHandler();
 
 	// Virtuals - 
 	bool isRequestRelevant(const RequestInfo& info) override;

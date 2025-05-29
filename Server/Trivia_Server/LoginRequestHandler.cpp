@@ -13,11 +13,6 @@ LoginRequestHandler::LoginRequestHandler(std::weak_ptr<RequestHandlerFactory> ha
 
 }
 
-LoginRequestHandler::~LoginRequestHandler()
-{
-    
-}
-
 bool LoginRequestHandler::isRequestRelevant(const RequestInfo& info)
 {
     return ((info.requestID == static_cast<unsigned int>(RequestCode::SIGNUP_REQUEST)) || (info.requestID == static_cast<unsigned int>(RequestCode::LOGIN_REQUEST)));
