@@ -1,7 +1,7 @@
 #include "RequestHandlerFactory.h"
 
 RequestHandlerFactory::RequestHandlerFactory(std::weak_ptr<IDatabase> database):
-	m_database(database), m_loginManager(database), m_roomManager(), m_StatisticsManager(database)
+	m_database(database), m_loginManager(database), m_roomManager(), m_StatisticsManager(database), m_gameManager(database)
 {
 
 }
@@ -40,6 +40,11 @@ std::unique_ptr<IRequestHandler> RequestHandlerFactory::createRoomMemberRequestH
 	return std::make_unique<RoomMemberRequestHandler>(shared_from_this(), this->m_roomManager, user, desiredRoom.value());
 }
 
+std::unique_ptr<IRequestHandler> RequestHandlerFactory::createGameRequestHandler(const LoggedUser& user, Game& game)
+{
+	return std::make_unique<GameRequestHandler>(shared_from_this(), user, this->m_gameManager, game);
+}
+
 LoginManager& RequestHandlerFactory::getLoginManager()
 {
 	return this->m_loginManager;
@@ -55,3 +60,7 @@ RoomManager& RequestHandlerFactory::getRoomManager()
 	return this->m_roomManager;
 }
 
+GameManager& RequestHandlerFactory::getGameManager()
+{
+	return this->m_gameManager;
+}

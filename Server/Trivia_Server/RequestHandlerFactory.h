@@ -4,10 +4,12 @@
 #include "MenuRequestHandler.h"
 #include "RoomAdminRequestHandler.h"
 #include "RoomMemberRequestHandler.h"
+#include "GameRequestHandler.h"
 
 #include "LoginManager.h"
 #include "RoomManager.h"
 #include "StatisticsManager.h"
+#include "GameManager.h"
 
 #include <memory>
 #include <vector>
@@ -24,11 +26,13 @@ public:
 	std::unique_ptr<IRequestHandler> createMenuRequestHandler(const LoggedUser& user);
 	std::unique_ptr<IRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, int roomId);
 	std::unique_ptr<IRequestHandler> createRoomMemberRequestHandler(const LoggedUser& user, int roomId);
+	std::unique_ptr<IRequestHandler> createGameRequestHandler(const LoggedUser& user, Game& game);
 
 	// Managers Getters - 
 	LoginManager& getLoginManager();
 	StatisticsManager& getStatisticsManager();
 	RoomManager& getRoomManager();
+	GameManager& getGameManager();
 
 private:
 	// Attributes - 
@@ -38,5 +42,6 @@ private:
 	LoginManager m_loginManager;
 	RoomManager m_roomManager;
 	StatisticsManager m_StatisticsManager;
+	GameManager m_gameManager;
 
 };
