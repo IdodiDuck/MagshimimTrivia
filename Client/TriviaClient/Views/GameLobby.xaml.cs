@@ -18,6 +18,7 @@ using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
 using System.IO;
 using System.Runtime.Serialization;
+using TriviaClient.Views;
 
 namespace TriviaClient
 {
@@ -111,8 +112,7 @@ namespace TriviaClient
                         if (response.hasGameBegun)
                         {
                             m_refreshPage = false;
-                            MessageBox.Show("The game has started!", "Game Started", MessageBoxButton.OK, MessageBoxImage.Information);
-                            // NavigationService.Navigate(new GamePage(m_communicator));
+                            NavigationService.Navigate(new Game(m_communicator));
                         }
 
                         else if (response.status != StatusCodes.SUCCESS)
@@ -169,8 +169,7 @@ namespace TriviaClient
 
                 if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
-                    MessageBox.Show("Game started successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    // NavigationService.Navigate(new GamePage(m_communicator));
+                    NavigationService.Navigate(new Game(m_communicator));
                 }
 
                 else
