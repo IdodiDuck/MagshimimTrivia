@@ -38,7 +38,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
 {
     std::unique_lock lock(m_updateMutex);
 
-    if (m_players.find(user) == m_players.end()) 
+    if (m_players.find(user) == m_players.cend()) 
     {
         throw ManagerException("User not found in game");
     }
@@ -53,7 +53,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
 
     auto now = std::chrono::steady_clock::now();
     unsigned int answerTime = 0;
-    if (m_answerTimes.find(user) != m_answerTimes.end())
+    if (m_answerTimes.find(user) != m_answerTimes.cend())
     {
         answerTime = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(now - m_answerTimes[user]).count());
         m_answerTimes.erase(user);
