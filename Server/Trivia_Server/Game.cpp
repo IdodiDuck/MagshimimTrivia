@@ -3,7 +3,7 @@
 #include <chrono>
 
 Game::Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users)
-    : m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions((unsigned int)questions.size()), m_state(GameState::WAITING)
+    : m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING)
 {
     if (!users.empty()) 
     {
@@ -20,7 +20,7 @@ Question Game::getQuestionForUser(const std::string& user)
         throw std::runtime_error("User not found in game");
     }
 
-    GameData& data = m_players[user];
+    GameData& data = m_players.at(user);
     unsigned int currentIndex = data.correctAnswerCount + data.wrongAnswerCount;
 
     if (currentIndex >= m_questions.size()) 
@@ -41,7 +41,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
         throw std::runtime_error("User not found in game");
     }
 
-    GameData& data = m_players[user];
+    GameData& data = m_players.at(user);
     unsigned int currentIndex = data.correctAnswerCount + data.wrongAnswerCount;
 
     if (currentIndex >= m_questions.size()) 
@@ -53,7 +53,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
     unsigned int answerTime = 0;
     if (m_answerTimes.find(user) != m_answerTimes.end())
     {
-        answerTime = std::chrono::duration_cast<std::chrono::seconds>(now - m_answerTimes[user]).count();
+        answerTime = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(now - m_answerTimes[user]).count());
         m_answerTimes.erase(user);
     }
 

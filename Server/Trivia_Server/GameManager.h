@@ -12,13 +12,19 @@ class GameManager
 {
 
 public:
-	GameManager(std::weak_ptr<IDatabase> db);
-	std::shared_ptr<Game> createGame(const Room& room);
+	// C'tor - 
+	GameManager(std::weak_ptr<IDatabase> dataBase);
+
+	// Game Management Methods - 
+	Game& createGame(const Room& room);
 	void deleteGame(const unsigned int gameId);
+	Game& getGameSafely(const unsigned int gameId);
+	
 
 private:
-	std::weak_ptr<IDatabase> m_IDatabase;
-	std::unordered_map<int, std::shared_ptr<Game>> m_games;
+	// Attributes - 
+	std::weak_ptr<IDatabase> m_Database;
+	std::unordered_map<int, Game> m_games;
 	std::shared_mutex m_mutex;
 
 };
