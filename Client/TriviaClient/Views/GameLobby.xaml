@@ -52,9 +52,32 @@
                                FontWeight="Bold"
                                Margin="10,10,10,5"/>
                     <ListView x:Name="PlayersListView"
-                              Height="300"
-                              BorderThickness="0"
-                              Background="Transparent"/>
+          Height="300"
+          BorderThickness="0"
+          Background="Transparent">
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" Padding="8" Margin="5"
+                    Background="White" HorizontalAlignment="Stretch">
+                                    <TextBlock Text="{Binding}" FontSize="14" Foreground="Black"/>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="Margin" Value="5"/>
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                <Setter Property="IsHitTestVisible" Value="False"/>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+
+                    </ListView>
                 </StackPanel>
             </Border>
 
@@ -74,36 +97,41 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Time per question:" Width="120"/>
-                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding Path=TimePerQuestion, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Max players:" Width="120"/>
-                            <TextBlock x:Name="MaxPlayersText" Text="{Binding Path=QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock x:Name="MaxPlayersText" Text="{Binding Path=MaxPlayers, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
-
-                <Button x:Name="StartGameButton"
-                         Content="START GAME"
-                         Height="50"
-                         FontSize="16"
-                         FontWeight="Bold"
-                         Background="#FF007ACC"
-                         Foreground="White"
-                         BorderThickness="0"
-                         Visibility="Collapsed"
-                         Click="StartGameButton_Click"/>
             </StackPanel>
         </Grid>
 
         <!-- Footer -->
         <Border Grid.Row="2" Background="#FFEEEEEE" Padding="10">
-            <Button x:Name="LeaveButton"
-                    Content="LEAVE ROOM"
-                    HorizontalAlignment="Right"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                <!-- Admin Panel -->
+                <StackPanel x:Name="AdminButtonsPanel" Orientation="Horizontal" Visibility="Collapsed" >
+                    <Button x:Name="StartGameButton"
+                    Content="START GAME"
+                    Margin="0,0,10,0"
                     Width="120"
-                    Click="LeaveButton_Click"/>
+                    Click="StartGameButton_Click"/>
+                    <Button x:Name="CloseRoomButton"
+                    Content="CLOSE ROOM"
+                    Width="120"
+                    Click="CloseRoomButton_Click"/>
+                </StackPanel>
+
+                <!-- Regular Member Panel -->
+                <Button x:Name="LeaveButton"
+                Content="LEAVE ROOM"
+                Width="120"
+                Visibility="Collapsed"
+                Click="LeaveButton_Click"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Page>

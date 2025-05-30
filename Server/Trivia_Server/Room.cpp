@@ -19,6 +19,11 @@ void Room::removeUser(const LoggedUser& user)
 	m_users.erase(user);
 }
 
+void Room::changeRoomStatus(const RoomStatus& newStatus)
+{
+    m_metadata.status = newStatus;
+}
+
 std::set<std::string> Room::getAllUsers() const
 {
     std::set<std::string> usernames;
@@ -34,4 +39,9 @@ std::set<std::string> Room::getAllUsers() const
 RoomData Room::getRoomData() const
 {
     return m_metadata;
+}
+
+bool Room::isRoomFull() const
+{
+    return (m_users.size() >= m_metadata.maxPlayers);
 }

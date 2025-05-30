@@ -12,62 +12,40 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using TriviaClient.Infrastructure;
-using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
-    public static class Globals
-    {
-        public static Communicator Communicator = new Communicator();
-    }
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        private readonly Communicator m_communicator;
         public MainWindow()
         {
             InitializeComponent();
-            InitializeCommunicator();
+            m_communicator = new Communicator();
             NavigateToLogin();
-        }
-
-        private void InitializeCommunicator()
-        {
-            try
-            {
-                Globals.Communicator = new Communicator();
-
-                if (!Globals.Communicator.IsConnected)
-                {
-                    MessageBox.Show("Failed to connect to server. Please try again later.",
-                                  "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    System.Environment.Exit(1);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to initialize connection: {ex.Message}",
-                              "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(1);
-            }
         }
 
         private void NavigateToLogin()
         {
+            MainFrame.Navigate(new Login(m_communicator));
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
             try
             {
-                var loginPage = new Login();
-                MainFrame.Navigate(loginPage);
+                m_communicator.CloseConnection();
             }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load login page: {ex.Message}",
-                              "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                System.Environment.Exit(1);
+                MessageBox.Show($"Error closing connection: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
     }
 }

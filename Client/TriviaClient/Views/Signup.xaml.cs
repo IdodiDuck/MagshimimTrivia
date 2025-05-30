@@ -17,6 +17,7 @@ using System.Net.Sockets;
 using System.Runtime.Serialization;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
+using System.IO;
 
 namespace TriviaClient
 {
@@ -25,9 +26,12 @@ namespace TriviaClient
     /// </summary>
     public partial class Signup : Page
     {
-        public Signup()
+        private readonly Communicator m_communicator;
+
+        public Signup(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void SignUpButton_Click(object sender, RoutedEventArgs e)
@@ -39,12 +43,12 @@ namespace TriviaClient
                     username = UsernameTextBox.Text,
                     password = PasswordBox.Password,
                     email = EmailTextBox.Text
-
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(signupRequest);
-                byte[] serverResponse = Globals.Communicator.SendAndReceiveFromServer(serializedRequest);
-                var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
+                m_communicator.SendToServer(serializedRequest);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
+                var response = Deserializer.DeserializeResponse<SignupResponse>(serverResponse);
 
                 if (response == null)
                 {
@@ -53,34 +57,37 @@ namespace TriviaClient
                     return;
                 }
 
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
                 if (response.status == StatusCodes.SUCCESS)
                 {
-                    this.NavigationService.Navigate(new MainMenu(UsernameTextBox.Text));
+                    this.NavigationService.Navigate(new MainMenu(m_communicator, UsernameTextBox.Text));
                 }
 
                 else
                 {
-                    MessageBox.Show("Invalid username or password.", "Signup Failed",
-                                   MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Signup Failed", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
 
-            catch (SocketException ex)
+            catch (IOException ex)
             {
-                MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Connection error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -94,7 +101,6 @@ namespace TriviaClient
             UpdateSignupButtonState();
         }
 
-
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
             UpdateSignupButtonState();
@@ -103,7 +109,7 @@ namespace TriviaClient
         private void UpdateSignupButtonState()
         {
             SignUpButton.IsEnabled = !string.IsNullOrWhiteSpace(UsernameTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(PasswordBox.Password) && 
+                                   !string.IsNullOrWhiteSpace(PasswordBox.Password) &&
                                    !string.IsNullOrWhiteSpace(EmailTextBox.Text);
         }
 

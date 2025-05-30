@@ -1,6 +1,6 @@
 #include "RoomManager.h"
 
-#include <stdexcept>
+#include "ManagerException.h"
 
 RoomManager::~RoomManager()
 {
@@ -9,50 +9,81 @@ RoomManager::~RoomManager()
 
 void RoomManager::createRoom(const LoggedUser& user, const RoomData& data)
 {
+    std::shared_lock readingLock(m_roomsMutex);
+
     const int MIN_VALID_ID = 1;
+
     if (data.id < MIN_VALID_ID)
     {
-        throw std::invalid_argument("Error: Invalid room ID");
+        throw ManagerException("Error: Invalid room ID!");
     }
 
-    if (m_rooms.find(data.id) != m_rooms.cend()) 
+    if (m_rooms.find(data.id) != m_rooms.cend())
     {
-        throw std::runtime_error("Error: Room with ID " + std::to_string(data.id) + " already exists");
+        throw ManagerException("Error: Room with ID " + std::to_string(data.id) + " already exists!");
     }
+
+    readingLock.unlock();
 
     Room newRoom(data);
     newRoom.addUser(user);
 
+    std::unique_lock writingLock(m_roomsMutex);
     m_rooms.emplace(data.id, std::move(newRoom));
 }
 
-void RoomManager::deleteRoom(int ID)
+void RoomManager::deleteRoom(const int ID)
 {
+    std::shared_lock readingLock(m_roomsMutex);
+
     auto roomIt = m_rooms.find(ID);
-    if (roomIt == m_rooms.cend())
+    if (!doesRoomExist(ID))
     {
-        throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
+        throw ManagerException("Error: Room with ID " + std::to_string(ID) + " not found!");
     }
 
+    readingLock.unlock();
+
+    std::unique_lock writeLock(m_roomsMutex);
     m_rooms.erase(roomIt);
+}
+
+void RoomManager::removeUserFromRoom(const int ID, const LoggedUser& removedUser)
+{
+    auto desiredRoom = this->getRoomReference(ID);
+
+    if (desiredRoom.has_value())
+    {
+        desiredRoom.value().get().removeUser(removedUser);
+    }
+}
+
+void RoomManager::addUserToRoom(const int ID, const LoggedUser& addedUser)
+{
+    auto desiredRoom = this->getRoomReference(ID);
+
+    if (desiredRoom.has_value())
+    {
+        desiredRoom.value().get().addUser(addedUser);
+    }
 }
 
 RoomStatus RoomManager::getRoomState(const int ID) const
 {
-    auto roomIt = m_rooms.find(ID);
-    if (roomIt == m_rooms.cend())
+    if (!doesRoomExist(ID))
     {
-        throw std::runtime_error("Error: Room with ID " + std::to_string(ID) + " not found");
+        throw ManagerException("Error: Room with ID " + std::to_string(ID) + " not found!");
     }
 
-    return roomIt->second.getRoomData().status;
+    return this->m_rooms.at(ID).getRoomData().status;
 }
 
 std::vector<RoomData> RoomManager::getRooms() const
 {
-    std::vector<RoomData> rooms;
+    std::shared_lock lock(m_roomsMutex);
 
-    for (const auto& [id, room] : m_rooms) 
+    std::vector<RoomData> rooms;
+    for (const auto& [id, room] : m_rooms)
     {
         rooms.push_back(room.getRoomData());
     }
@@ -60,13 +91,34 @@ std::vector<RoomData> RoomManager::getRooms() const
     return rooms;
 }
 
-std::optional<std::reference_wrapper<const Room>> RoomManager::getRoom(const int ID) const
+std::optional<Room> RoomManager::getRoom(const int ID) const
 {
-    auto roomIt = m_rooms.find(ID);
-    if (roomIt != m_rooms.end())
+    std::shared_lock lock(m_roomsMutex);
+
+    if (doesRoomExist(ID))
     {
-        return std::cref(roomIt->second); // Returning constant reference
+        return m_rooms.at(ID);
     }
 
     return std::nullopt;
+}
+
+std::optional<std::reference_wrapper<Room>> RoomManager::getRoomReference(const int ID)
+{
+    std::unique_lock lock(m_roomsMutex);
+
+    auto desiredRoomIt = m_rooms.find(ID);
+
+    if (desiredRoomIt != m_rooms.end())
+    {
+        return std::optional<std::reference_wrapper<Room>>(desiredRoomIt->second);
+    }
+
+    return std::nullopt;
+}
+
+bool RoomManager::doesRoomExist(const int ID) const
+{
+    std::shared_lock lock(m_roomsMutex);
+    return (this->m_rooms.find(ID) != this->m_rooms.cend());
 }

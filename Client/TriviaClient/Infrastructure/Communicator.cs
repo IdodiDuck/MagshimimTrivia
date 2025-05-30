@@ -1,8 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows;
 using TriviaClient.Constants;
 
 namespace TriviaClient.Infrastructure
@@ -10,8 +11,8 @@ namespace TriviaClient.Infrastructure
     public class Communicator
     {
         // Attributes -
-        private readonly TcpClient m_socket;
-        private readonly NetworkStream stream;
+        private readonly TcpClient? m_socket;
+        private readonly NetworkStream? stream;
         public bool IsConnected { get; private set; }
 
         // Constructor - 
@@ -28,22 +29,23 @@ namespace TriviaClient.Infrastructure
             {
                 Console.WriteLine("Communicator: [ERROR]: " + ex.Message);
                 IsConnected = false;
-
-                throw new Exception("Communicator: [ERROR]: Could not connect to server.", ex);
             }
         }
+
         // Communication Methods - 
-        public byte[] SendAndReceiveFromServer(byte[] message)
+        public byte[] ReceiveFromServer()
         {
             try
             {
                 if (!IsConnected)
                 {
-                    throw new InvalidOperationException("Communicator: [ERROR]: Not connected to the server.");
+                    throw new InvalidOperationException("Communicator Receiving: [ERROR]: Not connected to the server.");
                 }
 
-                stream.Write(message, 0, message.Length);
-                stream.Flush();
+                if (stream == null)
+                {
+                    throw new InvalidOperationException("Communicator Receiving: [ERROR]: Stream is not initialized.");
+                }
 
                 byte[] responseBuffer = new byte[NetworkConstants.BUFFER_SIZE];
                 int bytesRead = stream.Read(responseBuffer, 0, responseBuffer.Length);
@@ -56,13 +58,32 @@ namespace TriviaClient.Infrastructure
 
             catch (Exception ex)
             {
-                Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
+                Console.WriteLine("Communicator: [ERROR]: Error with receiving the request: " + ex.Message);
                 return Array.Empty<byte>();
+            }
+        }
+        public void SendToServer(byte[] message)
+        {
+            try
+            {
+                if (!IsConnected)
+                {
+                    throw new InvalidOperationException("Communicator Sending: [ERROR]: Not connected to the server.");
+                }
+
+                stream?.Write(message, 0, message.Length);
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine("Communicator: [ERROR]: Error with sending the request: " + ex.Message);
             }
         }
 
         public void CloseConnection()
         {
+            Console.WriteLine("Closing Client Communicator Active Connection...\n");
+
             try
             {
                 stream?.Close();
@@ -73,6 +94,7 @@ namespace TriviaClient.Infrastructure
             catch (Exception ex)
             {
                 Console.WriteLine("Communicator: [ERROR]: Error with closing connection: " + ex.Message);
+                Application.Current.Shutdown();
             }
         }
     }

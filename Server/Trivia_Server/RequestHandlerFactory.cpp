@@ -6,14 +6,38 @@ RequestHandlerFactory::RequestHandlerFactory(std::weak_ptr<IDatabase> database):
 
 }
 
-std::unique_ptr<LoginRequestHandler> RequestHandlerFactory::createLoginRequestHandler()
+std::unique_ptr<IRequestHandler> RequestHandlerFactory::createLoginRequestHandler()
 {
 	return std::make_unique<LoginRequestHandler>(shared_from_this());
 }
 
-std::unique_ptr<MenuRequestHandler> RequestHandlerFactory::createMenuRequestHandler(const LoggedUser& user)
+std::unique_ptr<IRequestHandler> RequestHandlerFactory::createMenuRequestHandler(const LoggedUser& user)
 {
 	return std::make_unique<MenuRequestHandler>(shared_from_this(), user);
+}
+
+std::unique_ptr<IRequestHandler> RequestHandlerFactory::createRoomAdminRequestHandler(const LoggedUser& user, const int roomId)
+{
+	auto desiredRoom = this->m_roomManager.getRoom(roomId);
+
+	if (!desiredRoom.has_value())
+	{
+		throw std::runtime_error("Room with given ID does not exist.");
+	}
+
+	return std::make_unique<RoomAdminRequestHandler>(shared_from_this(), this->m_roomManager, user, desiredRoom.value());
+}
+
+std::unique_ptr<IRequestHandler> RequestHandlerFactory::createRoomMemberRequestHandler(const LoggedUser& user, const int roomId)
+{
+	auto desiredRoom = this->m_roomManager.getRoom(roomId);
+
+	if (!desiredRoom.has_value())
+	{
+		throw std::runtime_error("Room with given ID does not exist.");
+	}
+
+	return std::make_unique<RoomMemberRequestHandler>(shared_from_this(), this->m_roomManager, user, desiredRoom.value());
 }
 
 LoginManager& RequestHandlerFactory::getLoginManager()

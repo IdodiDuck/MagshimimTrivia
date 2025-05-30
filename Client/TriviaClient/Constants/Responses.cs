@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TriviaClient.Models;
+
 namespace TriviaClient.Constants
 {
     internal class Responses
@@ -13,6 +15,7 @@ namespace TriviaClient.Constants
             public string message { get; set; } = string.Empty;
         }
 
+        // V1.0.0 Responses - 
         public class LoginResponse
         {
             public uint status { get; set; }
@@ -23,25 +26,16 @@ namespace TriviaClient.Constants
             public uint status { get; set; }
         }
 
+        // V2.0.0 Responses - 
         public class LogoutResponse
         {
-            public uint status { get; set; }
-        }
-
-        public class RoomData
-        {
-            public uint id { get; set; }
-            public string name { get; set; } = string.Empty;
-            public uint maxPlayers { get; set; }
-            public uint numOfQuestionsInGame { get; set; }
-            public uint timePerQuestion { get; set; }
             public uint status { get; set; }
         }
 
         public class GetRoomsResponse
         {
             public uint status { get; set; }
-            public List<RoomData> rooms { get; set; } = new List<RoomData>();
+            public List<Room> rooms { get; set; } = new List<Room>();
         }
 
         public class GetPlayersInRoomResponse
@@ -75,5 +69,31 @@ namespace TriviaClient.Constants
         {
             public uint status { get; set; }
         }
+
+        // V3.0.0 Responses - 
+        public class CloseRoomResponse
+        {
+            public uint status { get; set; }
+        }
+
+        public class StartGameResponse
+        {
+            public uint status { get; set; }
+        }
+
+        public class GetRoomStateResponse
+        {
+            public uint status { get; set; }
+            public bool hasGameBegun { get; set; }
+            public List<string> players { get; set; } = new List<string>();
+            public uint questionsCount { get; set; }
+            public uint answerTimeout { get; set; }
+        }
+
+        public class LeaveRoomResponse
+        {
+            public uint status { get; set; }
+        }
     }
+
 }

@@ -19,6 +19,7 @@ using TriviaClient.Infrastructure;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Diagnostics;
+using System.IO;
 
 namespace TriviaClient
 {
@@ -27,10 +28,12 @@ namespace TriviaClient
     /// </summary>
     public partial class Login : Page
     {
+        private readonly Communicator m_communicator;
 
-        public Login()
+        public Login(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -44,7 +47,8 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(loginRequest);
-                byte[] serverResponse = Globals.Communicator.SendAndReceiveFromServer(serializedRequest);
+                m_communicator.SendToServer(serializedRequest);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<LoginResponse>(serverResponse);
 
                 if (response == null)
@@ -54,37 +58,40 @@ namespace TriviaClient
                     return;
                 }
 
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
                 if (response.status == StatusCodes.SUCCESS)
                 {
                     UsernameTextBox.Clear();
                     PasswordBox.Clear();
 
-                    this.NavigationService.Navigate(new MainMenu(loginRequest.username));
+                    this.NavigationService.Navigate(new MainMenu(m_communicator, loginRequest.username));
                 }
 
                 else
                 {
-                    MessageBox.Show("Invalid username or password / user already logged in.", "Login Failed",
-                                   MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Login Failed", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
 
-            catch (SocketException ex)
+            catch (IOException ex)
             {
-                MessageBox.Show($"Connection error: {ex.Message}", "Network Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -106,7 +113,7 @@ namespace TriviaClient
 
         private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            this.NavigationService.Navigate(new Signup());
+            this.NavigationService.Navigate(new Signup(m_communicator));
         }
     }
 }

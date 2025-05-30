@@ -3,6 +3,9 @@
 #include "IRequestHandler.h"
 #include "LoggedUser.h"
 
+#include <atomic>
+#include <mutex>
+
 class RequestHandlerFactory;
 
 class MenuRequestHandler : public IRequestHandler
@@ -15,11 +18,16 @@ public:
 	// Virtuals - 
 	bool isRequestRelevant(const RequestInfo& info) override;
 	RequestResult handleRequest(const RequestInfo& info) override;
+	void handleDisconnection() override;
 
 private:
 	// Attributes - 
 	LoggedUser m_user;
 	std::weak_ptr<RequestHandlerFactory> m_handlerFactory;
+
+	// Statics - 
+	static std::atomic<unsigned int> m_currentRoomId;
+	static std::mutex m_roomIdMutex;
 
 	// Room Operation Methods - 
 	RequestResult signout(const RequestInfo& info);
@@ -32,5 +40,7 @@ private:
 
 	// Support Methods - 
 	std::shared_ptr<RequestHandlerFactory> getFactorySafely();
+	
+	unsigned int generateNewRoomId();
 
 };

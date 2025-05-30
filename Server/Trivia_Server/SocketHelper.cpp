@@ -1,10 +1,10 @@
 #include "SocketHelper.h"
 
-using std::string;
+#include <iostream>
 
 std::optional<std::vector<unsigned char>> SocketHelper::getData(const SOCKET sc, const int bytesNum)
 {
-	const int DEFAULT_FLAG = 0;
+	const int DEFAULT_FLAG = 0, CLIENT_CLOSED_SOCKET = 0;
 
 	std::vector<unsigned char> data(bytesNum);
 
@@ -12,6 +12,13 @@ std::optional<std::vector<unsigned char>> SocketHelper::getData(const SOCKET sc,
 
 	if (res == SOCKET_ERROR)
 	{
+		std::cerr << "[ERROR]: Unexpected Error with Client's Socket: WSA Last Error: " << WSAGetLastError() << std::endl;
+		return std::nullopt;
+	}
+
+	else if (res == CLIENT_CLOSED_SOCKET)
+	{
+		std::cerr << "[ERROR]: Client has closed his socket!" << std::endl;
 		return std::nullopt;
 	}
 

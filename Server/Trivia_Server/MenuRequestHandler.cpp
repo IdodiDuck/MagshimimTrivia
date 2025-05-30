@@ -6,7 +6,10 @@
 #include "JsonResponsePacketSerializer.h"
 #include "JsonRequestPacketDeserializer.h"
 
-#include <iostream>
+#include "ManagerException.h"
+
+std::atomic<unsigned int> MenuRequestHandler::m_currentRoomId(1);
+std::mutex MenuRequestHandler::m_roomIdMutex;
 
 MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user): m_user(user), m_handlerFactory(handlerFactory)
 {
@@ -26,38 +29,61 @@ bool MenuRequestHandler::isRequestRelevant(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::handleRequest(const RequestInfo& info)
 {
-    switch (static_cast<RequestCode>(info.requestID))
+    try
     {
-        case RequestCode::SIGNOUT_REQUEST:
-            return signout(info);
+        switch (static_cast<RequestCode>(info.requestID))
+        {
+            case RequestCode::SIGNOUT_REQUEST:
+                return signout(info);
 
-        case RequestCode::ROOMS_REQUEST:
-            return getRooms(info);
+            case RequestCode::ROOMS_REQUEST:
+                return getRooms(info);
 
-        case RequestCode::PLAYERS_IN_ROOM_REQUEST:
-            return getPlayersInRoom(info);
+            case RequestCode::PLAYERS_IN_ROOM_REQUEST:
+                return getPlayersInRoom(info);
 
-        case RequestCode::PERSONAL_STATS_REQUEST:
-            return getPersonalStats(info);
+            case RequestCode::PERSONAL_STATS_REQUEST:
+                return getPersonalStats(info);
 
-        case RequestCode::HIGH_SCORE_REQUEST:
-            return getHighScore(info);
+            case RequestCode::HIGH_SCORE_REQUEST:
+                return getHighScore(info);
 
-        case RequestCode::JOIN_ROOM_REQUEST:
-            return joinRoom(info);
+            case RequestCode::JOIN_ROOM_REQUEST:
+                return joinRoom(info);
 
-        case RequestCode::CREATE_ROOM_REQUEST:
-            return createRoom(info);
+            case RequestCode::CREATE_ROOM_REQUEST:
+                return createRoom(info);
 
-        default:
-            ErrorResponse errorResponse;
-            errorResponse.message = "Unknown request type.";
-            return
-            {
-                JsonResponsePacketSerializer::serializeResponse(errorResponse),
-                std::make_unique<MenuRequestHandler>(*this)
-            };
+            default:
+                throw ManagerException("Error: Unknown Type of Request was sent!");
+        }
     }
+
+    catch (const ManagerException& e)
+    {
+        ErrorResponse errorResponse = { };
+        errorResponse.message = e.what();
+        RequestResult requestResult;
+        requestResult.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
+        requestResult.newHandler = this->getFactorySafely()->createMenuRequestHandler(this->m_user);
+        return requestResult;
+    }
+
+    catch (const ServerException& e)
+    {
+        ErrorResponse errorResponse = { };
+        errorResponse.message = "Server Error: " + std::string(e.what());
+        RequestResult requestResult;
+        requestResult.response = JsonResponsePacketSerializer::serializeResponse(errorResponse);
+        requestResult.newHandler = this->getFactorySafely()->createLoginRequestHandler();
+        return requestResult;
+    }
+
+}
+
+void MenuRequestHandler::handleDisconnection()
+{
+    this->getFactorySafely()->getLoginManager().logOut(this->m_user.getUserName());
 }
 
 RequestResult MenuRequestHandler::signout(const RequestInfo& info)
@@ -75,12 +101,12 @@ RequestResult MenuRequestHandler::signout(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::getRooms(const RequestInfo& info)
 {
-    GetRoomsResponse response { SUCCESS };
+    GetRoomsResponse response { SUCCESS, getFactorySafely()->getRoomManager().getRooms() };
     
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<MenuRequestHandler>(*this) // To do - appoint to a new handler when added
+        std::make_unique<MenuRequestHandler>(*this)
     };
 }
 
@@ -131,31 +157,68 @@ RequestResult MenuRequestHandler::getHighScore(const RequestInfo& info)
 
 RequestResult MenuRequestHandler::joinRoom(const RequestInfo& info)
 {
-    const unsigned int INVALID_ROOM_ID = 0;
-
     JoinRoomRequest request = JsonRequestPacketDeserializer::deserializeJoinRoomRequest(info.buffer).value();
-    JoinRoomResponse response {};
+    JoinRoomResponse response = {};
 
-    response.status = (request.roomId != INVALID_ROOM_ID) ? SUCCESS : FAILURE;
+    auto roomOpt = getFactorySafely()->getRoomManager().getRoomReference(request.roomId);
+
+    if (!roomOpt.has_value())
+    {
+        throw ManagerException("Error: Room doesn't exist!");
+    }
+
+    Room& room = roomOpt.value();
+
+    switch (room.getRoomData().status)
+    {
+        case RoomStatus::CLOSED:
+            throw ManagerException("Error: Room is closed!");
+
+        case RoomStatus::GAME_STARTED:
+            throw ManagerException("Error: Room is in the middle of an active game!");
+
+        default:
+            // Room is at active status -> User can possibly join
+            break;
+    }
+
+    if (room.isRoomFull())
+    {
+        throw ManagerException("Error: Room is at full capacity!");
+    }
+
+    room.addUser(this->m_user);
+    response.status = SUCCESS;
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<MenuRequestHandler>(*this) // To do - appoint to a new handler when added
+        getFactorySafely()->createRoomMemberRequestHandler(this->m_user, request.roomId)
     };
 }
+
 
 RequestResult MenuRequestHandler::createRoom(const RequestInfo& info)
 {
     CreateRoomRequest request = JsonRequestPacketDeserializer::deserializeCreateRoomRequest(info.buffer).value();
     CreateRoomResponse response {};
 
+    RoomData addedRoomData = { };
+    addedRoomData.maxPlayers = request.maxUsers;
+    addedRoomData.name = request.roomName;
+    addedRoomData.numOfQuestionsInGame = request.questionCount;
+    addedRoomData.timePerQuestion = request.answerTimeout;
+    addedRoomData.status = RoomStatus::OPENED;
+    addedRoomData.id = generateNewRoomId();
+
+    this->getFactorySafely()->getRoomManager().createRoom(m_user, addedRoomData);
+
     response.status = (request.roomName != "") ? SUCCESS : FAILURE;
 
     return
     {
         JsonResponsePacketSerializer::serializeResponse(response),
-        std::make_unique<MenuRequestHandler>(*this) // To do - appoint to a new handler when added
+        this->getFactorySafely()->createRoomAdminRequestHandler(m_user, addedRoomData.id)
     };
 }
 
@@ -166,5 +229,11 @@ std::shared_ptr<RequestHandlerFactory> MenuRequestHandler::getFactorySafely()
         return factory;
     }
 
-    throw std::runtime_error("MenuRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
+    throw ServerException("MenuRequestHandler: [ERROR]: RequestHandlerFactory is no longer available");
+}
+
+unsigned int MenuRequestHandler::generateNewRoomId()
+{
+    std::lock_guard<std::mutex> lock(m_roomIdMutex);
+    return m_currentRoomId.fetch_add(1, std::memory_order_relaxed);
 }

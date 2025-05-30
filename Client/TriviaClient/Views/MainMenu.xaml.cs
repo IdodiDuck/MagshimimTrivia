@@ -16,6 +16,8 @@ using TriviaClient.Infrastructure;
 using Newtonsoft.Json;
 using TriviaClient.Constants;
 using static TriviaClient.Constants.Responses;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -25,101 +27,83 @@ namespace TriviaClient
     public partial class MainMenu : Page
     {
         private string Username { get; set; } = string.Empty;
+        private readonly Communicator m_communicator;
 
-        public MainMenu(string username)
+        public MainMenu(Communicator clientCommunicator, string username)
         {
             InitializeComponent();
             Username = username;
+            m_communicator = clientCommunicator;
 
             UserNameText.Text = Username;
         }
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new CreateRoom());
+            this.NavigationService.Navigate(new CreateRoom(m_communicator));
         }
 
         private void JoinRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new JoinRoom());
+            this.NavigationService.Navigate(new JoinRoom(m_communicator));
         }
 
         private void StatisticsBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack)
-            {
-                var request = Serializer.SerializeEmptyRequest(RequestCode.PersonalStatsRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
-                var response = Deserializer.DeserializeResponse<GetPersonalStatsResponse>(serverResponse);
-
-                if (response == null)
-                {
-                    MessageBox.Show("Invalid response from server.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-
-                if (response.status == StatusCodes.SUCCESS)
-                {
-                    this.NavigationService.Navigate(new PersonalStatistics(response.statistics));
-                }
-
-                return;
-            }
-            MessageBox.Show("Error: Couldn't fetch personal statistics.");
+           this.NavigationService.Navigate(new PersonalStatistics(m_communicator));
         }
 
         private void SignOutBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack)
+            try
             {
                 var request = Serializer.SerializeEmptyRequest(RequestCode.SignoutRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
+                m_communicator.SendToServer(request);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<SignOutResponse>(serverResponse);
 
                 if (response == null)
                 {
-                    MessageBox.Show("Invalid response from server.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Invalid response from server or sign out failed.", "Server Error",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }    
+                
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
-
-                if (response.status == StatusCodes.SUCCESS)
+                if (NavigationService.CanGoBack)
                 {
                     NavigationService.GoBack();
+                    return;
                 }
-
-                return;
             }
-            MessageBox.Show("Error: There's no previous page you can go back to!");
+
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            MessageBox.Show("Error: There's No previous page to navigate back to.");
         }
 
         private void BestScoresBtn_click(object sender, RoutedEventArgs e)
         {
-            if (NavigationService.CanGoBack)
-            {
-                var request = Serializer.SerializeEmptyRequest(RequestCode.HighScoreRequest);
-                var serverResponse = Globals.Communicator.SendAndReceiveFromServer(request);
-                var response = Deserializer.DeserializeResponse<GetHighScoreResponse>(serverResponse);
-
-                if (response == null)
-                {
-                    MessageBox.Show("Invalid response from server.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-
-                if (response.status == StatusCodes.SUCCESS)
-                {
-                    this.NavigationService.Navigate(new HighScores(response.statistics));
-                }
-
-                return;
-            }
-            MessageBox.Show("Error: Couldn't fetch personal statistics.");
+            this.NavigationService.Navigate(new HighScores(m_communicator));
         }
     }
 }

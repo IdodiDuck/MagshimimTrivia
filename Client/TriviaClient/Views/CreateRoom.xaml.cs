@@ -15,6 +15,8 @@ using System.Windows.Navigation;
 using TriviaClient.Constants;
 using static TriviaClient.Constants.Responses;
 using TriviaClient.Infrastructure;
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace TriviaClient
 {
@@ -23,28 +25,34 @@ namespace TriviaClient
     /// </summary>
     public partial class CreateRoom : Page
     {
-        public CreateRoom()
+        private readonly Communicator m_communicator;
+
+        public CreateRoom(Communicator communicator)
         {
             InitializeComponent();
+            m_communicator = communicator;
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
+            const bool IS_ADMIN = true;
+            const int EMPTY = 0, MIN_PLAYERS = 2;
+
             try
             {
-                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers <= 0)
+                if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers < MIN_PLAYERS)
                 {
                     MessageBox.Show("Please enter a valid number of players", "Invalid Input");
                     return;
                 }
 
-                if (!int.TryParse(QuestionsNumberTextBox.Text, out int questionCount) || questionCount <= 0)
+                if (!int.TryParse(QuestionsNumberTextBox.Text, out int questionCount) || questionCount <= EMPTY)
                 {
                     MessageBox.Show("Please enter a valid number of questions", "Invalid Input");
                     return;
                 }
 
-                if (!int.TryParse(QuestionTimeTextBox.Text, out int answerTimeout) || answerTimeout <= 0)
+                if (!int.TryParse(QuestionTimeTextBox.Text, out int answerTimeout) || answerTimeout <= EMPTY)
                 {
                     MessageBox.Show("Please enter a valid time per question", "Invalid Input");
                     return;
@@ -59,12 +67,32 @@ namespace TriviaClient
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(request);
-                byte[] response = Globals.Communicator.SendAndReceiveFromServer(serializedRequest);
-                var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(response);
+                m_communicator.SendToServer(serializedRequest);
+                byte[] serverResponse = m_communicator.ReceiveFromServer();
+                var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(serverResponse);
+
+                if (createRoomResponse == null)
+                {
+                    MessageBox.Show("Invalid response from server.", "Server Error",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
+                {
+                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
+                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)
                 {
-                    this.NavigationService.Navigate(new GameLobby(request.roomName, maxUsers, questionCount, answerTimeout));
+                    RoomNameTextBox.Clear();
+                    PlayersNumberTextBox.Clear();
+                    QuestionsNumberTextBox.Clear();
+                    QuestionTimeTextBox.Clear();
+
+                    this.NavigationService.Navigate(new GameLobby(m_communicator, request.roomName, (uint)maxUsers, (uint)questionCount, (uint)answerTimeout, IS_ADMIN));
                 }
 
                 else
@@ -73,9 +101,19 @@ namespace TriviaClient
                 }
             }
 
+            catch (IOException ex)
+            {
+                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
+            catch (SerializationException ex)
+            {
+                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+
             catch (Exception ex)
             {
-                MessageBox.Show($"Error creating room: {ex.Message}", "Error");
+                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -87,15 +125,15 @@ namespace TriviaClient
                 return;
             }
 
-           MessageBox.Show("Error: There's no previous page you can go back to!");
+            MessageBox.Show("Error: There's no previous page you can go back to!");
         }
 
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
         {
             CreateButton.IsEnabled = !string.IsNullOrWhiteSpace(RoomNameTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(PlayersNumberTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(QuestionsNumberTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(QuestionTimeTextBox.Text);
+                                     !string.IsNullOrWhiteSpace(PlayersNumberTextBox.Text) &&
+                                     !string.IsNullOrWhiteSpace(QuestionsNumberTextBox.Text) &&
+                                     !string.IsNullOrWhiteSpace(QuestionTimeTextBox.Text);
         }
     }
 

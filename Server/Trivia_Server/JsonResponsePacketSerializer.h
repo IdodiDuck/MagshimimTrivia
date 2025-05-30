@@ -5,6 +5,7 @@
 #include "Constants.h"
 #include "Room.h"
 
+// V1.0.0 Responses - 
 typedef struct LoginResponse
 {
     unsigned int status;
@@ -23,7 +24,7 @@ typedef struct ErrorResponse
 
 } ErrorResponse;
 
-// v2.0.0
+// V2.0.0 Responses - 
 
 typedef struct LogoutResponse
 {
@@ -70,14 +71,46 @@ typedef struct CreateRoomResponse
 
 } CreateRoomResponse;
 
+// V3.0.0 Responses - 
+typedef struct CloseRoomResponse
+{
+    unsigned int status;
+
+} CloseRoomResponse;
+
+typedef struct StartGameResponse
+{
+    unsigned int status;
+
+} StartGameResponse;
+
+typedef struct GetRoomStateResponse
+{
+    unsigned int status;
+    bool hasGameBegun;
+    std::vector<std::string> players;
+    unsigned int questionsCount;
+    unsigned int answerTimeout;
+
+
+} GetRoomStateResponse;
+
+typedef struct LeaveRoomResponse
+{
+    unsigned int status;
+
+} LeaveRoomResponse;
+
 class JsonResponsePacketSerializer
 {
 
 public:
+    // V1.0.0 Serializations - 
     static std::vector<unsigned char> serializeResponse(const ErrorResponse& errorResponse);
     static std::vector<unsigned char> serializeResponse(const LoginResponse& loginResponse);
     static std::vector<unsigned char> serializeResponse(const SignupResponse& signUpResponse);
 
+    // V2.0.0 Serializations - 
     static std::vector<unsigned char> serializeResponse(const LogoutResponse& loguotResponse);
     static std::vector<unsigned char> serializeResponse(const GetRoomsResponse& getRoomsResponse);
     static std::vector<unsigned char> serializeResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse);
@@ -85,4 +118,15 @@ public:
     static std::vector<unsigned char> serializeResponse(const CreateRoomResponse& createRoomResponse);
     static std::vector<unsigned char> serializeResponse(const getHighScoreResponse& getHighScoreResponse);
     static std::vector<unsigned char> serializeResponse(const getPersonalStatsResponse& getPersonalStatsResponse);
+
+    // V3.0.0 Serializations - 
+    static std::vector<unsigned char> serializeResponse(const CloseRoomResponse& closeRoomResponse);
+    static std::vector<unsigned char> serializeResponse(const StartGameResponse& startGameResponse);
+    static std::vector<unsigned char> serializeResponse(const GetRoomStateResponse& getRoomStateResponse);
+    static std::vector<unsigned char> serializeResponse(const LeaveRoomResponse& leaveRoomResponse);
+
+private:
+    // Support Methods - 
+    static void insertLengthAsBytes(std::vector<unsigned char>& buffer, const int dataLength);
+    static std::vector<unsigned char> buildResponse(const ResponseCode code, const std::string& jsonString);
 };
