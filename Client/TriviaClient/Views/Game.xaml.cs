@@ -30,6 +30,7 @@ namespace TriviaClient.Views
         private uint CurrentQuestionNumber {  get; set; }
         private uint CorrectAnswersAmount { get; set; }
         private uint? SelectedAnswerId { get; set; } = null;
+        private List<KeyValuePair<string, string>> answers = new();
         private uint TimePerQuestion { get; set; }
         private DispatcherTimer QuestionTimer;
         private int TimeLeft;
@@ -68,7 +69,7 @@ namespace TriviaClient.Views
             if (this.TimeLeft <= 0)
             {
                 uint answerToSend = SelectedAnswerId ?? uint.MaxValue;
-                SubmitAnswer(answerToSend);
+                _ = SubmitAnswerAsync(answerToSend);
             }
         }
 
@@ -106,12 +107,12 @@ namespace TriviaClient.Views
         {
             CurrentQuestion.Text = questionResponse.question;
 
-            var answers = questionResponse.answers.ToList();
+            this.answers = questionResponse.answers.ToList();
 
-            AnswerButton1.Content = answers[0].Value;
-            AnswerButton2.Content = answers[1].Value;
-            AnswerButton3.Content = answers[2].Value;
-            AnswerButton4.Content = answers[3].Value;
+            AnswerButton1.Content = this.answers[0].Value;
+            AnswerButton2.Content = this.answers[1].Value;
+            AnswerButton3.Content = this.answers[2].Value;
+            AnswerButton4.Content = this.answers[3].Value;
 
             AnswerButton1.IsEnabled = true;
             AnswerButton2.IsEnabled = true;
@@ -120,6 +121,7 @@ namespace TriviaClient.Views
 
             this.SelectedAnswerId = null;
             ClearButtonHighlights();
+            ResetButtonColors();
 
             StartQuestionTimer((int)(this.TimePerQuestion));
         }
@@ -236,7 +238,7 @@ namespace TriviaClient.Views
             }
         }
 
-        private void SubmitAnswer(uint answerId)
+        private async Task SubmitAnswerAsync(uint answerId)
         {
             try
             {
@@ -264,6 +266,12 @@ namespace TriviaClient.Views
                 bool isAnswerCorrect = response.correctAnswerId == answerId;
 
                 this.CorrectAnswersText.Text = isAnswerCorrect ? $"{++this.CorrectAnswersAmount}" : $"{this.CorrectAnswersAmount}";
+
+                ShowAnswerResult(answerId, response.correctAnswerId);
+                await Task.Delay(1500);
+
+                DisableAnswerButtons();
+
                 if (this.CurrentQuestionNumber != this.QuestionAmount)
                 {
                     GetNextQuestionFromServer();
@@ -272,8 +280,6 @@ namespace TriviaClient.Views
 
                 ShowWaitingForGameToEndUI();
                 _ = WaitForGameToEndAsync();
-
-                // TODO -> Move this eventually to the Game Results Page
                 return;
             }
 
@@ -282,6 +288,51 @@ namespace TriviaClient.Views
                 MessageBox.Show($"Error submitting answer: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        private void ShowAnswerResult(uint selectedId, uint correctAnswerId)
+        {
+            const string SELECTED_BUTTON = "selected", CORRECT_BUTTONS = "correct";
+
+            var buttons = new[] { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
+
+            for (int currButton = 0; currButton < buttons.Length; currButton++)
+            {
+                var button = buttons[currButton];
+                var answerKey = uint.Parse(this.answers[currButton].Key);
+
+                string buttonState = answerKey == correctAnswerId ? CORRECT_BUTTONS :
+                               answerKey == selectedId ? SELECTED_BUTTON : "default";
+
+                switch (buttonState)
+                {
+                    case CORRECT_BUTTONS:
+                        button.BorderBrush = Brushes.LightGreen;
+                        button.BorderThickness = new Thickness(3);
+                        break;
+
+                    case SELECTED_BUTTON:
+                        button.BorderBrush = Brushes.IndianRed;
+                        button.BorderThickness = new Thickness(3);
+                        break;
+
+                    default:
+                        button.BorderBrush = Brushes.Black;
+                        button.BorderThickness = new Thickness(1);
+                        break;
+                }
+            }
+        }
+
+        private void ResetButtonColors()
+        {
+            var buttons = new[] { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
+
+            foreach (var button in buttons)
+            {
+                button.Background = Brushes.White;
+            }
+        }
+
         private void ShowWaitingForGameToEndUI()
         {
             GameGrid.Visibility = Visibility.Collapsed;
@@ -289,30 +340,26 @@ namespace TriviaClient.Views
         }
         private void AnswerButton1_Click(object sender, RoutedEventArgs e)
         {
-            SelectedAnswerId = 0;
+            this.SelectedAnswerId = uint.Parse(this.answers[0].Key);
             HighlightSelectedButton(AnswerButton1);
-            DisableAnswerButtons();
         }
 
         private void AnswerButton2_Click(object sender, RoutedEventArgs e)
         {
-            SelectedAnswerId = 1;
+            this.SelectedAnswerId = uint.Parse(this.answers[1].Key);
             HighlightSelectedButton(AnswerButton2);
-            DisableAnswerButtons();
         }
 
         private void AnswerButton3_Click(object sender, RoutedEventArgs e)
         {
-            SelectedAnswerId = 2;
+            this.SelectedAnswerId = uint.Parse(this.answers[2].Key);
             HighlightSelectedButton(AnswerButton3);
-            DisableAnswerButtons();
         }
 
         private void AnswerButton4_Click(object sender, RoutedEventArgs e)
         {
-            SelectedAnswerId = 3;
+            this.SelectedAnswerId = uint.Parse(this.answers[3].Key);
             HighlightSelectedButton(AnswerButton4);
-            DisableAnswerButtons();
         }
     }
 }
