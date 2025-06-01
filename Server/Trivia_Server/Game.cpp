@@ -2,97 +2,83 @@
 
 #include "ManagerException.h"
 
-Game::Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users):
-    m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING_TO_START)
+Game::Game(const unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion):
+    m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING_TO_START), m_timerDuration(std::chrono::seconds(timePerQuestion))
 {
     if (!users.empty()) 
     {
         this->m_state = GameState::STARTED;
+        this->m_timerStart = std::chrono::steady_clock::now();
     }
+}
+
+Game::~Game()
+{
+    this->m_questions.clear();
+    this->m_players.clear();
+    this->m_answerTimes.clear();
 }
 
 Question Game::getQuestionForUser(const std::string& user)
 {
     std::shared_lock lock(m_updateMutex);
 
-    if (m_players.find(user) == m_players.cend())
+    if (!isUserActive(user))
     {
         throw ManagerException("User not found in game");
     }
 
     GameData& data = m_players.at(user);
-    unsigned int currentIndex = data.correctAnswerCount + data.wrongAnswerCount;
+    unsigned int index = getCurrentQuestionIndex(data);
 
-    if (currentIndex >= m_questions.size())
+    if (index >= m_questions.size())
     {
-        throw ManagerException("No more questions available for this user");
+        throw std::out_of_range("No more questions for this user");
     }
 
-    data.currentQuestion = m_questions[currentIndex];
+    Question& question = m_questions[index];
+    data.currentQuestion = question;
     m_answerTimes[user] = std::chrono::steady_clock::now();
 
-    return data.currentQuestion;
+    return question;
 }
 
 void Game::submitAnswer(const std::string& user, const std::string& answer)
 {
     std::unique_lock lock(m_updateMutex);
 
-    if (m_players.find(user) == m_players.cend()) 
+    if (!isUserActive(user))
     {
         throw ManagerException("User not found in game");
     }
 
     GameData& data = m_players.at(user);
-    unsigned int currentIndex = data.correctAnswerCount + data.wrongAnswerCount;
+    unsigned int index = getCurrentQuestionIndex(data);
 
-    if (currentIndex >= m_questions.size()) 
+    if (index >= m_questions.size())
     {
         throw std::runtime_error("User has already answered all questions");
     }
 
-    auto now = std::chrono::steady_clock::now();
-    unsigned int answerTime = 0;
-    if (m_answerTimes.find(user) != m_answerTimes.cend())
-    {
-        answerTime = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(now - m_answerTimes[user]).count());
-        m_answerTimes.erase(user);
-    }
+    unsigned int answerTime = calculateAnswerTime(user);
 
-    const std::string& correctAnswer = data.currentQuestion.getCorrectAnswer();
-    if (answer == correctAnswer) 
-    {
-        data.correctAnswerCount++;
-    }
-    else 
-    {
-        data.wrongAnswerCount++;
-    }
+    updateUserStatistics(data, answer, answerTime);
 
-    unsigned int totalAnswered = data.correctAnswerCount + data.wrongAnswerCount;
-    data.averageAnswerTime = ((data.averageAnswerTime * (totalAnswered - 1)) + answerTime) / totalAnswered;
+    this->m_state = GameState::WAITING_FOR_NEXT_QUESTION;
 
-    bool allFinished = true;
-
-    for (const auto& [username, gameData] : m_players) 
-    {
-        if ((gameData.correctAnswerCount + gameData.wrongAnswerCount) < m_totalQuestions)
-        {
-            allFinished = false;
-            break;
-        }
-    }
-
-    if (allFinished) 
-    {
-        m_state = GameState::FINISHED;
-    }
+    lock.unlock();
+    updateGame();
 }
 
 void Game::removePlayer(const std::string& user)
 {
     std::unique_lock lock(m_userMutex);
-    m_players.erase(user);
+
+    auto removedUserIt = m_players.find(user);
+    if (removedUserIt != m_players.cend())
+    {
+        removedUserIt->second.hasLeft = true;
+    }
 }
 
 unsigned int Game::getGameId() const
@@ -102,16 +88,24 @@ unsigned int Game::getGameId() const
 
 bool Game::isGameEmpty() const
 {
-    const int EMPTY = 0;
+    std::shared_lock readLock(m_userMutex);
 
-    return (this->m_players.size() == EMPTY);
+    for (const auto& [username, data] : m_players) 
+    {
+        if (!data.hasLeft) 
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 GameData Game::getPlayerGameData(const std::string& username) const
 {
     std::shared_lock readLock(m_userMutex);
 
-    if (this->m_players.find(username) == this->m_players.cend()) 
+    if (!isUserActive(username))
     {
         throw ManagerException("User not found in game");
     }
@@ -119,15 +113,145 @@ GameData Game::getPlayerGameData(const std::string& username) const
     return this->m_players.at(username);
 }
 
-std::vector<std::string> Game::getAllPlayersUsernames() const
+std::unordered_map<std::string, PlayerResults> Game::getAllPlayerResults() const
 {
-    std::shared_lock lock(m_userMutex);
-    std::vector<std::string> usernames;
+    std::unordered_map<std::string, PlayerResults> results;
 
-    for (const auto& [name, data] : m_players)
+    for (const auto& [username, data] : this->m_players)
     {
-        usernames.push_back(name);
+        results[username] = PlayerResults{
+            username,
+            data.correctAnswerCount,
+            data.wrongAnswerCount,
+            data.averageAnswerTime
+        };
     }
 
-    return usernames;
+    return results;
+}
+
+bool Game::isUserActive(const std::string& user) const
+{
+    auto userIt = m_players.find(user);
+    return (userIt != m_players.cend()) && (!userIt->second.hasLeft);
+}
+
+bool Game::didUserAnswer(const std::string& user) const
+{
+    std::shared_lock readLock(m_userMutex);
+
+    if (!isUserActive(user))
+    {
+        return false;
+    }
+
+    return (m_answerTimes.find(user) != m_answerTimes.cend());
+}
+
+bool Game::isTimerExpired(const std::chrono::seconds duration) const
+{
+    auto now = std::chrono::steady_clock::now();
+    return (elapsedTime() >= duration);
+}
+
+std::chrono::seconds Game::timeLeft() const
+{
+    auto now = std::chrono::steady_clock::now();
+    return std::max(std::chrono::seconds(0), this->timeDurationWait() - elapsedTime());
+}
+
+std::chrono::seconds Game::elapsedTime() const
+{
+    auto now = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::seconds>(now - m_timerStart);
+}
+
+std::chrono::seconds Game::timeDurationWait() const
+{
+    return (this->m_state == GameState::WAITING_FOR_ANSWER ? this->m_timerDuration : this->m_waitingForQuestionDuration);
+}
+
+void Game::updateGame()
+{
+    if (!this->isTimerExpired(timeDurationWait()))
+    {
+        return;
+    }
+
+    switch (this->m_state)
+    {
+        case GameState::WAITING_FOR_ANSWER:
+        {
+            for (auto& playerPair : m_players)
+            {
+                const std::string& username = playerPair.first;
+
+                if (!didUserAnswer(username))
+                {
+                    submitAnswer(username, "NO_ANSWER");
+                }
+            }
+
+            m_state = GameState::WAITING_FOR_NEXT_QUESTION;
+            m_timerStart = std::chrono::steady_clock::now();
+            break;
+        }
+
+        case GameState::WAITING_FOR_NEXT_QUESTION:
+        {
+            bool allPlayersDone = true;
+
+            for (const auto& [user, data] : m_players)
+            {
+                unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
+                if (currentQuestion < m_totalQuestions)
+                {
+                    allPlayersDone = false;
+                    break;
+                }
+            }
+
+            this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
+            m_timerStart = std::chrono::steady_clock::now();
+            break;
+        }
+
+        default:
+            break;
+    }
+}
+
+bool Game::isGameOver() const
+{
+    return (this->m_state == GameState::FINISHED);
+}
+
+unsigned int Game::getCurrentQuestionIndex(const GameData& data) const
+{
+    return data.correctAnswerCount + data.wrongAnswerCount;
+}
+
+unsigned int Game::calculateAnswerTime(const std::string& user)
+{
+    auto now = std::chrono::steady_clock::now();
+
+    if (auto it = m_answerTimes.find(user); it != m_answerTimes.end())
+    {
+        unsigned int time = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(now - it->second).count());
+        m_answerTimes.erase(it);
+        return time;
+    }
+
+    return 0;
+}
+
+void Game::updateUserStatistics(GameData& data, const std::string& answer, unsigned int time)
+{
+    const std::string& correctAnswer = data.currentQuestion.getCorrectAnswer();
+    bool isCorrect = (answer == correctAnswer);
+
+    isCorrect ? data.correctAnswerCount++ : data.wrongAnswerCount++;
+
+    unsigned int totalAnswered = data.correctAnswerCount + data.wrongAnswerCount;
+    data.averageAnswerTime = ((data.averageAnswerTime * (totalAnswered - 1)) + time) / totalAnswered;
 }

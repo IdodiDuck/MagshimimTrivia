@@ -2,6 +2,7 @@
 
 #include "Question.h"
 #include "LoggedUser.h"
+#include "JsonResponsePacketSerializer.h"
 
 #include <vector>
 #include <unordered_map>
@@ -15,6 +16,7 @@ typedef struct GameData
     unsigned int correctAnswerCount;
     unsigned int wrongAnswerCount;
     unsigned int averageAnswerTime;
+    bool hasLeft = false;
 
     // Default C'tor - 
     GameData() = default;
@@ -30,12 +32,20 @@ enum class GameState
     FINISHED
 };
 
+enum class AnswerResult
+{
+    CORRECT,
+    WRONG,
+    NO_ANSWER
+};
+
 class Game 
 {
 
 public:
-    // C'tor - 
-	Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users);
+    // C'tor & D'tor - 
+	Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion);
+    ~Game();
 
 	Question getQuestionForUser(const std::string& user);
 	void submitAnswer(const std::string& user, const std::string& answer);
@@ -44,8 +54,9 @@ public:
     // Getters - 
     unsigned int getGameId() const;
     bool isGameEmpty() const;
+    bool isGameOver() const;
     GameData getPlayerGameData(const std::string& username) const;
-    std::vector<std::string> getAllPlayersUsernames() const;
+    std::unordered_map<std::string, PlayerResults> getAllPlayerResults() const;
 
 private:
     // Attributes - 
@@ -54,8 +65,29 @@ private:
     unsigned int m_gameId;
     unsigned int m_totalQuestions;
     GameState m_state;
+
     mutable std::shared_mutex m_updateMutex;
     mutable std::shared_mutex m_userMutex;
+
+    // Timer - 
+    std::chrono::steady_clock::time_point m_timerStart; // start time of the timer
+    std::chrono::seconds m_timerDuration; // Duration of the timer
+
+    const std::chrono::seconds m_waitingForQuestionDuration = std::chrono::seconds(2);
+    std::chrono::steady_clock::time_point m_questionStartTime;
     std::unordered_map<std::string, std::chrono::steady_clock::time_point> m_answerTimes;
 
+    // Support Methods - 
+    bool isUserActive(const std::string& user) const;
+    bool didUserAnswer(const std::string& user) const;
+    unsigned int getCurrentQuestionIndex(const GameData& data) const;
+    unsigned int calculateAnswerTime(const std::string& user);
+    void updateUserStatistics(GameData& data, const std::string& answer, unsigned int time);
+
+    bool isTimerExpired(const std::chrono::seconds duration) const;
+    std::chrono::seconds timeLeft() const;
+    std::chrono::seconds elapsedTime() const;
+    std::chrono::seconds timeDurationWait() const;
+
+    void updateGame();
 };
