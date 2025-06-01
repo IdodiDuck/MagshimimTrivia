@@ -30,7 +30,6 @@ namespace TriviaClient.Views
         private uint CurrentQuestionNumber {  get; set; }
         private uint CorrectAnswersAmount { get; set; }
         private uint? SelectedAnswerId { get; set; } = null;
-        private Button? SelectedButton { get; set; } = null;
         private uint TimePerQuestion { get; set; }
         private DispatcherTimer QuestionTimer;
         private int TimeLeft;
@@ -132,9 +131,9 @@ namespace TriviaClient.Views
                 this.m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.LEAVE_GAME_REQUEST));
                 var serverResponse = Deserializer.DeserializeResponse<LeaveGameResponse>(this.m_communicator.ReceiveFromServer());
 
-
                 if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
+                    this.QuestionTimer.Stop();
                     while (NavigationService.CanGoBack)
                     {
                         NavigationService.GoBack();
@@ -179,7 +178,6 @@ namespace TriviaClient.Views
 
             selected.BorderThickness = new Thickness(4);
             selected.BorderBrush = Brushes.DodgerBlue;
-            this.SelectedButton = selected;
         }
 
         private void ClearButtonHighlights()
@@ -192,7 +190,6 @@ namespace TriviaClient.Views
                 btn.BorderBrush = Brushes.Black;
             }
 
-            SelectedButton = null;
         }
         private async Task WaitForGameToEndAsync()
         {
