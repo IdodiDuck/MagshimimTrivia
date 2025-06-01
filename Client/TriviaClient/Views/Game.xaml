@@ -3,65 +3,78 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:TriviaClient.Views"
       mc:Ignorable="d"
       Title="Game"
       d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Grid x:Name="GameGrid" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Header Row -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+            <!-- Header Row -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Left side: game stats -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
-                <TextBlock Text="Questions: " FontWeight="Bold" FontSize="16" Margin="10,0"/>
-                <TextBlock x:Name="QuestionsProgressText" Text="" FontSize="16" Margin="5,0"/>
+                <!-- Left side: game stats -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
+                    <TextBlock Text="Questions: " FontWeight="Bold" FontSize="16" Margin="10,0"/>
+                    <TextBlock x:Name="QuestionsProgressText" Text="" FontSize="16" Margin="5,0"/>
 
-                <TextBlock Text="Correct: " FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
-                <TextBlock x:Name="CorrectAnswersText" Text="0" FontSize="16" Margin="5,0"/>
+                    <TextBlock Text="Correct: " FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
+                    <TextBlock x:Name="CorrectAnswersText" Text="0" FontSize="16" Margin="5,0"/>
 
-                <TextBlock Text="Time Left: " FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
-                <TextBlock x:Name="TimeLeftText" Text="15" FontSize="16" Margin="5,0"/>
+                    <TextBlock Text="Time Left: " FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
+                    <TextBlock x:Name="TimeLeftText" Text="15" FontSize="16" Margin="5,0"/>
+                </StackPanel>
+
+                <!-- Right side: exit button -->
+                <Button x:Name="ExitButton"
+                        Content="EXIT"
+                        Width="80"
+                        Height="30"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Click="ExitButton_Click"
+                        Margin="0,0,10,0"
+                        Grid.Column="1"/>
+            </Grid>
+
+            <!-- Main Content -->
+            <StackPanel Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="600" Margin="0,20,0,0">
+                <Border Background="#FFEFEFEF" CornerRadius="10" Padding="20" Margin="0,0,0,20" BorderBrush="#FFCCCCCC" BorderThickness="1">
+                    <TextBlock x:Name="CurrentQuestion" 
+                               Text="" 
+                               TextWrapping="Wrap"
+                               FontSize="24" 
+                               FontWeight="Bold" 
+                               TextAlignment="Center"/>
+                </Border>
+
+                <UniformGrid Rows="2" Columns="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,10">
+                    <Button x:Name="AnswerButton1" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton1_Click"/>
+                    <Button x:Name="AnswerButton2" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton2_Click"/>
+                    <Button x:Name="AnswerButton3" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton3_Click"/>
+                    <Button x:Name="AnswerButton4" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton4_Click"/>
+                </UniformGrid>
             </StackPanel>
-
-            <!-- Right side: exit button -->
-            <Button x:Name="ExitButton"
-                    Content="EXIT"
-                    Width="80"
-                    Height="30"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    Click="ExitButton_Click"
-                    Margin="0,0,10,0"
-                    Grid.Column="1"/>
         </Grid>
 
-        <!-- Main Content -->
-        <StackPanel Grid.Row="1" VerticalAlignment="Top" HorizontalAlignment="Center" Width="600" Margin="0,20,0,0">
-            <Border Background="#FFEFEFEF" CornerRadius="10" Padding="20" Margin="0,0,0,20" BorderBrush="#FFCCCCCC" BorderThickness="1">
-                <TextBlock x:Name="CurrentQuestion" 
-                           Text="" 
-                           TextWrapping="Wrap"
-                           FontSize="24" 
-                           FontWeight="Bold" 
+        <!-- Overlay: Waiting for players to finish -->
+        <Grid Background="#AAFFFFFF" Visibility="Collapsed" x:Name="WaitingOverlay" Panel.ZIndex="1000">
+            <Border Background="White" CornerRadius="10" Padding="30" BorderBrush="Gray" BorderThickness="2"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Waiting for all players to finish..."
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Foreground="Black"
                            TextAlignment="Center"/>
             </Border>
-
-            <UniformGrid Rows="2" Columns="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="0,10">
-                <Button x:Name="AnswerButton1" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton1_Click"/>
-                <Button x:Name="AnswerButton2" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton2_Click"/>
-                <Button x:Name="AnswerButton3" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton3_Click"/>
-                <Button x:Name="AnswerButton4" Content="" FontSize="16" Margin="10" Padding="15" Click="AnswerButton4_Click"/>
-            </UniformGrid>
-        </StackPanel>
+        </Grid>
     </Grid>
 </Page>

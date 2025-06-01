@@ -212,13 +212,8 @@ namespace TriviaClient.Views
 
                             if (navService != null)
                             {
-                                //navService.Navigate(new GameResultsPage(resultsResponse));
-                                while (NavigationService.CanGoBack)
-                                {
-                                    NavigationService.GoBack();
-                                }
-
-                                NavigationService.GoForward();
+                                //TODO: Navigate to GameResults Page!
+                                // return;
                             }
 
                             else
@@ -275,6 +270,7 @@ namespace TriviaClient.Views
                     return;
                 }
 
+                ShowWaitingForGameToEndUI();
                 _ = WaitForGameToEndAsync();
 
                 // TODO -> Move this eventually to the Game Results Page
@@ -285,6 +281,11 @@ namespace TriviaClient.Views
             {
                 MessageBox.Show($"Error submitting answer: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+        private void ShowWaitingForGameToEndUI()
+        {
+            GameGrid.Visibility = Visibility.Collapsed;
+            WaitingOverlay.Visibility = Visibility.Visible;
         }
         private void AnswerButton1_Click(object sender, RoutedEventArgs e)
         {
