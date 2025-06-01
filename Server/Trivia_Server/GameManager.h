@@ -19,6 +19,7 @@ public:
 	Game& createGame(const Room& room);
 	void deleteGame(const unsigned int gameId);
 	Game& getGameSafely(const unsigned int gameId);
+	void submitGameStatsToDB(const GameData& data, const std::string& username);
 	
 
 private:

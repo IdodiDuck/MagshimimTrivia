@@ -15,7 +15,7 @@ Game& GameManager::createGame(const Room& room)
 
     if (!dataBase)
     {
-        throw ServerException("[ERROR] Failed to open database in constructor.");
+        throw ServerException("[ERROR] Failed to open database.");
     }
 
     const auto& roomData = room.getRoomData();
@@ -39,7 +39,7 @@ Game& GameManager::createGame(const Room& room)
         players[user] = GameData { questions.front(), NONE, NONE, NONE };
     }
 
-    this->m_games.try_emplace(gameId, gameId, std::move(questions), std::move(players));
+    this->m_games.try_emplace(gameId, gameId, std::move(questions), std::move(players), roomData.timePerQuestion);
 
     lock.unlock();
     return this->getGameSafely(gameId);
@@ -49,10 +49,13 @@ void GameManager::deleteGame(const unsigned int gameId)
 {
     std::unique_lock lock(m_mutex);
 
-    if (!m_games.erase(gameId))
+    auto currentGameIt = m_games.find(gameId);
+    if (currentGameIt == m_games.end())
     {
         throw ManagerException("Game not found, cannot delete it!");
     }
+
+    m_games.erase(currentGameIt);
 }
 
 Game& GameManager::getGameSafely(const unsigned int gameId)
@@ -72,4 +75,16 @@ Game& GameManager::getGameSafely(const unsigned int gameId)
     }
 
     return this->m_games.at(gameId);
+}
+
+void GameManager::submitGameStatsToDB(const GameData& data, const std::string& username)
+{
+    auto dataBase = m_Database.lock();
+
+    if (!dataBase)
+    {
+        throw ServerException("[ERROR] Failed to open database.");
+    }
+
+    dataBase->submitGameStatistics(username, data);
 }
