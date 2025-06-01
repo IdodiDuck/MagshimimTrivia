@@ -11,11 +11,6 @@ StatisticsManager::StatisticsManager(std::weak_ptr<IDatabase> dataBase): m_datab
 
 }
 
-StatisticsManager::~StatisticsManager()
-{
-
-}
-
 std::vector<std::string> StatisticsManager::getHighScore()
 {
     auto db = m_database.lock();
