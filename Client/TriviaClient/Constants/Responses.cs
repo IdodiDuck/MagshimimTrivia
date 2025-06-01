@@ -105,7 +105,7 @@ namespace TriviaClient.Constants
         {
             public uint status { get; set; }
             public string question { get; set; } = string.Empty;
-            public Dictionary<uint, string> answers { get; set; } = new Dictionary<uint, string>(); 
+            public Dictionary<string, string> answers { get; set; } = new Dictionary<string, string>(); 
         }
 
         public class SubmitAnswerResponse
@@ -114,12 +114,10 @@ namespace TriviaClient.Constants
             public uint correctAnswerId { get; set; }
         }
 
-        public class PlayerResults
+        public class GetGameResultsResponse
         {
-            public string username { get; set; } = string.Empty;
-            public uint correctAnswerCount { get; set; }
-            public uint wrongAnswerCount { get; set; }
-            public uint averageAnswerTime { get; set; }
+            public uint status { get; set; }
+            public List<PlayerResults> results { get; set; } = new List<PlayerResults>();
         }
     }
 
