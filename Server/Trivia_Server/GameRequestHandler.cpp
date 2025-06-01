@@ -68,8 +68,9 @@ RequestResult GameRequestHandler::handleRequest(const RequestInfo& requestInfo)
 
 void GameRequestHandler::handleDisconnection()
 {
-	try 
+	try
 	{
+		this->m_gameManager.submitGameStatsToDB(this->m_game.getPlayerGameData(this->m_user.getUserName()), this->m_user.getUserName());
 		this->m_game.removePlayer(this->m_user.getUserName());
 		this->getFactorySafely()->getRoomManager().removeUserFromRoom(this->m_game.getGameId(), this->m_user);
 
@@ -115,12 +116,17 @@ RequestResult GameRequestHandler::submitAnswer(const RequestInfo& info)
 	SubmitAnswerRequest request = JsonRequestPacketDeserializer::deserializeSubmitAnswerRequest(info.buffer).value();
 
 	SubmitAnswerResponse response = { };
-
 	response.status = SUCCESS;
-	Question currentQuestion = this->getFactorySafely()->getGameManager().getGameSafely(this->m_game.getGameId()).getQuestionForUser(this->m_user.getUserName());
+
+	auto& game = this->getFactorySafely()->getGameManager().getGameSafely(this->m_game.getGameId());
+
+	Question currentQuestion = game.getQuestionForUser(this->m_user.getUserName());
+	auto possibleAnswers = currentQuestion.getPossibleAnswers();
+
+	std::string answer = (request.answerId >= possibleAnswers.size() ? "NO_ANSWER" : possibleAnswers.at(request.answerId));
 	response.correctAnswerId = currentQuestion.getCorrectAnswerId();
 
-	this->getFactorySafely()->getGameManager().getGameSafely(this->m_game.getGameId()).submitAnswer(this->m_user.getUserName(), currentQuestion.getPossibleAnswers().at(request.answerId));
+	game.submitAnswer(this->m_user.getUserName(), answer);
 
 	return
 	{
@@ -132,25 +138,28 @@ RequestResult GameRequestHandler::submitAnswer(const RequestInfo& info)
 RequestResult GameRequestHandler::getGameResults(const RequestInfo& info)
 {
 	GetGameResultsResponse response = {};
-	response.status = SUCCESS;
 
-	std::vector<std::string> allPlayers = this->m_game.getAllPlayersUsernames();
-
-	for (const std::string& username : allPlayers)
+	if (!this->m_game.isGameOver())
 	{
-		auto userGameData = this->m_game.getPlayerGameData(username);
-
-		PlayerResults playerGameResult = {
-			username,
-			userGameData.correctAnswerCount,
-			userGameData.wrongAnswerCount,
-			userGameData.averageAnswerTime
+		response.status = FAILURE;
+		return
+		{
+			JsonResponsePacketSerializer::serializeResponse(response),
+			this->getFactorySafely()->createGameRequestHandler(this->m_user, this->m_game)
 		};
-
-		response.results.push_back(playerGameResult);
 	}
 
-	return 
+	response.status = SUCCESS;
+
+	auto playerResultsMap = this->m_game.getAllPlayerResults();
+
+	for (const auto& [username, playerResult] : playerResultsMap)
+	{
+		this->m_gameManager.submitGameStatsToDB(this->m_game.getPlayerGameData(username), username);
+		response.results.push_back(playerResult);
+	}
+
+	return
 	{
 		JsonResponsePacketSerializer::serializeResponse(response),
 		this->getFactorySafely()->createMenuRequestHandler(this->m_user)
@@ -161,8 +170,15 @@ RequestResult GameRequestHandler::leaveGame(const RequestInfo& info)
 {
 	try
 	{
+		this->m_gameManager.submitGameStatsToDB(this->m_game.getPlayerGameData(this->m_user.getUserName()), this->m_user.getUserName());
 		this->m_game.removePlayer(this->m_user.getUserName());
 		this->getFactorySafely()->getRoomManager().removeUserFromRoom(this->m_game.getGameId(), this->m_user.getUserName());
+
+		if (this->m_game.isGameEmpty()) 
+		{
+			this->getFactorySafely()->getRoomManager().deleteRoom(this->m_game.getGameId());
+			this->m_gameManager.deleteGame(this->m_game.getGameId());
+		}
 	}
 
 	catch (const ManagerException& e)
