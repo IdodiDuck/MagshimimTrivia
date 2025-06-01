@@ -155,10 +155,16 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
 
 std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetQuestionResponse& getQuestionResponse)
 {
+    nlohmann::json answersJson;
+    for (const auto& [key, value] : getQuestionResponse.answers)
+    {
+        answersJson[std::to_string(key)] = value;
+    }
+
     nlohmann::json jsonResponse = {
         {"status", getQuestionResponse.status},
         {"question", getQuestionResponse.question},
-        {"answers", getQuestionResponse.answers}
+        {"answers", answersJson}
     };
 
     std::string jsonString = jsonResponse.dump();
