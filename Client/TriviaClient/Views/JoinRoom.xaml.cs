@@ -27,6 +27,7 @@ namespace TriviaClient
     /// </summary>
     public partial class JoinRoom : Page
     {
+        private string m_username { get; set; } = string.Empty;
         private readonly Communicator m_communicator;
         private Thread? m_refreshRoomsThread;
         private bool m_refreshPage;
@@ -117,7 +118,7 @@ namespace TriviaClient
                 {
                     m_refreshPage = false;
                     this.NavigationService.Navigate(new GameLobby(m_communicator, selectedRoomInfo.name, selectedRoomInfo.maxPlayers,
-                        selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN));
+                        selectedRoomInfo.numOfQuestionsInGame, selectedRoomInfo.timePerQuestion, IS_NOT_ADMIN, m_username));
                     return;
                     
                 }

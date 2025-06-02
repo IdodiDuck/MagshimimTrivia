@@ -34,10 +34,13 @@ namespace TriviaClient.Views
         private uint TimePerQuestion { get; set; }
         private DispatcherTimer QuestionTimer;
         private int TimeLeft;
+        private string m_username { get; set; } = string.Empty;
 
-        public Game(Communicator communicator, uint questionsAmount, uint timePerQuestions)
+        public Game(Communicator communicator, uint questionsAmount, uint timePerQuestions, string username)
         {
             InitializeComponent();
+
+            m_username = username;
 
             this.m_communicator = communicator;
             this.QuestionAmount = questionsAmount;
@@ -214,8 +217,8 @@ namespace TriviaClient.Views
 
                             if (navService != null)
                             {
-                                //TODO: Navigate to GameResults Page!
-                                // return;
+                                this.NavigationService.Navigate(new AfterGameScore(m_communicator, resultsResponse.results, m_username));
+                                return;
                             }
 
                             else

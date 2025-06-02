@@ -25,12 +25,14 @@ namespace TriviaClient
     /// </summary>
     public partial class CreateRoom : Page
     {
+        private string m_username { get; set; } = string.Empty;
         private readonly Communicator m_communicator;
 
-        public CreateRoom(Communicator communicator)
+        public CreateRoom(Communicator communicator, string username)
         {
             InitializeComponent();
             m_communicator = communicator;
+            m_username = username;
         }
 
         private void CreateButton_Click(object sender, RoutedEventArgs e)
@@ -68,22 +70,8 @@ namespace TriviaClient
 
                 byte[] serializedRequest = Serializer.SerializeRequest(request);
                 m_communicator.SendToServer(serializedRequest);
-                byte[] serverResponse = m_communicator.ReceiveFromServer();
-                var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(serverResponse);
-
-                if (createRoomResponse == null)
-                {
-                    MessageBox.Show("Invalid response from server.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
-                {
-                    ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
-                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
+                byte[] response = m_communicator.ReceiveFromServer();
+                var createRoomResponse = Deserializer.DeserializeResponse<CreateRoomResponse>(response);
 
                 if (createRoomResponse?.status == StatusCodes.SUCCESS)
                 {
@@ -92,7 +80,7 @@ namespace TriviaClient
                     QuestionsNumberTextBox.Clear();
                     QuestionTimeTextBox.Clear();
 
-                    this.NavigationService.Navigate(new GameLobby(m_communicator, request.roomName, (uint)maxUsers, (uint)questionCount, (uint)answerTimeout, IS_ADMIN));
+                    this.NavigationService.Navigate(new GameLobby(m_communicator, request.roomName, (uint)maxUsers, (uint)questionCount, (uint)answerTimeout, IS_ADMIN, m_username));
                 }
 
                 else

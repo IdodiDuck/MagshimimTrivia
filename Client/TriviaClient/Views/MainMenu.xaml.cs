@@ -40,7 +40,7 @@ namespace TriviaClient
 
         private void CreateRoomBtn_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.Navigate(new CreateRoom(m_communicator));
+            this.NavigationService.Navigate(new CreateRoom(m_communicator, Username));
         }
 
         private void JoinRoomBtn_Click(object sender, RoutedEventArgs e)
