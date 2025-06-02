@@ -9,57 +9,93 @@
       Title="AfterGameScore">
 
     <Grid Background="White">
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
-            <TextBlock Text="Trivia Game - Final Scores" FontSize="26" FontWeight="Bold" 
-                       Margin="0,10,0,30" TextAlignment="Center" HorizontalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <!-- Podium -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,30">
-                <!-- 2nd Place -->
-                <StackPanel Width="150" Background="Silver" Margin="0" VerticalAlignment="Bottom">
-                    <TextBlock Text="2nd Place" FontSize="16" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Name="SecondPlaceName" Text="{Binding Path=SecondPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
-                    <TextBlock Name="SecondPlaceScore" Text="{Binding Path=SecondPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
-                    <TextBlock Name="SecondPlaceTime" Text="{Binding Path=SecondPlaceTime, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
+        <Grid Grid.Row="0" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Trivia Game - Final Scores" FontSize="26" FontWeight="Bold"
+                       HorizontalAlignment="Left" VerticalAlignment="Top"
+                       Grid.Column="0" Margin="234,12,0,0"/>
+
+            <Button Content="Back to Menu" Width="150" Height="40"
+                    Click="BackToMenu_Click"
+                    HorizontalAlignment="Center" VerticalAlignment="Top"
+                    Grid.Column="1" Margin="0,9,0,0" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+
+                <!-- Podium -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,30">
+                    <!-- 2nd Place -->
+                    <StackPanel Width="150" Background="Silver" Margin="0" VerticalAlignment="Bottom">
+                        <TextBlock Text="2nd Place" FontSize="16" FontWeight="Bold" TextAlignment="Center" Height="27"/>
+                        <TextBlock Name="SecondPlaceName" Text="{Binding Path=SecondPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center" Height="28"/>
+                        <TextBlock Name="SecondPlaceScore" Text="{Binding Path=SecondPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center" Height="20"/>
+                        <TextBlock Name="SecondPlaceTime" Text="{Binding Path=SecondPlaceTime, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center" Height="20"/>
+                    </StackPanel>
+
+                    <!-- 1st Place -->
+                    <StackPanel Width="170" Height="150" Background="Gold" Margin="0" VerticalAlignment="Bottom">
+                        <TextBlock Text="1st Place" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                        <TextBlock Name="FirstPlaceName" Text="{Binding Path=FirstPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="16" TextAlignment="Center"/>
+                        <TextBlock Name="FirstPlaceScore" Text="{Binding Path=FirstPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                        <TextBlock Name="FirstPlaceTime" Text="{Binding Path=FirstPlaceTime, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- 3rd Place -->
+                    <StackPanel Width="150" Background="#CD7F32" Margin="0" VerticalAlignment="Bottom">
+                        <TextBlock Text="3rd Place" FontSize="16" FontWeight="Bold" TextAlignment="Center"/>
+                        <TextBlock Name="ThirdPlaceName" Text="{Binding Path=ThirdPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                        <TextBlock Name="ThirdPlaceScore" Text="{Binding Path=ThirdPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
+                        <TextBlock Name="ThirdPlaceTime" Text="{Binding Path=ThirdPlaceTime, UpdateSourceTrigger=PropertyChanged}"  FontSize="12" TextAlignment="Center"/>
+                    </StackPanel>
                 </StackPanel>
 
-                <!-- 1st Place -->
-                <StackPanel Width="170" Height="150" Background="Gold" Margin="0" VerticalAlignment="Bottom">
-                    <TextBlock Text="1st Place" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Name="FirstPlaceName" Text="{Binding Path=FirstPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="16" TextAlignment="Center"/>
-                    <TextBlock Name="FirstPlaceScore" Text="{Binding Path=FirstPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
-                    <TextBlock Name="FirstPlaceTime" Text="{Binding Path=FirstPlaceTime, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
-                </StackPanel>
+                <StackPanel Width="500" Margin="0,10,0,0" HorizontalAlignment="Center">
+                    <Grid Background="#EEE" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                <!-- 3rd Place -->
-                <StackPanel Width="150" Background="#CD7F32" Margin="0" VerticalAlignment="Bottom">
-                    <TextBlock Text="3rd Place" FontSize="16" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Name="ThirdPlaceName" Text="{Binding Path=ThirdPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
-                    <TextBlock Name="ThirdPlaceScore" Text="{Binding Path=ThirdPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
-                    <TextBlock Name="ThirdPlaceTime" Text="{Binding Path=ThirdPlaceTime, UpdateSourceTrigger=PropertyChanged}"  FontSize="12" TextAlignment="Center"/>
+                        <TextBlock Text="Name" Grid.Column="0" FontWeight="Bold" Padding="8,4" />
+                        <TextBlock Text="Correct Answers" Grid.Column="1" FontWeight="Bold" Padding="8,4" />
+                        <TextBlock Text="Avg Time (s)" Grid.Column="2" FontWeight="Bold" Padding="8,4" />
+                    </Grid>
+
+                    <!-- Players Scores -->
+                    <ItemsControl Name="ScoreDataGrid">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#CCC" BorderThickness="0,0,0,1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding Name}" Grid.Column="0" Padding="8,4" />
+                                        <TextBlock Text="{Binding CorrectAnswers}" Grid.Column="1" Padding="8,4" />
+                                        <TextBlock Text="{Binding AvgTime}" Grid.Column="2" Padding="8,4" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </StackPanel>
-
-            <!-- Player List -->
-            <DataGrid Name="ScoreDataGrid"
-                   Width="500"
-                   Height="200"
-                   AutoGenerateColumns="False"
-                   HeadersVisibility="Column"
-                   CanUserAddRows="False"
-                   IsReadOnly="True"
-                   HorizontalAlignment="Center"
-                   Margin="0,10,0,0">
-                   <DataGrid.Columns>
-                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
-                        <DataGridTextColumn Header="Correct Answers" Binding="{Binding CorrectAnswers}" Width="150" />
-                        <DataGridTextColumn Header="Avg Time (s)" Binding="{Binding AvgTime}" Width="120" />
-                   </DataGrid.Columns>
-            </DataGrid>
-            
-            <!-- Back Button -->
-            <Button Content="Back to Menu" Width="150" Height="40" Margin="0,20,0,0"
-                    Click="BackToMenu_Click" HorizontalAlignment="Center"/>
-        </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
+    
