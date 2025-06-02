@@ -221,10 +221,7 @@ namespace TriviaClient.Views
                                 return;
                             }
 
-                            else
-                            {
-                                MessageBox.Show("NavigationService not available", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
+                            MessageBox.Show("NavigationService not available", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         });
 
                         break;
