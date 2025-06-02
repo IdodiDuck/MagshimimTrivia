@@ -15,7 +15,6 @@ using System.Windows.Shapes;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
 using TriviaClient.Models;
-using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient.Views
 {
@@ -24,13 +23,6 @@ namespace TriviaClient.Views
         private string m_username { get; set; } = string.Empty;
         private readonly Communicator m_communicator;
         private readonly List<PlayerResults> m_results;
-
-        public class PlayerScore
-        {
-            public string Name { get; set; } = string.Empty;
-            public int CorrectAnswers { get; set; }
-            public string AvgTime { get; set; } = string.Empty;
-        }
 
         public AfterGameScore(Communicator communicator, List<PlayerResults> results, string username)
         {
@@ -47,6 +39,7 @@ namespace TriviaClient.Views
         {
             try
             {
+                const int PLAYERS_AT_PODIUM = 3;
                 var players = m_results
                     .Select(r => new PlayerScore
                     {
@@ -58,30 +51,24 @@ namespace TriviaClient.Views
                     .ThenBy(p => double.Parse(p.AvgTime))
                     .ToList();
 
-                if (players.Count > 0)
-                {
-                    FirstPlaceName.Text = players[0].Name;
-                    FirstPlaceScore.Text = $"Correct: {players[0].CorrectAnswers}";
-                    FirstPlaceTime.Text = $"Avg Time: {players[0].AvgTime}";
-                }
+                var podiumControls = new[] { new { Name = FirstPlaceName, Score = FirstPlaceScore, Time = FirstPlaceTime },
+                        new { Name = SecondPlaceName, Score = SecondPlaceScore, Time = SecondPlaceTime },
+                        new { Name = ThirdPlaceName, Score = ThirdPlaceScore, Time = ThirdPlaceTime }
+                };
 
-                if (players.Count > 1)
+                for (int currPlayer = 0; currPlayer < Math.Min(players.Count, PLAYERS_AT_PODIUM); currPlayer++)
                 {
-                    SecondPlaceName.Text = players[1].Name;
-                    SecondPlaceScore.Text = $"Correct: {players[1].CorrectAnswers}";
-                    SecondPlaceTime.Text = $"Avg Time: {players[1].AvgTime}";
-                }
+                    var player = players[currPlayer];
+                    var controls = podiumControls[currPlayer];
 
-                if (players.Count > 2)
-                {
-                    ThirdPlaceName.Text = players[2].Name;
-                    ThirdPlaceScore.Text = $"Correct: {players[2].CorrectAnswers}";
-                    ThirdPlaceTime.Text = $"Avg Time: {players[2].AvgTime}";
+                    controls.Name.Text = player.Name;
+                    controls.Score.Text = $"Correct: {player.CorrectAnswers}";
+                    controls.Time.Text = $"Avg Time: {player.AvgTime}";
                 }
 
                 ScoreDataGrid.ItemsSource = players;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Error loading results: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
