@@ -31,17 +31,20 @@ namespace TriviaClient
         private Thread? m_roomStatesThread;
         private bool m_refreshPage;
         private bool m_isAdmin;
+        private string m_username = string.Empty;
 
         private string RoomName { get; set; } = string.Empty;
         private uint MaxPlayer { get; set; }
         private uint QuestionAmount { get; set; }
         private uint TimePerQuestion { get; set; }
 
-        public GameLobby(Communicator communicator, string roomName, uint maxPlayer, uint questionAmount, uint timePerQuestion, bool isAdmin)
+        public GameLobby(Communicator communicator, string roomName, uint maxPlayer, uint questionAmount, uint timePerQuestion, bool isAdmin, string username)
         {
             InitializeComponent();
 
             m_communicator = communicator;
+
+            m_username = username;
 
             this.RoomName = roomName;
             this.MaxPlayer = maxPlayer;
@@ -112,7 +115,7 @@ namespace TriviaClient
                         if (response.hasGameBegun)
                         {
                             m_refreshPage = false;
-                            NavigationService.Navigate(new Game(m_communicator, QuestionAmount, TimePerQuestion));
+                            NavigationService.Navigate(new Game(m_communicator, QuestionAmount, TimePerQuestion, m_username));
                         }
 
                         else if (response.status != StatusCodes.SUCCESS)
@@ -169,7 +172,7 @@ namespace TriviaClient
 
                 if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
-                    NavigationService.Navigate(new Game(m_communicator, QuestionAmount, TimePerQuestion));
+                    NavigationService.Navigate(new Game(m_communicator, QuestionAmount, TimePerQuestion, m_username));
                 }
 
                 else

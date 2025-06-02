@@ -1,0 +1,65 @@
+﻿<Page x:Class="TriviaClient.Views.AfterGameScore"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:TriviaClient.Views"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="AfterGameScore">
+
+    <Grid Background="White">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+            <TextBlock Text="Trivia Game - Final Scores" FontSize="26" FontWeight="Bold" 
+                       Margin="0,10,0,30" TextAlignment="Center" HorizontalAlignment="Center"/>
+
+            <!-- Podium -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,30">
+                <!-- 2nd Place -->
+                <StackPanel Width="150" Background="Silver" Margin="0" VerticalAlignment="Bottom">
+                    <TextBlock Text="2nd Place" FontSize="16" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Name="SecondPlaceName" Text="{Binding Path=SecondPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                    <TextBlock Name="SecondPlaceScore" Text="{Binding Path=SecondPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
+                    <TextBlock Name="SecondPlaceTime" Text="{Binding Path=SecondPlaceTime, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 1st Place -->
+                <StackPanel Width="170" Height="150" Background="Gold" Margin="0" VerticalAlignment="Bottom">
+                    <TextBlock Text="1st Place" FontSize="18" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Name="FirstPlaceName" Text="{Binding Path=FirstPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="16" TextAlignment="Center"/>
+                    <TextBlock Name="FirstPlaceScore" Text="{Binding Path=FirstPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                    <TextBlock Name="FirstPlaceTime" Text="{Binding Path=FirstPlaceTime, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 3rd Place -->
+                <StackPanel Width="150" Background="#CD7F32" Margin="0" VerticalAlignment="Bottom">
+                    <TextBlock Text="3rd Place" FontSize="16" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Name="ThirdPlaceName" Text="{Binding Path=ThirdPlaceName, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextAlignment="Center"/>
+                    <TextBlock Name="ThirdPlaceScore" Text="{Binding Path=ThirdPlaceScore, UpdateSourceTrigger=PropertyChanged}" FontSize="12" TextAlignment="Center"/>
+                    <TextBlock Name="ThirdPlaceTime" Text="{Binding Path=ThirdPlaceTime, UpdateSourceTrigger=PropertyChanged}"  FontSize="12" TextAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Player List -->
+            <DataGrid Name="ScoreDataGrid"
+                   Width="500"
+                   Height="200"
+                   AutoGenerateColumns="False"
+                   HeadersVisibility="Column"
+                   CanUserAddRows="False"
+                   IsReadOnly="True"
+                   HorizontalAlignment="Center"
+                   Margin="0,10,0,0">
+                   <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" />
+                        <DataGridTextColumn Header="Correct Answers" Binding="{Binding CorrectAnswers}" Width="150" />
+                        <DataGridTextColumn Header="Avg Time (s)" Binding="{Binding AvgTime}" Width="120" />
+                   </DataGrid.Columns>
+            </DataGrid>
+            
+            <!-- Back Button -->
+            <Button Content="Back to Menu" Width="150" Height="40" Margin="0,20,0,0"
+                    Click="BackToMenu_Click" HorizontalAlignment="Center"/>
+        </StackPanel>
+    </Grid>
+</Page>
