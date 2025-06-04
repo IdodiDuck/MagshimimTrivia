@@ -126,7 +126,8 @@ RequestResult GameRequestHandler::submitAnswer(const RequestInfo& info)
 	std::string answer = (request.answerId >= possibleAnswers.size() ? "NO_ANSWER" : possibleAnswers.at(request.answerId));
 	response.correctAnswerId = currentQuestion.getCorrectAnswerId();
 
-	game.submitAnswer(this->m_user.getUserName(), answer);
+	this->m_game.submitAnswer(this->m_user.getUserName(), answer);
+	this->m_game.updateGame();
 
 	return
 	{
@@ -139,6 +140,7 @@ RequestResult GameRequestHandler::getGameResults(const RequestInfo& info)
 {
 	GetGameResultsResponse response = {};
 
+	this->m_game.updateGame();
 	if (!this->m_game.isGameOver())
 	{
 		response.status = FAILURE;
@@ -162,7 +164,7 @@ RequestResult GameRequestHandler::getGameResults(const RequestInfo& info)
 	return
 	{
 		JsonResponsePacketSerializer::serializeResponse(response),
-		this->getFactorySafely()->createMenuRequestHandler(this->m_user)
+		this->getFactorySafely()->createGameRequestHandler(this->m_user, this->m_game)
 	};
 }
 
