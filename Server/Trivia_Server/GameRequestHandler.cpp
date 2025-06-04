@@ -152,12 +152,12 @@ RequestResult GameRequestHandler::getGameResults(const RequestInfo& info)
 	}
 
 	response.status = SUCCESS;
+	auto user = this->m_user.getUserName();
 
 	auto playerResultsMap = this->m_game.getAllPlayerResults();
 
 	for (const auto& [username, playerResult] : playerResultsMap)
 	{
-		this->m_gameManager.submitGameStatsToDB(this->m_game.getPlayerGameData(username), username);
 		response.results.push_back(playerResult);
 	}
 
