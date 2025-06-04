@@ -61,7 +61,7 @@ namespace TriviaClient.Views
         private void StartQuestionTimer(int seconds)
         {
             this.TimeLeft = seconds;
-            TimeLeftText.Text = this.TimeLeft.ToString();
+            TimeLeftText.Text = $"{this.TimeLeft} seconds";
             this.QuestionTimer.Start();
         }
         private void QuestionTimer_Tick(object? sender, EventArgs e)
@@ -198,7 +198,7 @@ namespace TriviaClient.Views
         }
         private async Task WaitForGameToEndAsync()
         {
-            const int TWO_SECONDS = 2000;
+            const int TWO_SECONDS = 500;
             try
             {
                 while (true)
@@ -217,6 +217,9 @@ namespace TriviaClient.Views
 
                             if (navService != null)
                             {
+                                this.m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.LEAVE_GAME_REQUEST));
+                                var serverResponse = Deserializer.DeserializeResponse<LeaveGameResponse>(this.m_communicator.ReceiveFromServer());
+                                
                                 this.NavigationService.Navigate(new AfterGameScore(m_communicator, resultsResponse.results, m_username));
                                 return;
                             }
