@@ -11,6 +11,6 @@ namespace TriviaClient.Models
         public string username { get; set; } = string.Empty;
         public uint correctAnswerCount { get; set; }
         public uint wrongAnswerCount { get; set; }
-        public uint averageAnswerTime { get; set; }
+        public double averageAnswerTime { get; set; }
     }
 }
