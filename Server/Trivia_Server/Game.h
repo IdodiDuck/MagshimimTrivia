@@ -11,14 +11,13 @@
 
 typedef struct GameData
 {
-    // Attributes - 
     Question currentQuestion;
-    unsigned int correctAnswerCount;
-    unsigned int wrongAnswerCount;
-    unsigned int averageAnswerTime;
+    unsigned int correctAnswerCount = 0;
+    unsigned int wrongAnswerCount = 0;
+    double averageAnswerTime = 0.0;
     bool hasLeft = false;
+    bool hasAnsweredCurrentQuestion = false;
 
-    // Default C'tor - 
     GameData() = default;
 
 } GameData;
@@ -39,19 +38,17 @@ enum class AnswerResult
     NO_ANSWER
 };
 
-class Game 
+class Game
 {
-
 public:
     // C'tor & D'tor - 
-	Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion);
+    Game(unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion);
     ~Game();
 
-	Question getQuestionForUser(const std::string& user);
-	void submitAnswer(const std::string& user, const std::string& answer);
-	void removePlayer(const std::string& user);
+    Question getQuestionForUser(const std::string& user);
+    void submitAnswer(const std::string& user, const std::string& answer);
+    void removePlayer(const std::string& user);
 
-    // Getters - 
     unsigned int getGameId() const;
     bool isGameEmpty() const;
     bool isGameOver() const;
@@ -59,7 +56,7 @@ public:
     std::unordered_map<std::string, PlayerResults> getAllPlayerResults() const;
 
 private:
-    // Attributes - 
+    // Attributes 
     std::vector<Question> m_questions;
     std::unordered_map<std::string, GameData> m_players;
     unsigned int m_gameId;
@@ -70,19 +67,19 @@ private:
     mutable std::shared_mutex m_userMutex;
 
     // Timer - 
-    std::chrono::steady_clock::time_point m_timerStart; // start time of the timer
-    std::chrono::seconds m_timerDuration; // Duration of the timer
+    std::chrono::steady_clock::time_point m_timerStart;
+    std::chrono::seconds m_timerDuration;
 
     const std::chrono::seconds m_waitingForQuestionDuration = std::chrono::seconds(2);
     std::chrono::steady_clock::time_point m_questionStartTime;
     std::unordered_map<std::string, std::chrono::steady_clock::time_point> m_answerTimes;
 
-    // Support Methods - 
+    // Support Methods
     bool isUserActive(const std::string& user) const;
     bool didUserAnswer(const std::string& user) const;
     unsigned int getCurrentQuestionIndex(const GameData& data) const;
-    unsigned int calculateAnswerTime(const std::string& user);
-    void updateUserStatistics(GameData& data, const std::string& answer, unsigned int time);
+    double calculateAnswerTime(const std::string& user);
+    void updateUserStatistics(GameData& data, const std::string& answer, const double time);
 
     bool isTimerExpired(const std::chrono::seconds duration) const;
     std::chrono::seconds timeLeft() const;
@@ -90,4 +87,6 @@ private:
     std::chrono::seconds timeDurationWait() const;
 
     void updateGame();
+
+    friend class GameRequestHandler;
 };

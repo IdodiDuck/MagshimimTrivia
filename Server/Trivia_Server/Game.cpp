@@ -2,10 +2,10 @@
 
 #include "ManagerException.h"
 
-Game::Game(const unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion):
+Game::Game(const unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion) :
     m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING_TO_START), m_timerDuration(std::chrono::seconds(timePerQuestion))
 {
-    if (!users.empty()) 
+    if (!users.empty())
     {
         this->m_state = GameState::STARTED;
         this->m_timerStart = std::chrono::steady_clock::now();
@@ -90,9 +90,9 @@ bool Game::isGameEmpty() const
 {
     std::shared_lock readLock(m_userMutex);
 
-    for (const auto& [username, data] : m_players) 
+    for (const auto& [username, data] : m_players)
     {
-        if (!data.hasLeft) 
+        if (!data.hasLeft)
         {
             return false;
         }
@@ -180,44 +180,44 @@ void Game::updateGame()
 
     switch (this->m_state)
     {
-        case GameState::WAITING_FOR_ANSWER:
+    case GameState::WAITING_FOR_ANSWER:
+    {
+        for (auto& playerPair : m_players)
         {
-            for (auto& playerPair : m_players)
+            const std::string& username = playerPair.first;
+
+            if (!didUserAnswer(username))
             {
-                const std::string& username = playerPair.first;
-
-                if (!didUserAnswer(username))
-                {
-                    submitAnswer(username, "NO_ANSWER");
-                }
+                submitAnswer(username, "NO_ANSWER");
             }
-
-            m_state = GameState::WAITING_FOR_NEXT_QUESTION;
-            m_timerStart = std::chrono::steady_clock::now();
-            break;
         }
 
-        case GameState::WAITING_FOR_NEXT_QUESTION:
+        m_state = GameState::WAITING_FOR_NEXT_QUESTION;
+        m_timerStart = std::chrono::steady_clock::now();
+        break;
+    }
+
+    case GameState::WAITING_FOR_NEXT_QUESTION:
+    {
+        bool allPlayersDone = true;
+
+        for (const auto& [user, data] : m_players)
         {
-            bool allPlayersDone = true;
-
-            for (const auto& [user, data] : m_players)
+            unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
+            if (currentQuestion < m_totalQuestions)
             {
-                unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
-                if (currentQuestion < m_totalQuestions)
-                {
-                    allPlayersDone = false;
-                    break;
-                }
+                allPlayersDone = false;
+                break;
             }
-
-            this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
-            m_timerStart = std::chrono::steady_clock::now();
-            break;
         }
 
-        default:
-            break;
+        this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
+        m_timerStart = std::chrono::steady_clock::now();
+        break;
+    }
+
+    default:
+        break;
     }
 }
 
@@ -231,27 +231,34 @@ unsigned int Game::getCurrentQuestionIndex(const GameData& data) const
     return data.correctAnswerCount + data.wrongAnswerCount;
 }
 
-unsigned int Game::calculateAnswerTime(const std::string& user)
+double Game::calculateAnswerTime(const std::string& user)
 {
     auto now = std::chrono::steady_clock::now();
 
     if (auto it = m_answerTimes.find(user); it != m_answerTimes.end())
     {
-        unsigned int time = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(now - it->second).count());
+        double time = static_cast<double>(std::chrono::duration_cast<std::chrono::seconds>(now - it->second).count());
         m_answerTimes.erase(it);
         return time;
     }
 
-    return 0;
+    return 0.0;
 }
 
-void Game::updateUserStatistics(GameData& data, const std::string& answer, unsigned int time)
+void Game::updateUserStatistics(GameData& data, const std::string& answer, const double time)
 {
     const std::string& correctAnswer = data.currentQuestion.getCorrectAnswer();
     bool isCorrect = (answer == correctAnswer);
 
     isCorrect ? data.correctAnswerCount++ : data.wrongAnswerCount++;
 
-    unsigned int totalAnswered = data.correctAnswerCount + data.wrongAnswerCount;
+    double totalAnswered = static_cast<double>(data.correctAnswerCount + data.wrongAnswerCount);
+
+    if (totalAnswered == 1)
+    {
+        data.averageAnswerTime = time;
+        return;
+    }
+
     data.averageAnswerTime = ((data.averageAnswerTime * (totalAnswered - 1)) + time) / totalAnswered;
 }
