@@ -40,16 +40,13 @@ namespace TriviaClient.Views
             try
             {
                 const int PLAYERS_AT_PODIUM = 3;
-                var players = m_results
-                    .Select(r => new PlayerScore
-                    {
-                        Name = r.username,
-                        CorrectAnswers = (int)r.correctAnswerCount,
-                        AvgTime = $"{r.averageAnswerTime:F2}"
-                    })
-                    .OrderByDescending(p => p.CorrectAnswers)
-                    .ThenBy(p => double.Parse(p.AvgTime))
-                    .ToList();
+                var players = m_results.Select(r => new PlayerScore {
+                    Name = r.username,
+                    CorrectAnswers = (int)r.correctAnswerCount,
+                    AvgTimeMs = r.averageAnswerTime})
+                .OrderByDescending(p => p.CorrectAnswers)
+                .ThenBy(p => p.AvgTimeMs)
+                .ToList();
 
                 var podiumControls = new[] { new { Name = FirstPlaceName, Score = FirstPlaceScore, Time = FirstPlaceTime },
                         new { Name = SecondPlaceName, Score = SecondPlaceScore, Time = SecondPlaceTime },
