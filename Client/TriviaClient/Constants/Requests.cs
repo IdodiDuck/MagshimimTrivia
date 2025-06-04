@@ -46,5 +46,6 @@ namespace TriviaClient.Constants
     public class SubmitAnswerRequest
     {
         public uint answerId { get; set; }
+        public double answerTime { get; set; }
     }
 }

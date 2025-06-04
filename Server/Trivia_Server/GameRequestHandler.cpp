@@ -126,7 +126,7 @@ RequestResult GameRequestHandler::submitAnswer(const RequestInfo& info)
 	std::string answer = (request.answerId >= possibleAnswers.size() ? "NO_ANSWER" : possibleAnswers.at(request.answerId));
 	response.correctAnswerId = currentQuestion.getCorrectAnswerId();
 
-	this->m_game.submitAnswer(this->m_user.getUserName(), answer);
+	this->m_game.submitAnswer(this->m_user.getUserName(), answer, request.answerTime);
 	this->m_game.updateGame();
 
 	return

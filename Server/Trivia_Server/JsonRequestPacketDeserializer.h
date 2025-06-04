@@ -50,13 +50,14 @@ typedef struct CreateRoomRequest
 typedef struct SubmitAnswerRequest
 {
 	unsigned int answerId;
+	double answerTime;
 
 } SubmitAnswerRequest;
 
 
 class JsonRequestPacketDeserializer
 {
-public: 
+public:
 	// V1 Deserializations - 
 	static std::optional<LoginRequest> deserializeLoginRequest(const std::vector<unsigned char>& buffer);
 	static std::optional<SignupRequest> deserializeSignupRequest(const std::vector<unsigned char>& buffer);

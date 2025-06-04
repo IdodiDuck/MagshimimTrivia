@@ -31,7 +31,7 @@ namespace TriviaClient
         private uint GamesPlayed { get; set; }
         private uint CorrectAnswers { get; set; }
         private uint WrongAnswers { get; set; }
-        private int AverageAnswerTime { get; set; }
+        private double AverageAnswerTime { get; set; }
 
         public PersonalStatistics(Communicator communicator)
         {
@@ -73,7 +73,7 @@ namespace TriviaClient
                 }
 
                 GamesPlayed = uint.Parse(response.statistics[2].Substring(response.statistics[2].IndexOf(": ") + 2));
-                AverageAnswerTime = int.Parse(response.statistics[5].Substring(response.statistics[5].IndexOf(": ") + 2).Replace("s", ""));
+                AverageAnswerTime = double.Parse(response.statistics[5].Substring(response.statistics[5].IndexOf(": ") + 2).Replace("s", ""));
 
                 gamesPlayed.Text = GamesPlayed.ToString();
                 correctAns.Text = CorrectAnswers.ToString();

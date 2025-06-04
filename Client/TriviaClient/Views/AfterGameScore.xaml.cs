@@ -43,9 +43,9 @@ namespace TriviaClient.Views
                 var players = m_results.Select(r => new PlayerScore {
                     Name = r.username,
                     CorrectAnswers = (int)r.correctAnswerCount,
-                    AvgTimeMs = r.averageAnswerTime})
+                    AvgTimeS = r.averageAnswerTime})
                 .OrderByDescending(p => p.CorrectAnswers)
-                .ThenBy(p => p.AvgTimeMs)
+                .ThenBy(p => p.AvgTimeS)
                 .ToList();
 
                 var podiumControls = new[] { new { Name = FirstPlaceName, Score = FirstPlaceScore, Time = FirstPlaceTime },

@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Diagnostics;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
 using static TriviaClient.Constants.Responses;
@@ -27,7 +28,7 @@ namespace TriviaClient.Views
     {
         private readonly Communicator m_communicator;
         private uint QuestionAmount { get; set; }
-        private uint CurrentQuestionNumber {  get; set; }
+        private uint CurrentQuestionNumber { get; set; }
         private uint CorrectAnswersAmount { get; set; }
         private uint? SelectedAnswerId { get; set; } = null;
         private List<KeyValuePair<string, string>> answers = new();
@@ -35,6 +36,8 @@ namespace TriviaClient.Views
         private DispatcherTimer QuestionTimer;
         private int TimeLeft;
         private string m_username { get; set; } = string.Empty;
+        private Stopwatch stopwatch;
+        double answerTime { get; set; }
 
         public Game(Communicator communicator, uint questionsAmount, uint timePerQuestions, string username)
         {
@@ -52,6 +55,8 @@ namespace TriviaClient.Views
             this.QuestionTimer = new DispatcherTimer();
             this.QuestionTimer.Interval = TimeSpan.FromSeconds(1);
             this.QuestionTimer.Tick += QuestionTimer_Tick;
+            this.stopwatch = Stopwatch.StartNew();
+            answerTime = 0.00;
 
             StartQuestionTimer((int)(timePerQuestions));
             GetNextQuestionFromServer();
@@ -60,10 +65,12 @@ namespace TriviaClient.Views
 
         private void StartQuestionTimer(int seconds)
         {
+            this.stopwatch = Stopwatch.StartNew();
             this.TimeLeft = seconds;
             TimeLeftText.Text = $"{this.TimeLeft} seconds";
             this.QuestionTimer.Start();
         }
+
         private void QuestionTimer_Tick(object? sender, EventArgs e)
         {
             this.TimeLeft--;
@@ -198,12 +205,12 @@ namespace TriviaClient.Views
         }
         private async Task WaitForGameToEndAsync()
         {
-            const int TWO_SECONDS = 500;
+            const int TWO_HUNDRED_MILLISECONDS = 200;
             try
             {
                 while (true)
                 {
-                    await Task.Delay(TWO_SECONDS);
+                    await Task.Delay(TWO_HUNDRED_MILLISECONDS);
 
                     m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.GET_GAME_RESULTS_REQUEST));
                     var responseBytes = m_communicator.ReceiveFromServer();
@@ -219,7 +226,7 @@ namespace TriviaClient.Views
                             {
                                 this.m_communicator.SendToServer(Serializer.SerializeEmptyRequest(RequestCode.LEAVE_GAME_REQUEST));
                                 var serverResponse = Deserializer.DeserializeResponse<LeaveGameResponse>(this.m_communicator.ReceiveFromServer());
-                                
+
                                 this.NavigationService.Navigate(new AfterGameScore(m_communicator, resultsResponse.results, m_username));
                                 return;
                             }
@@ -247,9 +254,16 @@ namespace TriviaClient.Views
             {
                 this.QuestionTimer.Stop();
 
-                var answerRequest = new SubmitAnswerRequest { answerId = answerId };
+                if (this.answerTime == 0.00)
+                {
+                    this.answerTime = TimePerQuestion;
+                }
+
+                var answerRequest = new SubmitAnswerRequest { answerId = answerId, answerTime = this.answerTime };
                 var requestBytes = Serializer.SerializeRequest(answerRequest);
                 m_communicator.SendToServer(requestBytes);
+
+                this.answerTime = 0.00;
 
                 var responseBytes = m_communicator.ReceiveFromServer();
                 var response = Deserializer.DeserializeResponse<SubmitAnswerResponse>(responseBytes);
@@ -271,7 +285,7 @@ namespace TriviaClient.Views
                 this.CorrectAnswersText.Text = isAnswerCorrect ? $"{++this.CorrectAnswersAmount}" : $"{this.CorrectAnswersAmount}";
 
                 ShowAnswerResult(answerId, response.correctAnswerId);
-                await Task.Delay(1500);
+                await Task.Delay(150);
 
                 DisableAnswerButtons();
 
@@ -343,24 +357,28 @@ namespace TriviaClient.Views
         }
         private void AnswerButton1_Click(object sender, RoutedEventArgs e)
         {
+            this.answerTime = stopwatch.Elapsed.TotalSeconds;
             this.SelectedAnswerId = uint.Parse(this.answers[0].Key);
             HighlightSelectedButton(AnswerButton1);
         }
 
         private void AnswerButton2_Click(object sender, RoutedEventArgs e)
         {
+            this.answerTime = stopwatch.Elapsed.TotalSeconds;
             this.SelectedAnswerId = uint.Parse(this.answers[1].Key);
             HighlightSelectedButton(AnswerButton2);
         }
 
         private void AnswerButton3_Click(object sender, RoutedEventArgs e)
         {
+            this.answerTime = stopwatch.Elapsed.TotalSeconds;
             this.SelectedAnswerId = uint.Parse(this.answers[2].Key);
             HighlightSelectedButton(AnswerButton3);
         }
 
         private void AnswerButton4_Click(object sender, RoutedEventArgs e)
         {
+            this.answerTime = stopwatch.Elapsed.TotalSeconds;
             this.SelectedAnswerId = uint.Parse(this.answers[3].Key);
             HighlightSelectedButton(AnswerButton4);
         }

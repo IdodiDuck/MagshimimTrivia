@@ -7,7 +7,6 @@
 #include <vector>
 #include <unordered_map>
 #include <shared_mutex>
-#include <chrono>
 
 typedef struct GameData
 {
@@ -46,7 +45,7 @@ public:
     ~Game();
 
     Question getQuestionForUser(const std::string& user);
-    void submitAnswer(const std::string& user, const std::string& answer);
+    void submitAnswer(const std::string& user, const std::string& answer, const double answerTime);
     void removePlayer(const std::string& user);
 
     unsigned int getGameId() const;
@@ -66,25 +65,13 @@ private:
     mutable std::shared_mutex m_updateMutex;
     mutable std::shared_mutex m_userMutex;
 
-    // Timer - 
-    std::chrono::steady_clock::time_point m_timerStart;
-    std::chrono::seconds m_timerDuration;
-
-    const std::chrono::seconds m_waitingForQuestionDuration = std::chrono::seconds(2);
-    std::chrono::steady_clock::time_point m_questionStartTime;
-    std::unordered_map<std::string, std::chrono::steady_clock::time_point> m_answerTimes;
+    std::unordered_map<std::string, double> m_answerTimes;
 
     // Support Methods
     bool isUserActive(const std::string& user) const;
     bool didUserAnswer(const std::string& user) const;
     unsigned int getCurrentQuestionIndex(const GameData& data) const;
-    double calculateAnswerTime(const std::string& user);
     void updateUserStatistics(GameData& data, const std::string& answer, const double time);
-
-    bool isTimerExpired(const std::chrono::seconds duration) const;
-    std::chrono::seconds timeLeft() const;
-    std::chrono::seconds elapsedTime() const;
-    std::chrono::seconds timeDurationWait() const;
 
     void updateGame();
 

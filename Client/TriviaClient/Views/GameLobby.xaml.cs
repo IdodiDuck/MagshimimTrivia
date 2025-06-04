@@ -87,7 +87,7 @@ namespace TriviaClient
 
         private void refreshRoomStates()
         {
-            const int THREE_SECONDS = 3000;
+            const int THREE_HUNDRED_MILLISECONDS = 300;
 
             while (m_refreshPage && m_communicator.IsConnected)
             {
@@ -126,7 +126,7 @@ namespace TriviaClient
                         }
                     });
 
-                    Thread.Sleep(THREE_SECONDS);
+                    Thread.Sleep(THREE_HUNDRED_MILLISECONDS);
                 }
 
                 catch (IOException ex)
@@ -147,7 +147,7 @@ namespace TriviaClient
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error in room status thread: {ex.Message}");
-                    Thread.Sleep(THREE_SECONDS);
+                    Thread.Sleep(THREE_HUNDRED_MILLISECONDS);
                 }
             }
         }

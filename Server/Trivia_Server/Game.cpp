@@ -3,12 +3,11 @@
 #include "ManagerException.h"
 
 Game::Game(const unsigned int gameId, std::vector<Question> questions, std::unordered_map<std::string, GameData> users, const unsigned int timePerQuestion) :
-    m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING_TO_START), m_timerDuration(std::chrono::seconds(timePerQuestion))
+    m_gameId(gameId), m_questions(questions), m_players(users), m_totalQuestions(static_cast<unsigned int>(questions.size())), m_state(GameState::WAITING_TO_START)
 {
     if (!users.empty())
     {
         this->m_state = GameState::STARTED;
-        this->m_timerStart = std::chrono::steady_clock::now();
     }
 }
 
@@ -38,12 +37,12 @@ Question Game::getQuestionForUser(const std::string& user)
 
     Question& question = m_questions[index];
     data.currentQuestion = question;
-    m_answerTimes[user] = std::chrono::steady_clock::now();
+    m_answerTimes[user] = 0.00;
 
     return question;
 }
 
-void Game::submitAnswer(const std::string& user, const std::string& answer)
+void Game::submitAnswer(const std::string& user, const std::string& answer, const double answerTime)
 {
     std::unique_lock lock(m_updateMutex);
 
@@ -60,8 +59,7 @@ void Game::submitAnswer(const std::string& user, const std::string& answer)
         throw std::runtime_error("User has already answered all questions");
     }
 
-    unsigned int answerTime = calculateAnswerTime(user);
-
+    m_answerTimes.find(user)->second = answerTime;
     updateUserStatistics(data, answer, answerTime);
 
     this->m_state = GameState::WAITING_FOR_NEXT_QUESTION;
@@ -148,36 +146,8 @@ bool Game::didUserAnswer(const std::string& user) const
     return (m_answerTimes.find(user) != m_answerTimes.cend());
 }
 
-bool Game::isTimerExpired(const std::chrono::seconds duration) const
-{
-    auto now = std::chrono::steady_clock::now();
-    return (elapsedTime() >= duration);
-}
-
-std::chrono::seconds Game::timeLeft() const
-{
-    auto now = std::chrono::steady_clock::now();
-    return std::max(std::chrono::seconds(0), this->timeDurationWait() - elapsedTime());
-}
-
-std::chrono::seconds Game::elapsedTime() const
-{
-    auto now = std::chrono::steady_clock::now();
-    return std::chrono::duration_cast<std::chrono::seconds>(now - m_timerStart);
-}
-
-std::chrono::seconds Game::timeDurationWait() const
-{
-    return (this->m_state == GameState::WAITING_FOR_ANSWER ? this->m_timerDuration : this->m_waitingForQuestionDuration);
-}
-
 void Game::updateGame()
 {
-    if (!this->isTimerExpired(timeDurationWait()))
-    {
-        return;
-    }
-
     switch (this->m_state)
     {
     case GameState::WAITING_FOR_ANSWER:
@@ -188,12 +158,11 @@ void Game::updateGame()
 
             if (!didUserAnswer(username))
             {
-                submitAnswer(username, "NO_ANSWER");
+                submitAnswer(username, "NO_ANSWER", m_answerTimes.find(username)->second);
             }
         }
 
         m_state = GameState::WAITING_FOR_NEXT_QUESTION;
-        m_timerStart = std::chrono::steady_clock::now();
         break;
     }
 
@@ -212,7 +181,6 @@ void Game::updateGame()
         }
 
         this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
-        m_timerStart = std::chrono::steady_clock::now();
         break;
     }
 
@@ -229,20 +197,6 @@ bool Game::isGameOver() const
 unsigned int Game::getCurrentQuestionIndex(const GameData& data) const
 {
     return data.correctAnswerCount + data.wrongAnswerCount;
-}
-
-double Game::calculateAnswerTime(const std::string& user)
-{
-    auto now = std::chrono::steady_clock::now();
-
-    if (auto it = m_answerTimes.find(user); it != m_answerTimes.end())
-    {
-        double time = static_cast<double>(std::chrono::duration_cast<std::chrono::seconds>(now - it->second).count());
-        m_answerTimes.erase(it);
-        return time;
-    }
-
-    return 0.0;
 }
 
 void Game::updateUserStatistics(GameData& data, const std::string& answer, const double time)

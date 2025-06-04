@@ -13,7 +13,7 @@ std::optional<LoginRequest> JsonRequestPacketDeserializer::deserializeLoginReque
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
     // Get the info to loginRequest and return it
-    if (jsonData.is_discarded()) 
+    if (jsonData.is_discarded())
     {
         return {};
     }
@@ -28,7 +28,7 @@ std::optional<LoginRequest> JsonRequestPacketDeserializer::deserializeLoginReque
             throw std::exception("Error: failed to extract json data");
         }
 
-        return LoginRequest { username, password };
+        return LoginRequest{ username, password };
     }
 
     catch (const std::exception& e)
@@ -65,7 +65,7 @@ std::optional<SignupRequest> JsonRequestPacketDeserializer::deserializeSignupReq
             throw std::exception("Error: Failed to extract JSON data");
         }
 
-        return SignupRequest { username, password, email };
+        return SignupRequest{ username, password, email };
     }
 
     catch (const std::exception& e)
@@ -97,7 +97,7 @@ std::optional<GetPlayersInRoomRequest> JsonRequestPacketDeserializer::deserializ
         // Extract roomId from the parsed JSON and return the struct
         unsigned int roomId = jsonData.at(ROOM_ID).get<unsigned int>();
 
-        return GetPlayersInRoomRequest { roomId };
+        return GetPlayersInRoomRequest{ roomId };
     }
 
     catch (const std::exception& e)
@@ -142,7 +142,7 @@ std::optional<JoinRoomRequest> JsonRequestPacketDeserializer::deserializeJoinRoo
 std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreateRoomRequest(const std::vector<unsigned char>& buffer)
 {
     const std::string ROOM_NAME = "roomName", MAX_USERS = "maxUsers", QUESTION_COUNT = "questionCount", ANSWER_TIMEOUT = "answerTimeout";
-    
+
     // Convert the buffer to a string
     std::string jsonStr(buffer.begin(), buffer.end());
 
@@ -170,13 +170,14 @@ std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreat
     catch (const std::exception& e)
     {
         std::cerr << "Error extracting GetPlayersInRoomRequest data: " << e.what() << std::endl;
-        return CreateRoomRequest{"", 0, 0, 0};
+        return CreateRoomRequest{ "", 0, 0, 0 };
     }
 }
 
 std::optional<SubmitAnswerRequest> JsonRequestPacketDeserializer::deserializeSubmitAnswerRequest(const std::vector<unsigned char>& buffer)
 {
     const std::string ANSWER_ID = "answerId";
+    const std::string ANSWER_TIME = "answerTime";
 
     // Convert the buffer to a string
     std::string jsonStr(buffer.begin(), buffer.end());
@@ -195,8 +196,9 @@ std::optional<SubmitAnswerRequest> JsonRequestPacketDeserializer::deserializeSub
     {
         // Extract answerId from the parsed JSON and return the struct
         unsigned int answerId = jsonData.at(ANSWER_ID).get<unsigned int>();
+        double answerTime = jsonData.at(ANSWER_TIME).get<double>();
 
-        return SubmitAnswerRequest { answerId };
+        return SubmitAnswerRequest{ answerId, answerTime };
     }
 
     catch (const std::exception& e)
