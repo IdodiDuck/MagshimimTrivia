@@ -24,8 +24,8 @@ public:
 	// Handlers Getters - 
 	std::unique_ptr<IRequestHandler> createLoginRequestHandler();
 	std::unique_ptr<IRequestHandler> createMenuRequestHandler(const LoggedUser& user);
-	std::unique_ptr<IRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, int roomId);
-	std::unique_ptr<IRequestHandler> createRoomMemberRequestHandler(const LoggedUser& user, int roomId);
+	std::unique_ptr<IRequestHandler> createRoomAdminRequestHandler(const LoggedUser& user, const int roomId);
+	std::unique_ptr<IRequestHandler> createRoomMemberRequestHandler(const LoggedUser& user, const int roomId);
 	std::unique_ptr<IRequestHandler> createGameRequestHandler(const LoggedUser& user, Game& game);
 
 	// Managers Getters - 
