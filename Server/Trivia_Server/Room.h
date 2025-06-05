@@ -27,7 +27,9 @@ class Room
 {
 
 public:
+    // C'tor & D'tor - 
     Room(const RoomData& roomData);
+    ~Room();
 
     // Setters - 
     void addUser(const LoggedUser& user);

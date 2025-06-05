@@ -15,7 +15,6 @@ typedef struct GameData
     unsigned int wrongAnswerCount = 0;
     double averageAnswerTime = 0.0;
     bool hasLeft = false;
-    bool hasAnsweredCurrentQuestion = false;
 
     GameData() = default;
 

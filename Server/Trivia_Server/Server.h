@@ -10,8 +10,8 @@ class Server
 {
 
 public:
+	// C'tor - 
 	Server();
-	~Server();
 
 	void run();
 

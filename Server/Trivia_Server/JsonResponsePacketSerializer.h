@@ -26,7 +26,6 @@ typedef struct ErrorResponse
 } ErrorResponse;
 
 // V2.0.0 Responses - 
-
 typedef struct LogoutResponse
 {
     unsigned int status;

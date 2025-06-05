@@ -150,42 +150,42 @@ void Game::updateGame()
 {
     switch (this->m_state)
     {
-    case GameState::WAITING_FOR_ANSWER:
-    {
-        for (auto& playerPair : m_players)
+        case GameState::WAITING_FOR_ANSWER:
         {
-            const std::string& username = playerPair.first;
-
-            if (!didUserAnswer(username))
+            for (auto& playerPair : m_players)
             {
-                submitAnswer(username, "NO_ANSWER", m_answerTimes.find(username)->second);
+                const std::string& username = playerPair.first;
+
+                if (!didUserAnswer(username))
+                {
+                    submitAnswer(username, "NO_ANSWER", m_answerTimes.find(username)->second);
+                }
             }
+
+            m_state = GameState::WAITING_FOR_NEXT_QUESTION;
+            break;
         }
 
-        m_state = GameState::WAITING_FOR_NEXT_QUESTION;
-        break;
-    }
-
-    case GameState::WAITING_FOR_NEXT_QUESTION:
-    {
-        bool allPlayersDone = true;
-
-        for (const auto& [user, data] : m_players)
+        case GameState::WAITING_FOR_NEXT_QUESTION:
         {
-            unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
-            if (currentQuestion < m_totalQuestions)
+            bool allPlayersDone = true;
+
+            for (const auto& [user, data] : m_players)
             {
-                allPlayersDone = false;
-                break;
+                unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
+                if (currentQuestion < m_totalQuestions)
+                {
+                    allPlayersDone = false;
+                    break;
+                }
             }
+
+            this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
+            break;
         }
 
-        this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
-        break;
-    }
-
-    default:
-        break;
+        default:
+            break;
     }
 }
 

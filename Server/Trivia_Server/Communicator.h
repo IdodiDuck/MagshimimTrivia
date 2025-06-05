@@ -19,8 +19,10 @@ class Communicator
 {
 
 public:
+	// C'tor & D'tor - 
 	Communicator(std::weak_ptr<RequestHandlerFactory> handlerFactory);
 	~Communicator();
+
 	void startHandleRequests();
 
 private:

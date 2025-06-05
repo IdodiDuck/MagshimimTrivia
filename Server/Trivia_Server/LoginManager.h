@@ -26,21 +26,24 @@ enum class LoginStatus
 class LoginManager
 {
 public:
-
+    // C'tor & D'tor - 
     LoginManager(std::weak_ptr<IDatabase> dataBase);
     ~LoginManager();
 
+    // Management Methods -
     SignUpStatus signUp(const std::string& username, const std::string& password, const std::string& email);
     LoginStatus login(const std::string& username, const std::string& password);
     void logOut(const std::string& username);
 
 
 private:
+    // Attributes - 
     std::weak_ptr<IDatabase> m_dataBase;
     std::vector<LoggedUser> m_loggedUsers;
     std::mutex m_loggedUsersMutex;
     bool m_isDbValid;
 
+    // Support Methods - 
     bool isUserAlreadyLogged(const std::string& username);
 
 };
