@@ -7,7 +7,7 @@
       mc:Ignorable="d"
       Title="Trivia Game - Main Menu">
 
-    <Grid>
+    <Grid Background="#FF1E1E1E">
         <!-- Main layout container -->
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,18 +16,18 @@
         </Grid.RowDefinitions>
 
         <!-- Header with welcome message -->
-        <Border Grid.Row="0" Background="#E5E5E5E5" Padding="20">
+        <Border Grid.Row="0" Background="#FF2A2A2A" Padding="20">
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="WelcomeText" 
                            Text="Hello, " 
-                           Foreground="#FF333333"
+                           Foreground="#FFCCCCCC"
                            FontSize="24"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
                 
                 <TextBlock x:Name="UserNameText"
                            Text="{Binding Path=Username, UpdateSourceTrigger=PropertyChanged}"
-                           Foreground="#FF333333"
+                           Foreground="#FFCCCCCC"
                            FontSize="24"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
@@ -64,7 +64,7 @@
         </Grid>
 
         <!-- Footer with sign out button -->
-        <Border Grid.Row="2" Background="#E5E5E5E5" Padding="10">
+        <Border Grid.Row="2" Background="#FF2A2A2A" Padding="10">
             <Button x:Name="SignOutBtn"
                     Content="Sign Out"
                     HorizontalAlignment="Right"

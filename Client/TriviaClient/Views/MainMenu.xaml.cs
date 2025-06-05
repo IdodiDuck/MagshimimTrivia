@@ -78,7 +78,7 @@ namespace TriviaClient
 
                 if (NavigationService.CanGoBack)
                 {
-                    NavigationService.GoBack();
+                    this.NavigationService.Navigate(new Login(m_communicator));
                     return;
                 }
             }

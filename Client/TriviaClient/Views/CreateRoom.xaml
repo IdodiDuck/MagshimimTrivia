@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:TriviaClient"
       mc:Ignorable="d"
       Title="CreateRoom"
-      Background="White">
+      Background="#FF1E1E1E">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -16,9 +16,9 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="#E5E5E5E5" Padding="15">
+        <Border Grid.Row="0" Background="#FF2A2A2A" Padding="15">
             <TextBlock Text="Create New Room" 
-                       Foreground="Black"
+                       Foreground="#FFCCCCCC"
                        FontSize="24"
                        FontWeight="Bold"/>
         </Border>
@@ -32,7 +32,7 @@
             <!-- Room Name -->
             <StackPanel>
                 <TextBlock Text="Room Name" 
-                           Foreground="#FF333333"
+                           Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
                 <TextBox x:Name="RoomNameTextBox"
                          Height="40"
@@ -44,7 +44,7 @@
             <!-- Number of Players -->
             <StackPanel>
                 <TextBlock Text="Number of Players" 
-                           Foreground="#FF333333"
+                           Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
                 <TextBox x:Name="PlayersNumberTextBox"
                          Height="40"
@@ -56,7 +56,7 @@
             <!-- Number of Questions -->
             <StackPanel>
                 <TextBlock Text="Number of Questions" 
-                           Foreground="#FF333333"
+                           Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
                 <TextBox x:Name="QuestionsNumberTextBox"
                          Height="40"
@@ -68,7 +68,7 @@
             <!-- Time Per Question -->
             <StackPanel>
                 <TextBlock Text="Time Per Question (seconds)" 
-                           Foreground="#FF333333"
+                           Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
                 <TextBox x:Name="QuestionTimeTextBox"
                          Height="40"
@@ -92,7 +92,7 @@
         </StackPanel>
 
         <!-- Footer -->
-        <Border Grid.Row="2" Background="#E5E5E5E5" Padding="10">
+        <Border Grid.Row="2" Background="#FF2A2A2A" Padding="10">
             <Button x:Name="BackButton"
                     Content="BACK TO MENU"
                     HorizontalAlignment="Left"

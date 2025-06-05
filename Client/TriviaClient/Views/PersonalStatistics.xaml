@@ -6,7 +6,7 @@
       mc:Ignorable="d"
       Title="Personal Statistics">
 
-    <Grid Background="White">
+    <Grid Background="#FF1E1E1E">
         <!-- Main Panel -->
         <StackPanel HorizontalAlignment="Center"
                     VerticalAlignment="Top"
@@ -16,6 +16,7 @@
             <!-- Headers -->
             <TextBlock Text="Personal Statistics"
                        FontSize="24"
+                       Foreground="#FFCCCCCC"
                        FontWeight="Bold"
                        TextAlignment="Center"
                        Margin="0,10,0,20"
@@ -28,12 +29,12 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="11*"/>
+                    <ColumnDefinition Width="42*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Games Played:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="gamesPlayed"  Text="{Binding Path=GamesPlayed, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock Text="Games Played:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock x:Name="gamesPlayed"  Foreground="#FFCCCCCC" Text="{Binding Path=GamesPlayed, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
             <Grid Margin="0,15">
@@ -46,8 +47,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Correct Answers:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="correctAns" Text="{Binding Path=CorrectAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock Text="Correct Answers:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock x:Name="correctAns" Foreground="#FFCCCCCC" Text="{Binding Path=CorrectAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
             <Grid Margin="0,15">
@@ -60,8 +61,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Wrong Answers:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="wrongAns" Text="{Binding Path=WrongAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock Text="Wrong Answers:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock x:Name="wrongAns" Foreground="#FFCCCCCC" Text="{Binding Path=WrongAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
             <Grid Margin="0,15">
@@ -74,8 +75,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Average Answer Time:" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="avgAnsTime" Text="{Binding Path=AverageAnswerTime, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
+                <TextBlock Text="Average Answer Time:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
+                <TextBlock x:Name="avgAnsTime" Foreground="#FFCCCCCC" Text="{Binding Path=AverageAnswerTime, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
             </Grid>
 
         </StackPanel>

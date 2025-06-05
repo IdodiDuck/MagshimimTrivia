@@ -152,7 +152,6 @@ RequestResult GameRequestHandler::getGameResults(const RequestInfo& info)
 	}
 
 	response.status = SUCCESS;
-	auto user = this->m_user.getUserName();
 
 	auto playerResultsMap = this->m_game.getAllPlayerResults();
 

@@ -7,7 +7,7 @@
       mc:Ignorable="d"
       Title="GameLobby">
 
-    <Grid>
+    <Grid Background="#FF1E1E1E">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -15,23 +15,23 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="#E5E5E5E5" Padding="15">
+        <Border Grid.Row="0" Background="#FF2A2A2A" Padding="15">
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="RoomText" 
                            Text="Room: " 
-                           Foreground="Black"
+                           Foreground="White"
                            FontSize="18"
                            FontWeight="Bold"/>
 
                 <TextBlock x:Name="RoomNameText"
                            Text="{Binding Path=RoomName, UpdateSourceTrigger=PropertyChanged}"
-                           Foreground="Black"
+                           Foreground="White"
                            FontSize="16"
                            Margin="20,0,0,0"/>
 
                 <TextBlock x:Name="RoomStatusText"
                            Text="Waiting for players..."
-                           Foreground="Black"
+                           Foreground="White"
                            FontSize="16"
                            Margin="20,0,0,0"/>
             </StackPanel>
@@ -49,6 +49,7 @@
                 <StackPanel>
                     <TextBlock Text="Players in Room:" 
                                FontSize="16"
+                               Foreground="White"
                                FontWeight="Bold"
                                Margin="10,10,10,5"/>
                     <ListView x:Name="PlayersListView"
@@ -87,22 +88,23 @@
                     <StackPanel>
                         <TextBlock Text="Game Settings:" 
                                    FontSize="16"
+                                   Foreground="White"
                                    FontWeight="Bold"
                                    Margin="0,0,0,10"/>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <TextBlock Text="Questions:" Width="120"/>
-                            <TextBlock x:Name="QuestionCountText" Text="{Binding Path=QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="Questions:" Width="120" Foreground="#FFCCCCCC" />
+                            <TextBlock x:Name="QuestionCountText" Foreground="#FFCCCCCC" Text="{Binding Path=QuestionAmount, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <TextBlock Text="Time per question:" Width="120"/>
-                            <TextBlock x:Name="TimePerQuestionText" Text="{Binding Path=TimePerQuestion, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="Time per question:" Width="120" Foreground="#FFCCCCCC" />
+                            <TextBlock x:Name="TimePerQuestionText" Foreground="#FFCCCCCC" Text="{Binding Path=TimePerQuestion, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
-                            <TextBlock Text="Max players:" Width="120"/>
-                            <TextBlock x:Name="MaxPlayersText" Text="{Binding Path=MaxPlayers, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="Max players:" Width="120" Foreground="#FFCCCCCC" />
+                            <TextBlock x:Name="MaxPlayersText" Foreground="#FFCCCCCC" Text="{Binding Path=MaxPlayers, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -110,7 +112,7 @@
         </Grid>
 
         <!-- Footer -->
-        <Border Grid.Row="2" Background="#FFEEEEEE" Padding="10">
+        <Border Grid.Row="2" Background="#FF2A2A2A" Padding="10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
                 <!-- Admin Panel -->
                 <StackPanel x:Name="AdminButtonsPanel" Orientation="Horizontal" Visibility="Collapsed" >

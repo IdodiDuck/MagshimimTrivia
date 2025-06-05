@@ -9,7 +9,7 @@
         Height="450"
         Width="800"
         WindowStartupLocation="CenterScreen"
-        Background="White"
+        Background="#FF1E1E1E"
         Closing="MainWindow_Closing">
 
     <Frame x:Name="MainFrame"

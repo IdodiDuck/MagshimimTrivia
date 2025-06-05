@@ -23,14 +23,14 @@
 
                 <!-- Left side: game stats -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" Margin="0,0,0,10">
-                    <TextBlock Text="Questions: " FontWeight="Bold" FontSize="16" Margin="10,0"/>
-                    <TextBlock x:Name="QuestionsProgressText" Text="" FontSize="16" Margin="5,0"/>
+                    <TextBlock Text="Questions: " Foreground="White" FontWeight="Bold" FontSize="16" Margin="10,0"/>
+                    <TextBlock x:Name="QuestionsProgressText" Foreground="White" Text="" FontSize="16" Margin="5,0"/>
 
-                    <TextBlock Text="Correct: " FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
-                    <TextBlock x:Name="CorrectAnswersText" Text="0" FontSize="16" Margin="5,0"/>
+                    <TextBlock Text="Correct: " Foreground="White" FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
+                    <TextBlock x:Name="CorrectAnswersText" Foreground="White" Text="0" FontSize="16" Margin="5,0"/>
 
-                    <TextBlock Text="Time Left: " FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
-                    <TextBlock x:Name="TimeLeftText" Text="15" FontSize="16" Margin="5,0"/>
+                    <TextBlock Text="Time Left: " Foreground="White" FontWeight="Bold" FontSize="16" Margin="20,0,0,0"/>
+                    <TextBlock x:Name="TimeLeftText" Foreground="White" Text="0" FontSize="16" Margin="5,0"/>
                 </StackPanel>
 
                 <!-- Right side: exit button -->
