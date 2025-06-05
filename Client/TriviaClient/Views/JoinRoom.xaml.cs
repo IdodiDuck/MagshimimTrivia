@@ -110,7 +110,7 @@ namespace TriviaClient
                 if (responseBytes[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
                 {
                     ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(responseBytes);
-                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowError(errorResponse?.message + "");
                     return;
                 }
 
@@ -123,7 +123,7 @@ namespace TriviaClient
                     
                 }
 
-                MessageBox.Show("Failed to join the selected room.");
+                ShowError("Failed to join the selected room.");
                 return;
             }
 
@@ -311,6 +311,12 @@ namespace TriviaClient
             {
                 Console.WriteLine($"Dispatcher.Invoke error: {ex.Message}");
             }
+        }
+
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            ErrorTextBlock.Visibility = Visibility.Visible;
         }
     }
 

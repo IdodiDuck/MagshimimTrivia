@@ -52,15 +52,14 @@ namespace TriviaClient
 
                 if (response == null)
                 {
-                    MessageBox.Show("Invalid response from server.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowError("Invalid response from server.");
                     return;
                 }
 
                 if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
                 {
                     ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
-                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowError(errorResponse?.message ?? "Error.");
                     return;
                 }
 
@@ -71,23 +70,23 @@ namespace TriviaClient
 
                 else
                 {
-                    MessageBox.Show("Signup Failed", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowError("Error: Signup Failed");
                 }
             }
 
             catch (IOException ex)
             {
-                MessageBox.Show($"Connection error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Connection error: {ex.Message}");
             }
 
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Data serialization error: {ex.Message}");
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"An unexpected error occurred: {ex.Message}");
             }
         }
 
@@ -115,13 +114,13 @@ namespace TriviaClient
 
         private void Login_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (NavigationService.CanGoBack)
-            {
-                NavigationService.GoBack();
-                return;
-            }
+            this.NavigationService.Navigate(new Login(m_communicator));
+        }
 
-            MessageBox.Show("Error: There's no previous page you can go back to!");
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            ErrorTextBlock.Visibility = Visibility.Visible;
         }
     }
 }

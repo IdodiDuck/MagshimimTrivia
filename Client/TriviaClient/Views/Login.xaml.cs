@@ -53,15 +53,14 @@ namespace TriviaClient
 
                 if (response == null)
                 {
-                    MessageBox.Show("Invalid response from server.", "Server Error",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                    ShowError("Invalid response from server.");
                     return;
                 }
 
                 if (serverResponse[NetworkConstants.CODE_INDEX] == (byte)(ResponseCode.ERROR_RESPONSE))
                 {
                     ErrorResponse? errorResponse = Deserializer.DeserializeResponse<ErrorResponse>(serverResponse);
-                    MessageBox.Show(errorResponse?.message, "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowError(errorResponse?.message ?? "Error.");
                     return;
                 }
 
@@ -75,23 +74,23 @@ namespace TriviaClient
 
                 else
                 {
-                    MessageBox.Show("Login Failed", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+                    ShowError($"Error: Login Failed");
                 }
             }
 
             catch (IOException ex)
             {
-                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Connection Error: {ex.Message}");
             }
 
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Data serialization error: {ex.Message}");
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"An unexpected error occurred: {ex.Message}");
             }
         }
 
@@ -114,6 +113,12 @@ namespace TriviaClient
         private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             this.NavigationService.Navigate(new Signup(m_communicator));
+        }
+
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            ErrorTextBlock.Visibility = Visibility.Visible;
         }
     }
 }

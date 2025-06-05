@@ -44,19 +44,19 @@ namespace TriviaClient
             {
                 if (!int.TryParse(PlayersNumberTextBox.Text, out int maxUsers) || maxUsers < MIN_PLAYERS)
                 {
-                    MessageBox.Show("Please enter a valid number of players", "Invalid Input");
+                    ShowError("Please enter a valid number of players");
                     return;
                 }
 
                 if (!int.TryParse(QuestionsNumberTextBox.Text, out int questionCount) || questionCount <= EMPTY)
                 {
-                    MessageBox.Show("Please enter a valid number of questions", "Invalid Input");
+                    ShowError("Please enter a valid number of questions");
                     return;
                 }
 
                 if (!int.TryParse(QuestionTimeTextBox.Text, out int answerTimeout) || answerTimeout <= EMPTY)
                 {
-                    MessageBox.Show("Please enter a valid time per question", "Invalid Input");
+                    ShowError("Please enter a valid time per question");
                     return;
                 }
 
@@ -85,23 +85,23 @@ namespace TriviaClient
 
                 else
                 {
-                    MessageBox.Show("Failed to create room", "Error");
+                    ShowError("Error:  Failed to create room");
                 }
             }
 
             catch (IOException ex)
             {
-                MessageBox.Show($"Connection Error: {ex.Message}", "Network Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Connection Error: {ex.Message}");
             }
 
             catch (SerializationException ex)
             {
-                MessageBox.Show($"Data serialization error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"Data serialization error: {ex.Message}");
             }
 
             catch (Exception ex)
             {
-                MessageBox.Show($"An unexpected error occurred: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ShowError($"An unexpected error occurred: {ex.Message}");
             }
         }
 
@@ -113,7 +113,7 @@ namespace TriviaClient
                 return;
             }
 
-            MessageBox.Show("Error: There's no previous page you can go back to!");
+            ShowError("Error: There's no previous page you can go back to!");
         }
 
         private void Input_TextChanged(object sender, TextChangedEventArgs e)
@@ -123,7 +123,11 @@ namespace TriviaClient
                                      !string.IsNullOrWhiteSpace(QuestionsNumberTextBox.Text) &&
                                      !string.IsNullOrWhiteSpace(QuestionTimeTextBox.Text);
         }
+
+        private void ShowError(string message)
+        {
+            ErrorTextBlock.Text = message;
+            ErrorTextBlock.Visibility = Visibility.Visible;
+        }
     }
-
-
 }

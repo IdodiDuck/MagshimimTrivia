@@ -66,13 +66,13 @@
         </Grid>
 
         <!-- Overlay: Waiting for players to finish -->
-        <Grid Background="#AAFFFFFF" Visibility="Collapsed" x:Name="WaitingOverlay" Panel.ZIndex="1000">
-            <Border Background="White" CornerRadius="10" Padding="30" BorderBrush="Gray" BorderThickness="2"
+        <Grid Background="#FF1E1E1E" Visibility="Collapsed" x:Name="WaitingOverlay" Panel.ZIndex="1000">
+            <Border Background="Black" CornerRadius="10" Padding="30" BorderBrush="Gray" BorderThickness="2"
                     HorizontalAlignment="Center" VerticalAlignment="Center">
                 <TextBlock Text="Waiting for all players to finish..."
                            FontSize="24"
                            FontWeight="Bold"
-                           Foreground="Black"
+                           Foreground="white"
                            TextAlignment="Center"/>
             </Border>
         </Grid>

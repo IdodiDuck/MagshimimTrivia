@@ -129,6 +129,13 @@
                     Width="100" Height="40"
                     Click="JoinButton_Click"
                     IsEnabled="False"/>
+            
+            <TextBlock x:Name="ErrorTextBlock"
+                       Foreground="Red"
+                       FontWeight="Bold"
+                       Margin="40,20,0,20"
+                       Visibility="Visible"
+                       TextWrapping="Wrap"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal"
