@@ -14,7 +14,6 @@ Server::Server() : m_database(std::make_shared<SqliteDataBase>()), m_handlerFact
 
 void Server::run()
 {
-    // Launching communicator thread which handles new clients' requests
     std::thread communicatorThread(&Communicator::startHandleRequests, &m_communicator);
 
     std::string userInput = "";

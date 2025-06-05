@@ -6,13 +6,10 @@ std::optional<LoginRequest> JsonRequestPacketDeserializer::deserializeLoginReque
 {
     const std::string USER_NAME = "username", PASSWORD = "password";
 
-    // Convert the buffer to a string
     std::string jsonStr(buffer.cbegin(), buffer.cend());
 
-    // Parse the JSON
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
-    // Get the info to loginRequest and return it
     if (jsonData.is_discarded())
     {
         return {};
@@ -42,13 +39,10 @@ std::optional<SignupRequest> JsonRequestPacketDeserializer::deserializeSignupReq
 {
     const std::string USER_NAME = "username", PASSWORD = "password", EMAIL = "email";
 
-    // Convert the buffer to a string
     std::string jsonStr(buffer.cbegin(), buffer.cend());
 
-    // Parse the JSON
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
-    // Convert the info to signupRequest and return it
     if (jsonData.is_discarded())
     {
         return {};
@@ -79,13 +73,10 @@ std::optional<GetPlayersInRoomRequest> JsonRequestPacketDeserializer::deserializ
 {
     const std::string ROOM_ID = "roomId";
 
-    // Convert the buffer to a string
     std::string jsonStr(buffer.begin(), buffer.end());
 
-    // Parse the JSON safely (returns null if failed)
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
-    // Validate that parsing was successful
     if (jsonData.is_discarded())
     {
         std::cerr << "Error: Failed to parse JSON data for GetPlayersInRoomRequest." << std::endl;
@@ -94,7 +85,6 @@ std::optional<GetPlayersInRoomRequest> JsonRequestPacketDeserializer::deserializ
 
     try
     {
-        // Extract roomId from the parsed JSON and return the struct
         unsigned int roomId = jsonData.at(ROOM_ID).get<unsigned int>();
 
         return GetPlayersInRoomRequest{ roomId };
@@ -111,13 +101,10 @@ std::optional<JoinRoomRequest> JsonRequestPacketDeserializer::deserializeJoinRoo
 {
     const std::string ROOM_ID = "roomId";
 
-    // Convert the buffer to a string
     std::string jsonStr(buffer.begin(), buffer.end());
 
-    // Parse the JSON safely (returns null if failed)
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
-    // Validate that parsing was successful
     if (jsonData.is_discarded())
     {
         std::cerr << "Error: Failed to parse JSON data for GetPlayersInRoomRequest." << std::endl;
@@ -126,7 +113,6 @@ std::optional<JoinRoomRequest> JsonRequestPacketDeserializer::deserializeJoinRoo
 
     try
     {
-        // Extract roomId from the parsed JSON and return the struct
         unsigned int roomId = jsonData.at(ROOM_ID).get<unsigned int>();
 
         return JoinRoomRequest{ roomId };
@@ -143,13 +129,10 @@ std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreat
 {
     const std::string ROOM_NAME = "roomName", MAX_USERS = "maxUsers", QUESTION_COUNT = "questionCount", ANSWER_TIMEOUT = "answerTimeout";
 
-    // Convert the buffer to a string
     std::string jsonStr(buffer.begin(), buffer.end());
 
-    // Parse the JSON safely (returns null if failed)
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
-    // Validate that parsing was successful
     if (jsonData.is_discarded())
     {
         std::cerr << "Error: Failed to parse JSON data for GetPlayersInRoomRequest." << std::endl;
@@ -158,7 +141,6 @@ std::optional<CreateRoomRequest> JsonRequestPacketDeserializer::deserializeCreat
 
     try
     {
-        // Extract request fields from the parsed JSON and return the struct
         std::string roomName = jsonData.at(ROOM_NAME).get<std::string>();
         unsigned int maxUsers = jsonData.at(MAX_USERS).get<unsigned int>();
         unsigned int questionCount = jsonData.at(QUESTION_COUNT).get<unsigned int>();
@@ -179,13 +161,10 @@ std::optional<SubmitAnswerRequest> JsonRequestPacketDeserializer::deserializeSub
     const std::string ANSWER_ID = "answerId";
     const std::string ANSWER_TIME = "answerTime";
 
-    // Convert the buffer to a string
     std::string jsonStr(buffer.begin(), buffer.end());
 
-    // Parse the JSON safely (returns null if failed)
     auto jsonData = nlohmann::json::parse(jsonStr, nullptr, false);
 
-    // Validate that parsing was successful
     if (jsonData.is_discarded())
     {
         std::cerr << "Error: Failed to parse JSON data for SubmitAnswerRequest." << std::endl;
@@ -194,7 +173,6 @@ std::optional<SubmitAnswerRequest> JsonRequestPacketDeserializer::deserializeSub
 
     try
     {
-        // Extract answerId from the parsed JSON and return the struct
         unsigned int answerId = jsonData.at(ANSWER_ID).get<unsigned int>();
         double answerTime = jsonData.at(ANSWER_TIME).get<double>();
 

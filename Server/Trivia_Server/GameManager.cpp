@@ -2,9 +2,9 @@
 
 #include "ManagerException.h"
 
-GameManager::GameManager(std::weak_ptr<IDatabase> dataBase)
-    : m_Database(dataBase)
+GameManager::GameManager(std::weak_ptr<IDatabase> dataBase): m_Database(dataBase)
 {
+
 }
 
 Game& GameManager::createGame(const Room& room)

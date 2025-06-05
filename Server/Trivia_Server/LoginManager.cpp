@@ -6,8 +6,7 @@
 
 #include "ServerException.h"
 
-LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase)
-    : m_dataBase(dataBase), m_isDbValid(false)
+LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase): m_dataBase(dataBase), m_isDbValid(false)
 {
     if (auto db = m_dataBase.lock())
     {

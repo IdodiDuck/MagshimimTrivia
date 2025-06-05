@@ -30,9 +30,9 @@ std::optional<int> SocketHelper::getRequestCode(const SOCKET sc)
 {
 	const int REQUEST_CODE_BYTES = 1;
 
-	auto headerOpt = getData(sc, REQUEST_CODE_BYTES);  // Get data from socket
+	auto headerOpt = getData(sc, REQUEST_CODE_BYTES);
 
-	if (!headerOpt)  // If no data received or error occurred
+	if (!headerOpt)
 	{
 		return std::nullopt;
 	}
@@ -47,14 +47,13 @@ std::optional<int> SocketHelper::getRequestLength(const SOCKET sc)
 
 	auto headerOpt = getData(sc, REQUEST_LENGTH_BYTES);
 
-	if (!headerOpt)  // If no data received or error occurred
+	if (!headerOpt)
 	{
 		return std::nullopt;
 	}
 
 	const std::vector<unsigned char>& header = headerOpt.value();
 
-	// If we didn't received enough bytes for reading
 	if (header.size() < REQUEST_LENGTH_BYTES)
 	{
 		return std::nullopt;
@@ -68,7 +67,7 @@ std::optional<int> SocketHelper::getRequestLength(const SOCKET sc)
 		messageCode |= (header[currentByte] << (BYTE_SIZE * (REQUEST_LENGTH_BYTES - currentByte - 1)));
 	}
 
-	int requestLength = header[REQUEST_LENGTH_BYTES - 1];  // Might want to check if this logic is correct
+	int requestLength = header[REQUEST_LENGTH_BYTES - 1];
 	return requestLength;
 }
 

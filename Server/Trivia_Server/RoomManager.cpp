@@ -109,7 +109,7 @@ std::optional<std::reference_wrapper<Room>> RoomManager::getRoomReference(const 
 
     auto desiredRoomIt = m_rooms.find(ID);
 
-    if (desiredRoomIt != m_rooms.end())
+    if (desiredRoomIt != m_rooms.cend())
     {
         return std::optional<std::reference_wrapper<Room>>(desiredRoomIt->second);
     }

@@ -36,7 +36,7 @@ bool SqliteDataBase::open()
     }
 
     int dbExists = _access(this->_dataBaseName.c_str(), DATA_BASE_EXISTS_CODE);
-    int result = sqlite3_open(this->_dataBaseName.c_str(), &this->_dataBase); // database pointer is referencing now to the database file
+    int result = sqlite3_open(this->_dataBaseName.c_str(), &this->_dataBase);
 
     if (result != SQLITE_OK)
     {
@@ -52,7 +52,6 @@ bool SqliteDataBase::open()
         return false;
     }
 
-    // If the original database did not exist we will initialize it's tables right after we created it by sqlite3_open
     if (dbExists != DATA_BASE_EXISTS_CODE)
     {
         try
@@ -108,7 +107,6 @@ int SqliteDataBase::doesUserExist(const std::string& user)
     char* errMsg = nullptr;
     int userExists = 0;
 
-    // Callback function for finding the the existance of the user
     auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
         {
             const int EMPTY = 0, SUCCESSFULL_EXECUTION = 0;
@@ -129,7 +127,6 @@ int SqliteDataBase::doesUserExist(const std::string& user)
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    // Returning if the user exists or not based on the callback extraction results
     return (userExists == static_cast<int>(DatabaseResult::USER_EXISTS)) ? userExists : static_cast<int>(DatabaseResult::USER_NOT_FOUND);
 }
 
@@ -154,7 +151,6 @@ int SqliteDataBase::doesPasswordMatch(const std::string& user, const std::string
 
     int result = static_cast<int>(DatabaseResult::DATABASE_ERROR);
 
-    // Callback function to process the result
     auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
         {
             std::string* storedPassword = static_cast<std::string*>(data);
@@ -166,7 +162,6 @@ int SqliteDataBase::doesPasswordMatch(const std::string& user, const std::string
             return 0;
         };
 
-    // Execute the query and process the result using the callback
     if (sqlite3_exec(this->_dataBase, query.c_str(), callback, &storedPassword, &errMsg) != SQLITE_OK)
     {
         std::cerr << "DataBase: [ERORR]: " << errMsg << std::endl;
@@ -202,7 +197,6 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    // Check if the user exists first
     int userExists = doesUserExist(user);
 
     if (userExists == static_cast<int>(DatabaseResult::USER_EXISTS))
@@ -210,7 +204,6 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
         return static_cast<int>(DatabaseResult::USER_EXISTS);
     }
 
-    // Check if an error occurred when we checked if the user exists
     else if (userExists == static_cast<int>(DatabaseResult::DATABASE_ERROR))
     {
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
@@ -218,7 +211,6 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
 
     char* errMessage = nullptr;
 
-    // Begin the transaction
     if (sqlite3_exec(this->_dataBase, "BEGIN TRANSACTION;", nullptr, nullptr, &errMessage) != SQLITE_OK)
     {
         sqlite3_free(errMessage);
@@ -228,7 +220,6 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
 
     const std::string sql = "INSERT INTO USERS (USERNAME, PASSWORD, EMAIL) VALUES ('" + user + "', '" + password + "', '" + email + "');";
 
-    // Execute the insertion query
     if (executeQuery(sql) == static_cast<int>(DatabaseResult::DATABASE_ERROR))
     {
         std::cerr << "DataBase: [ERROR]: Failed to add user\n";
@@ -236,7 +227,6 @@ int SqliteDataBase::addNewUser(const std::string& user, const std::string& passw
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    // Commit the transaction
     if (sqlite3_exec(this->_dataBase, "COMMIT;", nullptr, nullptr, &errMessage) != SQLITE_OK)
     {
         sqlite3_free(errMessage);
@@ -252,7 +242,6 @@ std::list<Question> SqliteDataBase::getQuestions(const int questionsAmount)
 {
     int totalQuestions = getAmountOfQuestions();
 
-    // Extracting the amount of questions to ask (In case the user has requested more questions than available in the database)
     int validQuestionsAmount = min(questionsAmount, totalQuestions);
 
     std::string getQuestionsQuery = "SELECT * FROM QUESTIONS ORDER BY RANDOM() LIMIT " + std::to_string(validQuestionsAmount) + ";";
@@ -260,15 +249,14 @@ std::list<Question> SqliteDataBase::getQuestions(const int questionsAmount)
     std::list<Question> questions;
     char* errMsg = nullptr;
 
-    // Execute the query
     if (sqlite3_exec(this->_dataBase, getQuestionsQuery.c_str(), processQuestionsCallback, &questions, &errMsg) != SQLITE_OK)
     {
         std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
         sqlite3_free(errMsg);
-        return std::list<Question>();  // Return an empty list in case of error
+        return std::list<Question>();
     }
 
-    return questions;  // Return the list of questions
+    return questions;
 }
 
 float SqliteDataBase::getPlayerAverageAnswerTime(const std::string& username)
@@ -317,7 +305,7 @@ int SqliteDataBase::getNumOfCorrectAnswers(const std::string& username)
     auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
     {
         *static_cast<int*>(data) = std::stoi(argv[0]);
-        return 0; // Success code
+        return SUCCESS;
     };
 
     char* errMsg = nullptr;
@@ -345,7 +333,7 @@ int SqliteDataBase::getNumOfTotalAnswers(const std::string& username)
     auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
     {
         *static_cast<int*>(data) = std::stoi(argv[0]);
-        return 0; // Success code
+        return SUCCESS;
     };
 
     char* errMsg = nullptr;
@@ -373,7 +361,7 @@ int SqliteDataBase::getNumOfPlayerGames(const std::string& username)
     auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
     {
         *static_cast<int*>(data) = std::stoi(argv[0]);
-        return 0; // Success code
+        return SUCCESS;
     };
 
     char* errMsg = nullptr;
@@ -412,7 +400,6 @@ int SqliteDataBase::getPlayerScore(const std::string& username)
     double safeWrongAnswers = max(1.0, static_cast<double>(wrongAnswers));
     double safeAvgTime = max(1.0, static_cast<double>(avgAnswerTime));
 
-    // Calculate score
     double rawScore = (totalAnswers + gamesPlayed) / (safeWrongAnswers * safeAvgTime);
     int score = static_cast<int>(std::round(rawScore * SCORE_FACTOR_POINTS));
 
@@ -547,18 +534,16 @@ void SqliteDataBase::initializeTriviaDB()
     if (result != SQLITE_OK)
     {
         std::string errorMsg(errMessage);
-        sqlite3_free(errMessage);  // Free the error message memory
+        sqlite3_free(errMessage);
         throw std::runtime_error("Error starting transaction: " + errorMsg + "\n");
     }
 
     try
     {
-        // Trying to create all database tables
         executeQuery(CREATE_USERS);
         executeQuery(CREATE_QUESTIONS);
         executeQuery(CREATE_STATISTICS);
 
-        // Commit the transaction if the query was successful
         const std::string COMMIT_QUERY = "COMMIT;";
         executeQuery(COMMIT_QUERY.c_str());
 
@@ -569,7 +554,6 @@ void SqliteDataBase::initializeTriviaDB()
     {
         const int FAILURE = 1;
 
-        // Rollback if any exception occurs
         std::cout << e.what() << std::endl;
         sqlite3_exec(this->_dataBase, "ROLLBACK;", nullptr, nullptr, nullptr);
         exit(FAILURE); // If we still couldn't create the database we can not run the trivia...
@@ -583,10 +567,9 @@ bool SqliteDataBase::isDataBaseOpen()
 
 void SqliteDataBase::sortHighestScores(std::vector<std::pair<std::string, int>>& playersScores)
 {
-    // Sort players by score in descending order
     std::sort(playersScores.begin(), playersScores.end(), [](const std::pair<std::string, int>& currentPlayer, const std::pair<std::string, int>& otherPlayer)
     {
-        return currentPlayer.second > otherPlayer.second; // Sorting by the score
+        return currentPlayer.second > otherPlayer.second;
     });
 }
 
@@ -606,10 +589,9 @@ int SqliteDataBase::getAmountOfQuestions()
             *static_cast<int*>(data) = std::stoi(argv[0]);  // Set the count of questions
         }
 
-        return SUCCESS; // Success code
+        return SUCCESS;
     };
 
-    // Execute the query to get the number of questions
     if (sqlite3_exec(this->_dataBase, COUNT_QUERY.c_str(), countCallback, &totalQuestions, &errMsg) != SQLITE_OK)
     {
         std::cerr << "[ERROR] SQLite: " << errMsg << std::endl;
@@ -617,7 +599,7 @@ int SqliteDataBase::getAmountOfQuestions()
         return static_cast<int>(DatabaseResult::DATABASE_ERROR);
     }
 
-    return totalQuestions;  // Return the number of questions
+    return totalQuestions;
 }
 
 std::string SqliteDataBase::buildUpdateStatsQuery(const std::string& username, const GameData& data)
@@ -660,13 +642,9 @@ int SqliteDataBase::processScoresCallback(void* data, int argc, char** argv, cha
 
 int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, char** colNames)
 {
-    const int SUCCESS = 0, FAILURE = 1;
-
-    // Checking if there's an answer
     if (argc > 0)
     {
         const int QUESTION_TEXT_INDEX = 1, CORRECT_ANSWER_INDEX = 2, WRONG_ANSWER1_INDEX = 3, WRONG_ANSWER2_INDEX = 4, WRONG_ANSWER3_INDEX = 5;
-        // Extracting all data from database
         std::string questionText = argv[QUESTION_TEXT_INDEX];
         std::string correctAnswer = argv[CORRECT_ANSWER_INDEX];
 
@@ -681,8 +659,7 @@ int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, 
 
         auto correctAnswerIdIt = std::find(possibleAnswers.cbegin(), possibleAnswers.cend(), correctAnswer);
 
-        // If the correct answer is found, calculate its index
-        if (correctAnswerIdIt != possibleAnswers.end())
+        if (correctAnswerIdIt != possibleAnswers.cend())
         {
             int correctAnswerId = static_cast<int>(std::distance(possibleAnswers.cbegin(), correctAnswerIdIt));
 
@@ -709,11 +686,9 @@ void SqliteDataBase::addQuestionsFromOpenTDB()
 
     std::string responseData;
 
-    // Initializing the global libcurl environment
     curl_global_init(CURL_GLOBAL_DEFAULT);
     curl = curl_easy_init();
 
-    // Checking if the CURL handle was created successfully
     if (curl) 
     {
         std::string url = "https://opentdb.com/api.php?amount=10&type=multiple";
@@ -723,7 +698,6 @@ void SqliteDataBase::addQuestionsFromOpenTDB()
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeGETResponse);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &responseData);
 
-        // Sending HTTP Request
         res = curl_easy_perform(curl);
 
         if (res != CURLE_OK)
@@ -731,10 +705,9 @@ void SqliteDataBase::addQuestionsFromOpenTDB()
             std::cerr << "[DATABASE]: ERROR: " << curl_easy_strerror(res) << std::endl;
         }
 
-        curl_easy_cleanup(curl); // Cleanup CURL handle allocated memory
+        curl_easy_cleanup(curl);
     }
 
-    // Cleanup CURL global environment
     curl_global_cleanup();
 
     try
@@ -745,14 +718,12 @@ void SqliteDataBase::addQuestionsFromOpenTDB()
         insertQuestionsIntoDataBase(jsonResponse);
     }
 
-    // Catching JSON Errors
     catch (const nlohmann::json::parse_error& e)
     {
         std::cerr << "[DATABASE]: JSON parse error: " << e.what() << std::endl;
         std::cerr << "Raw response:\n" << responseData << std::endl;
     }
 
-    // Catching Database Errors
     catch (const std::exception& e)
     {
         std::cerr << "[DATABASE]: " << e.what() << std::endl;
@@ -790,7 +761,6 @@ void SqliteDataBase::insertQuestionsIntoDataBase(const nlohmann::json& jsonRespo
             prepareSQLQuery(ans);
         }
 
-        // Building the SQL Insertion query for the current question with the given answers
         std::string currentQuestionQuery = "INSERT INTO QUESTIONS (QUESTION, CORRECT_ANSWER, WRONG_ANSWER1, WRONG_ANSWER2, WRONG_ANSWER3) VALUES ('" +
             question + "', '" + correctAnswer + "', '" +
             incorrectAnswers[0] + "', '" +
