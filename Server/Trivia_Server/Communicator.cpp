@@ -95,7 +95,6 @@ void Communicator::handleNewClient(SOCKET clientSocket)
 
             else if (!info.buffer.empty())
             {
-                std::cout << "Invalid Empty Request" << std::endl;
                 sendErrorResponse(clientSocket, "Error: Invalid type of request.");
             }
         }
@@ -196,8 +195,6 @@ void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& err
 
 void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<unsigned char>& response)
 {
-    std::cout << "Sending back the response to the client" << std::endl;
-
     SocketHelper::sendData(clientSocket, response);
     std::cout << std::endl;
 }
