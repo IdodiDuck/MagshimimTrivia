@@ -1,9 +1,11 @@
 ﻿<Page x:Class="TriviaClient.HighScores"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Top Players" Height="450" Width="800">
-    
-    <Grid Background="#FF1E1E1E">
+      Title="Top Players">
+
+    <Grid Background="#FF1E1E1E"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -11,50 +13,41 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <!-- Title -->
         <TextBlock Text="Best Scores"
                    FontSize="30"
                    Foreground="#FFCCCCCC"
                    FontWeight="Bold"
                    HorizontalAlignment="Center"
                    Margin="0,20,0,20"
-                   Grid.Row="0" Grid.Column="0" />
+                   Grid.Row="0" />
 
-        <!-- Players List -->
-        <ItemsControl ItemsSource="{Binding TopPlayers}"
-                      Grid.Row="1" Grid.Column="0"
-                      HorizontalAlignment="Center"
-                      Margin="0,10">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="0,10">
-                        <!-- Name Box -->
-                        <Border Background="LightGray" 
-                                BorderBrush="DimGray" 
-                                BorderThickness="2" 
-                                CornerRadius="10" 
-                                Padding="10" 
-                                VerticalAlignment="Center">
-                            <TextBlock Text="{Binding}" 
-                                       FontSize="24"
-                                       FontWeight="Bold"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Center"
-                                       Margin="0,0"/>
-                        </Border>
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding TopPlayers}"
+                          HorizontalAlignment="Center"
+                          Margin="0,10">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,10">
+                            <Border Background="LightGray" 
+                                    BorderBrush="DimGray" 
+                                    BorderThickness="2" 
+                                    CornerRadius="10" 
+                                    Padding="10">
+                                <TextBlock Text="{Binding}" 
+                                           FontSize="24"
+                                           FontWeight="Bold"
+                                           HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
-        <!-- Back Button -->
         <Button Content="Back to Menu"
+                Grid.Row="2"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Width="150"
@@ -62,7 +55,6 @@
                 Margin="0,0,20,20"
                 Background="White"
                 Foreground="Black"
-                Grid.Row="2" Grid.Column="0"
                 Click="BackToMenu_Click"/>
     </Grid>
 </Page>
