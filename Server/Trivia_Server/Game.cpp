@@ -46,11 +46,6 @@ void Game::submitAnswer(const std::string& user, const std::string& answer, cons
 {
     std::unique_lock lock(m_updateMutex);
 
-    if (!isUserActive(user))
-    {
-        throw ManagerException("User not found in game");
-    }
-
     GameData& data = m_players.at(user);
     unsigned int index = getCurrentQuestionIndex(data);
 
