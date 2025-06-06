@@ -196,7 +196,6 @@ void Communicator::sendErrorResponse(SOCKET clientSocket, const std::string& err
 void Communicator::sendClientResponse(SOCKET clientSocket, const std::vector<unsigned char>& response)
 {
     SocketHelper::sendData(clientSocket, response);
-    std::cout << std::endl;
 }
 
 void Communicator::stopCommunicating()
