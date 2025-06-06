@@ -37,7 +37,7 @@ Question Game::getQuestionForUser(const std::string& user)
 
     Question& question = m_questions[index];
     data.currentQuestion = question;
-    m_answerTimes[user] = 0.00;
+    m_answerTimes[user] = 0.00; // Resets the answerTime when receiving new valid question request
 
     return question;
 }
@@ -192,13 +192,15 @@ unsigned int Game::getCurrentQuestionIndex(const GameData& data) const
 void Game::updateUserStatistics(GameData& data, const std::string& answer, const double time)
 {
     const std::string& correctAnswer = data.currentQuestion.getCorrectAnswer();
+    const int ONE_ANSWER = 1;
+
     bool isCorrect = (answer == correctAnswer);
 
     isCorrect ? data.correctAnswerCount++ : data.wrongAnswerCount++;
 
     double totalAnswered = static_cast<double>(data.correctAnswerCount + data.wrongAnswerCount);
 
-    if (totalAnswered == 1)
+    if (totalAnswered == ONE_ANSWER)
     {
         data.averageAnswerTime = time;
         return;
