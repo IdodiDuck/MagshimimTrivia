@@ -176,15 +176,8 @@ RequestInfo Communicator::parseClientRequest(const SOCKET clientSocket)
 
 void Communicator::processClientRequest(SOCKET clientSocket, RequestInfo& info)
 {
-    std::cout << "Handling the request, getting its results..." << std::endl;
     RequestResult handlingResult = m_clients[clientSocket]->handleRequest(info);
-
-    std::cout << "Giving the new handler to the client..." << std::endl;
-    std::cout << "Old handler type: " << typeid(*m_clients[clientSocket]).name() << std::endl;
     m_clients[clientSocket] = std::move(handlingResult.newHandler);
-    std::cout << "New handler type: " << typeid(*m_clients[clientSocket]).name() << std::endl;
-
-    std::cout << "Constructing response to be sent..." << std::endl;
     std::vector<unsigned char> buffer = handlingResult.response;
     std::string response = (buffer.empty() ? "" : std::string(buffer.begin(), buffer.end()));
 
