@@ -94,7 +94,7 @@ bool SqliteDataBase::close()
     return true;
 }
 
-int SqliteDataBase::doesUserExist(const std::string& user)
+bool SqliteDataBase::doesUserExist(const std::string& user)
 {
     if (!isDataBaseOpen())
     {
@@ -128,6 +128,39 @@ int SqliteDataBase::doesUserExist(const std::string& user)
     }
 
     return (userExists == static_cast<int>(DatabaseResult::USER_EXISTS)) ? userExists : static_cast<int>(DatabaseResult::USER_NOT_FOUND);
+}
+
+bool SqliteDataBase::doesUserExistInStatistics(const std::string& user)
+{
+    if (!isDataBaseOpen())
+    {
+        std::cerr << "DataBase: [ERROR] Database isn't open!" << std::endl;
+        return static_cast<int>(DatabaseResult::DATABASE_ERROR);
+    }
+
+    std::string SQLQuery = "SELECT USERNAME FROM STATISTICS WHERE USERNAME = '" + user + "';";
+
+    char* errMsg = nullptr;
+    bool userExists = false;
+
+    auto callback = [](void* data, int argc, char** argv, char** colNames) -> int
+        {
+            bool* existsFlag = static_cast<bool*>(data);
+            if (argc > 0 && argv[0] != nullptr)
+            {
+                *existsFlag = true;
+            }
+            return 0;
+        };
+
+    if (sqlite3_exec(this->_dataBase, SQLQuery.c_str(), callback, &userExists, &errMsg) != SQLITE_OK)
+    {
+        std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
+        sqlite3_free(errMsg);
+        return false;
+    }
+
+    return userExists;
 }
 
 int SqliteDataBase::doesPasswordMatch(const std::string& user, const std::string& password)
@@ -432,7 +465,7 @@ int SqliteDataBase::submitGameStatistics(const std::string& username, const Game
     }
 
     char* errMsg = nullptr;
-    bool userExists = doesUserExist(username);
+    bool userExists = doesUserExistInStatistics(username);
 
     const std::string desiredQuery = userExists ? buildUpdateStatsQuery(username, data) : buildInsertStatsQuery(username, data);
 

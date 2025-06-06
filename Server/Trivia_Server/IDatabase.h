@@ -17,7 +17,8 @@ public:
     virtual bool close() = 0;
 
     // User handling - 
-    virtual int doesUserExist(const std::string& user) = 0;
+    virtual bool doesUserExist(const std::string& user) = 0;
+    virtual bool doesUserExistInStatistics(const std::string& user) = 0;
     virtual int doesPasswordMatch(const std::string& user, const std::string& password) = 0;
     virtual int addNewUser(const std::string& user, const std::string& password, const std::string& email) = 0;
 

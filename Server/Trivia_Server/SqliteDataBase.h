@@ -31,7 +31,8 @@ public:
 	bool close() override;
 
 	// User handling - 
-	int doesUserExist(const std::string& user) override;
+	bool doesUserExist(const std::string& user) override;
+	bool doesUserExistInStatistics(const std::string& user) override;
 	int doesPasswordMatch(const std::string& user, const std::string& password) override;
 	int addNewUser(const std::string& user, const std::string& password, const std::string& email) override;
 
