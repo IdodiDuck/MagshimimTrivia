@@ -67,8 +67,8 @@ private:
 	static int processScoresCallback(void* data, int argc, char** argv, char** colNames);
 	static int processQuestionsCallback(void* data, int argc, char** argv, char** colNames);
 
-	// Adding 10 Questions to Database (V2.0.0)
-	void addQuestionsFromOpenTDB();
+	// Adding Questions to Database (V2.0.0)
+	void addQuestionsFromOpenTDB(const int questionsAmount);
 	void insertQuestionsIntoDataBase(const nlohmann::json& jsonResponse);
 	
 	std::string decodeHtmlCharacters(const std::string& input);

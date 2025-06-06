@@ -242,6 +242,14 @@ std::list<Question> SqliteDataBase::getQuestions(const int questionsAmount)
 {
     int totalQuestions = getAmountOfQuestions();
 
+    if (totalQuestions < questionsAmount)
+    {
+        int toFetch = questionsAmount - totalQuestions;
+
+        addQuestionsFromOpenTDB(toFetch);
+        totalQuestions = getAmountOfQuestions();
+    }
+
     int validQuestionsAmount = min(questionsAmount, totalQuestions);
 
     std::string getQuestionsQuery = "SELECT * FROM QUESTIONS ORDER BY RANDOM() LIMIT " + std::to_string(validQuestionsAmount) + ";";
@@ -251,9 +259,9 @@ std::list<Question> SqliteDataBase::getQuestions(const int questionsAmount)
 
     if (sqlite3_exec(this->_dataBase, getQuestionsQuery.c_str(), processQuestionsCallback, &questions, &errMsg) != SQLITE_OK)
     {
-        std::cerr << "DataBase: [ERROR]: " << errMsg << std::endl;
+        std::cerr << "[DATABASE]: [ERROR]: " << errMsg << std::endl;
         sqlite3_free(errMsg);
-        return std::list<Question>();
+        return {};
     }
 
     return questions;
@@ -678,8 +686,8 @@ int SqliteDataBase::processQuestionsCallback(void* data, int argc, char** argv, 
     return SUCCESS;
 }
 
-// Inserting 10 random questions Methods - (V2)
-void SqliteDataBase::addQuestionsFromOpenTDB()
+// Inserting random questions Methods - (V2)
+void SqliteDataBase::addQuestionsFromOpenTDB(const int questionsAmount)
 {
     CURL* curl;
     CURLcode res;
@@ -691,7 +699,7 @@ void SqliteDataBase::addQuestionsFromOpenTDB()
 
     if (curl) 
     {
-        std::string url = "https://opentdb.com/api.php?amount=10&type=multiple";
+        std::string url = "https://opentdb.com/api.php?type=multiple&amount=" + std::to_string(questionsAmount);
 
         // Setting the desired URL, the callback method and the buffer container for the returned response of HTTP Get Request
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
