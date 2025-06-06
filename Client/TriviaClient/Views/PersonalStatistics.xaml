@@ -6,90 +6,161 @@
       mc:Ignorable="d"
       Title="Personal Statistics">
 
-    <Grid Background="#FF1E1E1E">
-        <!-- Main Panel -->
-        <StackPanel HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
-                    Width="636"
-                    Margin="0,28,0,0"
-                    Orientation="Vertical" Height="341">
-            <!-- Headers -->
-            <TextBlock Text="Personal Statistics"
-                       FontSize="24"
-                       Foreground="#FFCCCCCC"
-                       FontWeight="Bold"
-                       TextAlignment="Center"
-                       Margin="0,10,0,20"
-                       HorizontalAlignment="Center"/>
+    <Grid>
 
-            <!-- Statistics Headers & Data -->
-            <Grid Margin="0,15">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="11*"/>
-                    <ColumnDefinition Width="42*"/>
-                </Grid.ColumnDefinitions>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Views/Images/statisticsBackground.jpg" Stretch="UniformToFill" />
+        </Grid.Background>
 
-                <TextBlock Text="Games Played:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="gamesPlayed"  Foreground="#FFCCCCCC" Text="{Binding Path=GamesPlayed, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
-            </Grid>
+        <Grid>
 
-            <Grid Margin="0,15">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <!-- Header bar -->
+            <Border Background="#FFFB8C00" Height="60" VerticalAlignment="Top" >
+                <TextBlock Text="Personal Statistics"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="26"
+                           FontWeight="Bold"
+                           Foreground="White"/>
+            </Border>
 
-                <TextBlock Text="Correct Answers:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="correctAns" Foreground="#FFCCCCCC" Text="{Binding Path=CorrectAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
-            </Grid>
+            <!-- Content Panel -->
+            <Border Background="#FF2A2A2A" CornerRadius="10" 
+                    Padding="30" Width="640" Height="350" 
+                    VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel>
 
-            <Grid Margin="0,15">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <Grid Margin="0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Wrong Answers:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="wrongAns" Foreground="#FFCCCCCC" Text="{Binding Path=WrongAnswers, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
-            </Grid>
+                        <TextBlock Text="Games Played:" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="20" 
+                                   Foreground="#FFFB8C00"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="gamesPlayed" 
+                                   Text="{Binding Path=GamesPlayed, UpdateSourceTrigger=PropertyChanged}" 
+                                   FontSize="20" 
+                                   Foreground="White" 
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"/>
+                    </Grid>
 
-            <Grid Margin="0,15">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                    <Grid Margin="0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Average Answer Time:" Foreground="#FFCCCCCC" FontWeight="SemiBold" FontSize="20" Grid.Column="0"/>
-                <TextBlock x:Name="avgAnsTime" Foreground="#FFCCCCCC" Text="{Binding Path=AverageAnswerTime, UpdateSourceTrigger=PropertyChanged}" FontSize="20" Grid.Column="1" Margin="10,0,0,0"/>
-            </Grid>
+                        <TextBlock Text="Correct Answers:" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="20" 
+                                   Foreground="#FFFB8C00"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="correctAns" 
+                                   Text="{Binding Path=CorrectAnswers, UpdateSourceTrigger=PropertyChanged}" 
+                                   FontSize="20" 
+                                   Foreground="White" 
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"/>
+                    </Grid>
 
-        </StackPanel>
+                    <Grid Margin="0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
 
-        <!-- Buttons -->
-        <Button Content="Back to Menu"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Width="150"
-                Height="40"
-                Margin="0,0,20,20"
-                Background="White" Foreground="Black"
-                Click="BackToMenu_Click"/>
+                        <TextBlock Text="Wrong Answers:" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="20" 
+                                   Foreground="#FFFB8C00"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="wrongAns" 
+                                   Text="{Binding Path=WrongAnswers, UpdateSourceTrigger=PropertyChanged}" 
+                                   FontSize="20" 
+                                   Foreground="White" 
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"/>
+                    </Grid>
 
+                    <Grid Margin="0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Average Answer Time:" 
+                                   FontWeight="SemiBold" 
+                                   FontSize="20" 
+                                   Foreground="#FFFB8C00"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="avgAnsTime" 
+                                   Text="{Binding Path=AverageAnswerTime, UpdateSourceTrigger=PropertyChanged}" 
+                                   FontSize="20" 
+                                   Foreground="White" 
+                                   Grid.Column="1"
+                                   VerticalAlignment="Center"
+                                   Margin="10,0,0,0"/>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+            <!-- Back button -->
+            <Button Content="Back to Menu"
+                    Width="160"
+                    Height="45"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,20,20"
+                    Background="#FFFB8C00"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Cursor="Hand"
+                    Click="BackToMenu_Click">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#FFFB8C00"/>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" 
+                                            CornerRadius="6" 
+                                            BorderThickness="{TemplateBinding BorderThickness}" 
+                                            BorderBrush="{TemplateBinding BorderBrush}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFFCA733"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#FFC07200"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+        </Grid>
     </Grid>
 </Page>

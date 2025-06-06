@@ -30,7 +30,6 @@ namespace TriviaClient
         private readonly Communicator m_communicator;
         private Thread? m_roomStatesThread;
         private bool m_refreshPage;
-        private bool m_isAdmin;
         private string m_username = string.Empty;
 
         private string RoomName { get; set; } = string.Empty;

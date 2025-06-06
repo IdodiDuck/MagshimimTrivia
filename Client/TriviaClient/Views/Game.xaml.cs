@@ -43,8 +43,7 @@ namespace TriviaClient.Views
         {
             InitializeComponent();
 
-            m_username = username;
-
+            this.m_username = username;
             this.m_communicator = communicator;
             this.QuestionAmount = questionsAmount;
             this.TimePerQuestion = timePerQuestions;
@@ -131,7 +130,6 @@ namespace TriviaClient.Views
 
             this.SelectedAnswerId = null;
             ClearButtonHighlights();
-            ResetButtonColors();
 
             StartQuestionTimer((int)(this.TimePerQuestion));
         }
@@ -146,12 +144,7 @@ namespace TriviaClient.Views
                 if (serverResponse?.status == StatusCodes.SUCCESS)
                 {
                     this.QuestionTimer.Stop();
-                    while (NavigationService.CanGoBack)
-                    {
-                        NavigationService.GoBack();
-                    }
-
-                    NavigationService.GoForward();
+                    this.NavigationService.Navigate(new MainMenu(this.m_communicator, this.m_username));
                     return;
                 }
 
@@ -308,6 +301,8 @@ namespace TriviaClient.Views
 
         private void ShowAnswerResult(uint selectedId, uint correctAnswerId)
         {
+            ClearButtonHighlights();
+
             const string SELECTED_BUTTON = "selected", CORRECT_BUTTONS = "correct";
 
             var buttons = new[] { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
@@ -337,16 +332,6 @@ namespace TriviaClient.Views
                         button.BorderThickness = new Thickness(1);
                         break;
                 }
-            }
-        }
-
-        private void ResetButtonColors()
-        {
-            var buttons = new[] { AnswerButton1, AnswerButton2, AnswerButton3, AnswerButton4 };
-
-            foreach (var button in buttons)
-            {
-                button.Background = Brushes.White;
             }
         }
 

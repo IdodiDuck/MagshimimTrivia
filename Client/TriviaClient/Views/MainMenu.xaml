@@ -7,124 +7,77 @@
       mc:Ignorable="d"
       Title="Trivia Game - Main Menu">
 
-    <Grid Background="#FF1E1E1E">
-        <!-- Main layout container -->
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Views/Style/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+
+        <Grid.Background>
+            <ImageBrush ImageSource="/Views/Images/triviaBackground.jpg" Stretch="UniformToFill" />
+        </Grid.Background>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header with welcome message -->
-        <Border Grid.Row="0" Background="#FF2A2A2A" Padding="20">
+        <!-- Top Header with dark orange -->
+        <Border Grid.Row="0" Background="#FFFB8C00" Padding="20">
             <StackPanel Orientation="Horizontal">
                 <TextBlock x:Name="WelcomeText" 
                            Text="Hello, " 
-                           Foreground="#FFCCCCCC"
+                           Foreground="White"
                            FontSize="24"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
-                
                 <TextBlock x:Name="UserNameText"
                            Text="{Binding Path=Username, UpdateSourceTrigger=PropertyChanged}"
-                           Foreground="#FFCCCCCC"
+                           Foreground="White"
                            FontSize="24"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
-        <!-- Main content area with buttons -->
         <Grid Grid.Row="1">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="300">
-                <!-- Create Room Button -->
                 <Button x:Name="CreateRoomBtn"
                         Content="Create Room"
                         Click="CreateRoomBtn_Click"
-                        Margin="0,0,0,20"/>
-
-                <!-- Join Room Button -->
+                        Margin="0,0,0,20"
+                        Style="{StaticResource MenuButtonStyle}"/>
                 <Button x:Name="JoinRoomBtn"
                         Content="Join Room"
                         Click="JoinRoomBtn_Click"
-                        Margin="0,0,0,20"/>
-
-                <!-- Statistics Button -->
+                        Margin="0,0,0,20"
+                        Style="{StaticResource MenuButtonStyle}"/>
                 <Button x:Name="StatisticsBtn"
                         Content="Personal Statistics"
                         Click="StatisticsBtn_Click"
-                        Margin="0,0,0,20"/>
-
-                <!-- Best Scores Button -->
+                        Margin="0,0,0,20"
+                        Style="{StaticResource MenuButtonStyle}"/>
                 <Button x:Name="BestScoresBtn"
-                    Content="Best Scores"
-                    Click="BestScoresBtn_click"
-                    Margin="0,0,0,20"/>
+                        Content="Best Scores"
+                        Click="BestScoresBtn_click"
+                        Margin="0,0,0,20"
+                        Style="{StaticResource MenuButtonStyle}"/>
             </StackPanel>
         </Grid>
 
-        <!-- Footer with sign out button -->
-        <Border Grid.Row="2" Background="#FF2A2A2A" Padding="10">
+        <!-- Bottom Footer with dark orange -->
+        <Border Grid.Row="2" Background="#FFFB8C00" Padding="10">
             <Button x:Name="SignOutBtn"
                     Content="Sign Out"
                     HorizontalAlignment="Right"
                     Width="100"
-                    Click="SignOutBtn_Click"/>
+                    Click="SignOutBtn_Click"
+                    Style="{StaticResource SignOutButtonStyle}"/>
         </Border>
     </Grid>
-
-    <Page.Resources>
-        <!-- Button Styles -->
-        <Style x:Key="MenuButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Foreground" Value="#FF333333"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Height" Value="60"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#FFDDDDDD"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="5"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF007ACC"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="SignOutButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#FF666666"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Foreground" Value="#FF007ACC"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Page.Resources>
 </Page>

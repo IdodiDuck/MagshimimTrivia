@@ -6,12 +6,20 @@
       mc:Ignorable="d"
       Title="Signup">
 
-    <Grid Background="#FF1E1E1E">
+    <Grid>
+        <!-- Background image -->
+        <Image Source="/Views/Images/loginBackground.jpg" Stretch="Fill" Panel.ZIndex="0"
+       HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+        <!-- Semi-transparent overlay to darken background -->
+        <Grid Background="#80000000" Panel.ZIndex="1"/>
+
         <!-- Main content container -->
         <Border CornerRadius="10" 
                 Background="#FF2A2A2A" 
                 Width="350" Height="450"
-                VerticalAlignment="Center" HorizontalAlignment="Center">
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Panel.ZIndex="2">
 
             <StackPanel Margin="20" VerticalAlignment="Center">
                 <!-- Header with logo -->
@@ -83,8 +91,7 @@
                     <TextBlock Text="Login" 
                                Foreground="#FF4DA6FF"
                                Cursor="Hand"
-                               MouseLeftButtonUp="Login_MouseLeftButtonUp">
-                    </TextBlock>
+                               MouseLeftButtonUp="Login_MouseLeftButtonUp"/>
                 </StackPanel>
             </StackPanel>
         </Border>

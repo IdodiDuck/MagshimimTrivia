@@ -9,6 +9,12 @@
       Background="#FF1E1E1E">
 
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Views/Images/triviaBackground.jpg"
+                        Stretch="UniformToFill"
+                        Opacity="0.3"/>
+        </Grid.Background>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -30,7 +36,7 @@
                     Width="400">
 
             <!-- Room Name -->
-            <StackPanel>
+            <StackPanel Margin="0,0,0,10">
                 <TextBlock Text="Room Name" 
                            Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
@@ -38,11 +44,15 @@
                          Height="40"
                          Padding="10"
                          FontSize="16"
-                         TextChanged ="Input_TextChanged"/>
+                         Background="#FF222222"
+                         Foreground="White"
+                         BorderBrush="#FFB36B00"
+                         BorderThickness="1"
+                         TextChanged="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Number of Players -->
-            <StackPanel>
+            <StackPanel Margin="0,0,0,10">
                 <TextBlock Text="Number of Players" 
                            Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
@@ -50,11 +60,15 @@
                          Height="40"
                          Padding="10"
                          FontSize="16"
-                         TextChanged ="Input_TextChanged"/>
+                         Background="#FF222222"
+                         Foreground="White"
+                         BorderBrush="#FFB36B00"
+                         BorderThickness="1"
+                         TextChanged="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Number of Questions -->
-            <StackPanel>
+            <StackPanel Margin="0,0,0,10">
                 <TextBlock Text="Number of Questions" 
                            Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
@@ -62,11 +76,15 @@
                          Height="40"
                          Padding="10"
                          FontSize="16"
-                         TextChanged ="Input_TextChanged"/>
+                         Background="#FF222222"
+                         Foreground="White"
+                         BorderBrush="#FFB36B00"
+                         BorderThickness="1"
+                         TextChanged="Input_TextChanged"/>
             </StackPanel>
 
             <!-- Time Per Question -->
-            <StackPanel>
+            <StackPanel Margin="0,0,0,10">
                 <TextBlock Text="Time Per Question (seconds)" 
                            Foreground="#FFCCCCCC"
                            Margin="0,0,0,5"/>
@@ -74,7 +92,11 @@
                          Height="40"
                          Padding="10"
                          FontSize="16"
-                         TextChanged ="Input_TextChanged"/>
+                         Background="#FF222222"
+                         Foreground="White"
+                         BorderBrush="#FFB36B00"
+                         BorderThickness="1"
+                         TextChanged="Input_TextChanged"/>
 
                 <TextBlock x:Name="ErrorTextBlock"
                            Foreground="Red"
@@ -83,19 +105,20 @@
                            Visibility="Collapsed"
                            TextWrapping="Wrap"/>
             </StackPanel>
-            
+
             <!-- Create Button -->
             <Button x:Name="CreateButton"
                     Content="Create Room"
                     Height="50"
                     FontSize="16"
                     FontWeight="Bold"
-                    Background="#E5E5E5E5"
-                    Foreground="Black"
+                    Background="#FFFB8C00"
+                    Foreground="White"
                     BorderThickness="0"
                     Margin="0,20,0,0"
                     IsEnabled="False"
-                    Click="CreateButton_Click"/>
+                    Click="CreateButton_Click"
+                    Cursor="Hand"/>
         </StackPanel>
 
         <!-- Footer -->
@@ -104,6 +127,10 @@
                     Content="BACK TO MENU"
                     HorizontalAlignment="Left"
                     Width="150"
+                    Background="#FFFB8C00"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Cursor="Hand"
                     Click="BackButton_Click"/>
         </Border>
     </Grid>

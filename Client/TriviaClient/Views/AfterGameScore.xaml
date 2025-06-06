@@ -8,11 +8,17 @@
       d:DesignHeight="450" d:DesignWidth="800"
       Title="AfterGameScore">
 
-    <Grid Background="#FF1E1E1E">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
+        <Grid.Background>
+            <ImageBrush ImageSource="/Views/Images/highScoresBackground.jpg"
+        Stretch="UniformToFill"
+        Opacity="0.25"/>
+        </Grid.Background>
 
         <!-- Header -->
         <Grid Grid.Row="0" Margin="10">
@@ -32,7 +38,9 @@
             <Button Content="Back to Menu" Width="150" Height="40"
                     Click="BackToMenu_Click"
                     HorizontalAlignment="Right" VerticalAlignment="Top"
-                    Grid.Column="1" Margin="0,10,10,0"/>
+                    Grid.Column="1" Margin="0,10,10,0"
+                    Style="{StaticResource MenuButtonStyle}"/>
+
         </Grid>
 
         <!-- Main content -->
@@ -43,45 +51,47 @@
             </Grid.ColumnDefinitions>
 
             <!-- Score Table -->
-            <StackPanel Grid.Column="0" HorizontalAlignment="Stretch">
-                <Grid Background="#EEE" Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="#FFDD7835" CornerRadius="10" Padding="10" Margin="0,0,10,0">
+                <StackPanel HorizontalAlignment="Stretch">
+                    <Grid Background="#EEE" Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Name" Grid.Column="0" FontWeight="Bold" Padding="8,4" />
-                    <TextBlock Text="Correct Answers" Grid.Column="1" FontWeight="Bold" Padding="8,4" />
-                    <TextBlock Text="Avg Time (s)" Grid.Column="2" FontWeight="Bold" Padding="8,4" />
-                </Grid>
+                        <TextBlock Text="Name" Grid.Column="0" FontWeight="Bold" Padding="8,4" />
+                        <TextBlock Text="Correct Answers" Grid.Column="1" FontWeight="Bold" Padding="8,4" />
+                        <TextBlock Text="Avg Time (s)" Grid.Column="2" FontWeight="Bold" Padding="8,4" />
+                    </Grid>
 
-                <ItemsControl Name="ScoreDataGrid" Foreground="White">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border BorderBrush="#CCC" BorderThickness="0,0,0,1">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                    <ItemsControl Name="ScoreDataGrid" Foreground="White">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="#CCC" BorderThickness="0,0,0,1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Name}" Grid.Column="0" Padding="8,4" />
-                                    <TextBlock Text="{Binding CorrectAnswers}" Grid.Column="1" Padding="8,4" />
-                                    <TextBlock Text="{Binding AvgTime}" Grid.Column="2" Padding="8,4" />
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </StackPanel>
+                                        <TextBlock Text="{Binding Name}" Grid.Column="0" Padding="8,4" />
+                                        <TextBlock Text="{Binding CorrectAnswers}" Grid.Column="1" Padding="8,4" />
+                                        <TextBlock Text="{Binding AvgTime}" Grid.Column="2" Padding="8,4" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
 
             <!-- Podium -->
             <StackPanel Grid.Column="1" Margin="40,0,0,0" VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <!-- 2nd Place -->
-                    <StackPanel Width="100" Height="120" Background="Silver" Margin="5" VerticalAlignment="Bottom">
+                    <StackPanel Width="100" Height="120" Background="Silver" Margin="5" VerticalAlignment="Bottom" >
                         <TextBlock Text="2nd Place" FontWeight="Bold" TextAlignment="Center"/>
                         <TextBlock Name="SecondPlaceName" Text="{Binding Path=SecondPlaceName}" TextAlignment="Center"/>
                         <TextBlock Name="SecondPlaceScore" Text="{Binding Path=SecondPlaceScore}" TextAlignment="Center"/>
@@ -89,7 +99,7 @@
                     </StackPanel>
 
                     <!-- 1st Place -->
-                    <StackPanel Width="120" Height="150" Background="Gold" Margin="5" VerticalAlignment="Bottom">
+                    <StackPanel Width="120" Height="150" Background="Gold" Margin="5" VerticalAlignment="Bottom" >
                         <TextBlock Text="1st Place" FontWeight="Bold" FontSize="16" TextAlignment="Center"/>
                         <TextBlock Name="FirstPlaceName" Text="{Binding Path=FirstPlaceName}" TextAlignment="Center"/>
                         <TextBlock Name="FirstPlaceScore" Text="{Binding Path=FirstPlaceScore}" TextAlignment="Center"/>
@@ -97,7 +107,7 @@
                     </StackPanel>
 
                     <!-- 3rd Place -->
-                    <StackPanel Width="100" Height="100" Background="#CD7F32" Margin="5" VerticalAlignment="Bottom">
+                    <StackPanel Width="100" Height="100" Background="#CD7F32" Margin="5" VerticalAlignment="Bottom" >
                         <TextBlock Text="3rd Place" FontWeight="Bold" TextAlignment="Center"/>
                         <TextBlock Name="ThirdPlaceName" Text="{Binding Path=ThirdPlaceName}" TextAlignment="Center"/>
                         <TextBlock Name="ThirdPlaceScore" Text="{Binding Path=ThirdPlaceScore}" TextAlignment="Center"/>

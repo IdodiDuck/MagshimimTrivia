@@ -13,5 +13,8 @@
         Closing="MainWindow_Closing">
 
     <Frame x:Name="MainFrame"
-           NavigationUIVisibility="Hidden"/>
+       NavigationUIVisibility="Hidden"
+       HorizontalAlignment="Stretch"
+       VerticalAlignment="Stretch"/>
+
 </Window>
