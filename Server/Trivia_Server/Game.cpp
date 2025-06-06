@@ -147,6 +147,16 @@ void Game::updateGame()
     {
         case GameState::WAITING_FOR_ANSWER:
         {
+            for (auto& playerPair : m_players)
+            {
+                const std::string& username = playerPair.first;
+
+                if (!didUserAnswer(username))
+                {
+                    submitAnswer(username, "NO_ANSWER", m_answerTimes.find(username)->second);
+                }
+            }
+
             m_state = GameState::WAITING_FOR_NEXT_QUESTION;
             break;
         }
