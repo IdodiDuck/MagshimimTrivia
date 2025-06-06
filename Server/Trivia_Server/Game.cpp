@@ -32,7 +32,7 @@ Question Game::getQuestionForUser(const std::string& user)
 
     if (index >= m_questions.size())
     {
-        throw std::out_of_range("No more questions for this user");
+        throw ManagerException("No more questions for this user");
     }
 
     Question& question = m_questions[index];
@@ -168,17 +168,7 @@ void Game::updateGame()
 
         case GameState::WAITING_FOR_NEXT_QUESTION:
         {
-            bool allPlayersDone = true;
-
-            for (const auto& [user, data] : m_players)
-            {
-                unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
-                if (currentQuestion < m_totalQuestions)
-                {
-                    allPlayersDone = false;
-                    break;
-                }
-            }
+            bool allPlayersDone = didAllPlayersFinish();
 
             this->m_state = allPlayersDone ? GameState::FINISHED : GameState::WAITING_FOR_ANSWER;
             break;
@@ -215,4 +205,18 @@ void Game::updateUserStatistics(GameData& data, const std::string& answer, const
     }
 
     data.averageAnswerTime = ((data.averageAnswerTime * (totalAnswered - 1)) + time) / totalAnswered;
+}
+
+bool Game::didAllPlayersFinish()
+{
+    for (const auto& [user, data] : this->m_players)
+    {
+        unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
+        if (currentQuestion < m_totalQuestions)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

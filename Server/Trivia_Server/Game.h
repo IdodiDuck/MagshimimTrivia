@@ -71,7 +71,7 @@ private:
     bool didUserAnswer(const std::string& user) const;
     unsigned int getCurrentQuestionIndex(const GameData& data) const;
     void updateUserStatistics(GameData& data, const std::string& answer, const double time);
-
+    bool didAllPlayersFinish();
     void updateGame();
 
     friend class GameRequestHandler;
