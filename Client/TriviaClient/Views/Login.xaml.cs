@@ -1,34 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using static TriviaClient.Constants.Responses;
 using TriviaClient.Constants;
-
 using TriviaClient.Infrastructure;
-using System.Net.Sockets;
-using System.Runtime.Serialization;
-using System.Diagnostics;
-using System.IO;
+using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
-    /// <summary>
-    /// Interaction logic for Login.xaml
-    /// </summary>
     public partial class Login : Page
     {
         private readonly Communicator m_communicator;
+        private bool isChangingProgrammatically = false;
 
         public Login(Communicator communicator)
         {
@@ -43,7 +28,7 @@ namespace TriviaClient
                 var loginRequest = new LoginRequest
                 {
                     username = UsernameTextBox.Text,
-                    password = PasswordBox.Password
+                    password = ShowPasswordCheckBox.IsChecked == true ? PasswordTextBox.Text : PasswordBox.Password
                 };
 
                 byte[] serializedRequest = Serializer.SerializeRequest(loginRequest);
@@ -68,7 +53,7 @@ namespace TriviaClient
                 {
                     UsernameTextBox.Clear();
                     PasswordBox.Clear();
-
+                    PasswordTextBox.Clear();
                     this.NavigationService.Navigate(new MainMenu(m_communicator, loginRequest.username));
                 }
 
@@ -101,13 +86,38 @@ namespace TriviaClient
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            if (isChangingProgrammatically) return;
+            isChangingProgrammatically = true;
+            PasswordTextBox.Text = PasswordBox.Password;
+            isChangingProgrammatically = false;
             UpdateLoginButtonState();
+        }
+
+        private void PasswordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (isChangingProgrammatically) return;
+            isChangingProgrammatically = true;
+            PasswordBox.Password = PasswordTextBox.Text;
+            isChangingProgrammatically = false;
+            UpdateLoginButtonState();
+        }
+
+        private void ShowPasswordCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            PasswordTextBox.Visibility = Visibility.Visible;
+            PasswordBox.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowPasswordCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            PasswordBox.Visibility = Visibility.Visible;
+            PasswordTextBox.Visibility = Visibility.Collapsed;
         }
 
         private void UpdateLoginButtonState()
         {
-            LoginButton.IsEnabled = !string.IsNullOrWhiteSpace(UsernameTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(PasswordBox.Password);
+            string password = ShowPasswordCheckBox.IsChecked == true ? PasswordTextBox.Text : PasswordBox.Password;
+            LoginButton.IsEnabled = !string.IsNullOrWhiteSpace(UsernameTextBox.Text) && !string.IsNullOrWhiteSpace(password);
         }
 
         private void SignUp_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

@@ -1,32 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Navigation;
-using static TriviaClient.Constants.Responses;
-using System.Net.Sockets;
-using System.Runtime.Serialization;
 using TriviaClient.Constants;
 using TriviaClient.Infrastructure;
-using System.IO;
+using static TriviaClient.Constants.Responses;
 
 namespace TriviaClient
 {
-    /// <summary>
-    /// Interaction logic for Signup.xaml
-    /// </summary>
     public partial class Signup : Page
     {
         private readonly Communicator m_communicator;
+        private bool isChangingProgrammatically = false;
 
         public Signup(Communicator communicator)
         {
@@ -41,7 +28,7 @@ namespace TriviaClient
                 var signupRequest = new SignupRequest
                 {
                     username = UsernameTextBox.Text,
-                    password = PasswordBox.Password,
+                    password = ShowPasswordCheckBox.IsChecked == true ? PasswordTextBox.Text : PasswordBox.Password,
                     email = EmailTextBox.Text
                 };
 
@@ -102,14 +89,41 @@ namespace TriviaClient
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            if (isChangingProgrammatically) return;
+            isChangingProgrammatically = true;
+            PasswordTextBox.Text = PasswordBox.Password;
+            isChangingProgrammatically = false;
             UpdateSignupButtonState();
+        }
+
+        private void PasswordTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (isChangingProgrammatically) return;
+            isChangingProgrammatically = true;
+            PasswordBox.Password = PasswordTextBox.Text;
+            isChangingProgrammatically = false;
+            UpdateSignupButtonState();
+        }
+
+        private void ShowPasswordCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            PasswordTextBox.Text = PasswordBox.Password;
+            PasswordBox.Visibility = Visibility.Collapsed;
+            PasswordTextBox.Visibility = Visibility.Visible;
+        }
+
+        private void ShowPasswordCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            PasswordBox.Password = PasswordTextBox.Text;
+            PasswordTextBox.Visibility = Visibility.Collapsed;
+            PasswordBox.Visibility = Visibility.Visible;
         }
 
         private void UpdateSignupButtonState()
         {
             SignUpButton.IsEnabled = !string.IsNullOrWhiteSpace(UsernameTextBox.Text) &&
-                                   !string.IsNullOrWhiteSpace(PasswordBox.Password) &&
-                                   !string.IsNullOrWhiteSpace(EmailTextBox.Text);
+                                     !string.IsNullOrWhiteSpace(PasswordBox.Password) &&
+                                     !string.IsNullOrWhiteSpace(EmailTextBox.Text);
         }
 
         private void Login_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
