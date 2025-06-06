@@ -147,16 +147,6 @@ void Game::updateGame()
     {
         case GameState::WAITING_FOR_ANSWER:
         {
-            for (auto& playerPair : m_players)
-            {
-                const std::string& username = playerPair.first;
-
-                if (!didUserAnswer(username))
-                {
-                    submitAnswer(username, "NO_ANSWER", m_answerTimes.find(username)->second);
-                }
-            }
-
             m_state = GameState::WAITING_FOR_NEXT_QUESTION;
             break;
         }
@@ -209,7 +199,7 @@ bool Game::didAllPlayersFinish()
     for (const auto& [user, data] : this->m_players)
     {
         unsigned int currentQuestion = data.correctAnswerCount + data.wrongAnswerCount;
-        if (currentQuestion < m_totalQuestions)
+        if ((currentQuestion < m_totalQuestions) && !data.hasLeft)
         {
             return false;
         }
