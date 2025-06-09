@@ -94,7 +94,7 @@ bool SqliteDataBase::close()
     return true;
 }
 
-bool SqliteDataBase::doesUserExist(const std::string& user)
+int SqliteDataBase::doesUserExist(const std::string& user)
 {
     if (!isDataBaseOpen())
     {
@@ -130,7 +130,7 @@ bool SqliteDataBase::doesUserExist(const std::string& user)
     return (userExists == static_cast<int>(DatabaseResult::USER_EXISTS)) ? userExists : static_cast<int>(DatabaseResult::USER_NOT_FOUND);
 }
 
-bool SqliteDataBase::doesUserExistInStatistics(const std::string& user)
+int SqliteDataBase::doesUserExistInStatistics(const std::string& user)
 {
     if (!isDataBaseOpen())
     {
