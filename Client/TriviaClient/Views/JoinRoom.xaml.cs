@@ -182,7 +182,7 @@ namespace TriviaClient
 
         private void refreshPage()
         {
-            const int THREE_SECONDS = 3000;
+            const int HALF_SECOND = 500;
 
             while (m_refreshPage && m_communicator.IsConnected)
             {
@@ -203,7 +203,7 @@ namespace TriviaClient
                     break;
                 }
 
-                Thread.Sleep(THREE_SECONDS);
+                Thread.Sleep(HALF_SECOND);
             }
 
         }
