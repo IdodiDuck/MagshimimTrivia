@@ -45,14 +45,14 @@ typedef struct GetPlayersInRoomResponse
 
 } GetPlayersInRoomResponse;
 
-typedef struct getHighScoreResponse
+typedef struct GetHighScoreResponse
 {
     unsigned int status;
     std::vector<std::string> statistics;
 
 } getHighScoreResponse;
 
-typedef struct getPersonalStatsResponse
+typedef struct GetPersonalStatsResponse
 {
     unsigned int status;
     std::vector<std::string> statistics;
@@ -155,8 +155,8 @@ public:
     static std::vector<unsigned char> serializeResponse(const GetPlayersInRoomResponse& getPlayersInRoomResponse);
     static std::vector<unsigned char> serializeResponse(const JoinRoomResponse& joinRoomResponse);
     static std::vector<unsigned char> serializeResponse(const CreateRoomResponse& createRoomResponse);
-    static std::vector<unsigned char> serializeResponse(const getHighScoreResponse& getHighScoreResponse);
-    static std::vector<unsigned char> serializeResponse(const getPersonalStatsResponse& getPersonalStatsResponse);
+    static std::vector<unsigned char> serializeResponse(const GetHighScoreResponse& getHighScoreResponse);
+    static std::vector<unsigned char> serializeResponse(const GetPersonalStatsResponse& getPersonalStatsResponse);
 
     // V3.0.0 Serializations - 
     static std::vector<unsigned char> serializeResponse(const CloseRoomResponse& closeRoomResponse);
@@ -172,6 +172,6 @@ public:
 
 private:
     // Support Methods - 
-    static void insertLengthAsBytes(std::vector<unsigned char>& buffer, const int dataLength);
+    static void insertLengthAsBytes(std::vector<unsigned char>& buffer, const uint32_t  dataLength);
     static std::vector<unsigned char> buildResponse(const ResponseCode code, const std::string& jsonString);
 };

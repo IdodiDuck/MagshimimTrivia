@@ -77,7 +77,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     return buildResponse(ResponseCode::CREATE_ROOM_RESPONSE, jsonString);
 }
 
-std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const getHighScoreResponse& getHighScoreResponse) 
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetHighScoreResponse& getHighScoreResponse) 
 {
     nlohmann::json jsonResponse = {{"status", getHighScoreResponse.status}, {"statistics", getHighScoreResponse.statistics}};
 
@@ -85,7 +85,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     return buildResponse(ResponseCode::GET_HIGH_SCORE_RESPONSE, jsonString);
 }
 
-std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const getPersonalStatsResponse& getPersonalStatsResponse) 
+std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const GetPersonalStatsResponse& getPersonalStatsResponse) 
 {
     nlohmann::json jsonResponse = {{"status", getPersonalStatsResponse.status}, {"statistics", getPersonalStatsResponse.statistics}};
 
@@ -178,7 +178,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::serializeResponse(const
     return buildResponse(ResponseCode::LEAVE_GAME_RESPONSE, jsonString);
 }
 
-void JsonResponsePacketSerializer::insertLengthAsBytes(std::vector<unsigned char>& buffer, const int dataLength)
+void JsonResponsePacketSerializer::insertLengthAsBytes(std::vector<unsigned char>& buffer, const uint32_t dataLength)
 {
     const int SHIFT_BYTE_3 = 24;
     const int SHIFT_BYTE_2 = 16;
@@ -198,7 +198,7 @@ std::vector<unsigned char> JsonResponsePacketSerializer::buildResponse(const Res
     buffer.push_back(static_cast<unsigned char>(code));
 
     // Adding message length using Big Endian
-    insertLengthAsBytes(buffer, jsonString.size());
+    insertLengthAsBytes(buffer, static_cast<uint32_t>(jsonString.size()));
 
     buffer.insert(buffer.end(), jsonString.begin(), jsonString.end());
 
