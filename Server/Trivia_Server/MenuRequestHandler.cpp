@@ -9,7 +9,6 @@
 #include "ManagerException.h"
 
 std::atomic<unsigned int> MenuRequestHandler::m_currentRoomId(1);
-std::mutex MenuRequestHandler::m_roomIdMutex;
 
 MenuRequestHandler::MenuRequestHandler(std::weak_ptr<RequestHandlerFactory> handlerFactory, const LoggedUser& user): m_user(user), m_handlerFactory(handlerFactory)
 {
@@ -234,6 +233,5 @@ std::shared_ptr<RequestHandlerFactory> MenuRequestHandler::getFactorySafely()
 
 unsigned int MenuRequestHandler::generateNewRoomId()
 {
-    std::lock_guard<std::mutex> lock(m_roomIdMutex);
     return m_currentRoomId.fetch_add(1, std::memory_order_relaxed);
 }

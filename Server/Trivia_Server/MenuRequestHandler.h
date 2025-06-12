@@ -27,7 +27,6 @@ private:
 
 	// Statics - 
 	static std::atomic<unsigned int> m_currentRoomId;
-	static std::mutex m_roomIdMutex;
 
 	// Room Operation Methods - 
 	RequestResult signout(const RequestInfo& info);
