@@ -1,10 +1,11 @@
 #include "LoginManager.h"
-#include "SqliteDataBase.h"
 
 #include <algorithm>
 #include <iostream>
+#include <regex>
 
-#include "ServerException.h"
+#include "SqliteDataBase.h"
+#include "ManagerException.h"
 
 LoginManager::LoginManager(std::weak_ptr<IDatabase> dataBase): m_dataBase(dataBase), m_isDbValid(false)
 {
@@ -38,6 +39,10 @@ SignUpStatus LoginManager::signUp(const std::string& username, const std::string
         std::cerr << "LoginManager: [ERROR] Cannot sign up. Database not available.\n";
         return SignUpStatus::SIGNUP_ERROR;
     }
+
+    // Exceptions will be thrown with informative message back to client about fields which don't handle regex requirements
+    validateEmail(email);
+    validatePassword(password);
 
     if (auto dataBase = m_dataBase.lock())
     {
@@ -108,4 +113,24 @@ bool LoginManager::isUserAlreadyLogged(const std::string& username)
 
     return std::any_of(this->m_loggedUsers.begin(), this->m_loggedUsers.end(),
         [&](const LoggedUser& user) { return user.getUserName() == username; });
+}
+
+void LoginManager::validatePassword(const std::string& password)
+{
+    const std::regex password_regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\\*\\&\\^\\%\\$\\#\\@\\!]).{8,}$");
+
+    if (!std::regex_match(password, password_regex))
+    {
+        throw ManagerException("Password does not meet requirements.");
+    }
+}
+
+void LoginManager::validateEmail(const std::string& email)
+{
+    const std::regex email_regex("^[a-zA-Z0-9]+@[a-zA-Z0-9]+(\\.[a-zA-Z]{2,})+$");
+
+    if (!std::regex_match(email, email_regex))
+    {
+        throw ManagerException("Invalid email format.");
+    }
 }

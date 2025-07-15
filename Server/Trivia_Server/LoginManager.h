@@ -45,6 +45,8 @@ private:
 
     // Support Methods - 
     bool isUserAlreadyLogged(const std::string& username);
+    void validatePassword(const std::string& password);
+    void validateEmail(const std::string& email);
 
 };
 
