@@ -51,6 +51,4 @@ Link: https://youtu.be/7HWdv_c9lRQ
 
 ## 📌 Credits
 Made by Ido Redid & Tom Torem
-- Graphics / Contribution: `A47_22`
 
-https://youtu.be/7HWdv_c9lRQ
